@@ -7,8 +7,7 @@ using namespace Eigen;
 
 const int nPulse = 4;
 const double maxTime = 1;
-const int nTimeStep = 1000; // Number of time steps in mesh.
-const int nZero = 2000;
+const int nTimeStep = 500; // Number of time steps in mesh.
 //typedef Matrix<Pulse, nPulse, 1> Sequence;
 
 class Pulse {

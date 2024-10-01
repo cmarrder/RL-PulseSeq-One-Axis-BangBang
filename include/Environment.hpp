@@ -7,7 +7,7 @@
 
 const double SMALL = 1e-8;
 
-constexpr size_t maxSteps = 10;
+constexpr size_t maxSteps = 20;
 
 class Environment {
 

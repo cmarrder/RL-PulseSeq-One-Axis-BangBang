@@ -9,6 +9,11 @@ def UDD(Npulse, maxTime):
     deltas = np.sin(np.pi * pulse_indices / (2 * Npulse + 2))**2
     return deltas * maxTime
 
+def PDD(Npulse, maxTime):
+    pulse_indices = np.arange(1, Npulse + 1) # size Npulse. Final value is Npulse
+    deltas = pulse_indices / (Npulse + 1) 
+    return deltas * maxTime
+
 def CPMG(Npulse, maxTime):
     pulse_indices = np.arange(1, Npulse + 1) # size Npulse. Final value is Npulse
     deltas = (2 * pulse_indices - 1) / (2 * Npulse) 

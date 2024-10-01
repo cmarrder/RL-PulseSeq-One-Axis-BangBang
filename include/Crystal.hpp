@@ -11,7 +11,7 @@
 #include "Param.hpp"
 
 constexpr std::complex<double> I(0.0, 1.0);
-constexpr double cutoffEps = 1e-8;
+constexpr double cutoffEps = 1e-21;
 
 using namespace Eigen;
 
@@ -21,6 +21,12 @@ VectorXd heaviside(const VectorXd& x)
 {
   return (x.array() < 0).select(VectorXd::Zero(x.size()), 
     VectorXd::Ones(x.size()));
+}
+
+VectorXd reciprocal(const VectorXd& x)
+{
+  VectorXd zeroRemoved = (x.array().abs() < 1e-12).select(VectorXd::Constant(x.size(), 1e12), x);
+  return 1 / zeroRemoved.array();
 }
 
 class Crystal {
@@ -68,7 +74,7 @@ class Crystal {
     {
       std::cout << "Error: Noise cutoff larger than max frequency!";
     }
-    somega = (heaviside(freq.array() - 0.0) - heaviside(freq.array() - bandMin)) + (heaviside(freq.array() - bandMax) - heaviside(freq.array() - freq(nFreq - 1)));
+    somega = reciprocal(freq).array() * (heaviside(freq.array() - 0.0) - heaviside(freq.array() - bandMin) + heaviside(freq.array() - bandMax) - heaviside(freq.array() - freq(nFreq - 1))).array();
 
     return somega; 
   }
@@ -180,7 +186,7 @@ class Crystal {
   {
     noiseParam1 = param.noiseParam1;
     noiseParam2 = param.noiseParam2;
-    int nZero = 8192 - (nTimeStep + 1);//8 * (nTimeStep + 1); // Number of zeros for padding.
+    int nZero = 32768 - (nTimeStep + 1);//8 * (nTimeStep + 1); // Number of zeros for padding.
     nTimePts = (nTimeStep + 1) + nZero; // Make a power of 2 to make FFT faster
     dTime = maxTime / nTimeStep;
 
