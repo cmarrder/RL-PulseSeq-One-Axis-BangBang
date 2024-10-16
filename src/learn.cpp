@@ -19,7 +19,9 @@ int main()
   Environment environment(param);
   //Environment environment;
   Agent<Feature, numAction> agent;
-  //  agent.load("param");
+  
+  //agent.load("/home/charlie/Documents/ml/CollectiveAction/data/model");
+  
   std::vector<int> actionRecord;
   std::vector<double> rewardHistory;
   std::vector<double> lossHistory;
@@ -68,7 +70,7 @@ int main()
     }
 
   }
-  //agent.save("param");
+  //agent.save("/home/charlie/Documents/ml/CollectiveAction/data/model");
 
   
   // Apply optimal action sequence and write it to file. Print if verbose.

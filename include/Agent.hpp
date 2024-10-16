@@ -15,9 +15,9 @@ class Agent {
 
   static constexpr double learningRate = 0.001;
   static constexpr double gamma = 0.95;
-  static constexpr int numHidden = 8;
+  static constexpr int numHidden = 64;
   static constexpr int minSampleSize = 20;
-  static constexpr double tau = 0.8;
+  static constexpr double tau = 0.9;//0.8375;//0.8;
 
   Network dqn;
   Network target;

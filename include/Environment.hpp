@@ -6,6 +6,7 @@
 #include "Action.hpp"
 
 const double SMALL = 1e-8;
+const double rewardScale = 0.1;
 
 constexpr size_t maxSteps = 20;
 
@@ -45,7 +46,7 @@ public:
   {
    if (done()) {
       double chi = crystal.chi();
-      return (fabs(chi) < SMALL ? 1 / SMALL : 1 / chi);
+      return rewardScale * (fabs(chi) < SMALL ? 1 / SMALL : 1 / chi);
     } else
       return 0;
   }

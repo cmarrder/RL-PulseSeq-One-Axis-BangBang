@@ -12,22 +12,22 @@ mkdir -p $pathname/$dirname
 
 
 ########## Make array of values using Tmin and Tmax
-#readarray -t values < $pathname/'tvals.txt'
+readarray -t values < $pathname/'tvals.txt'
 
 # Initialize built-in SECONDS variable so we can time the duration of this program.
 SECONDS=0
 
 # Set number of independent learning runs to do.
-nRun=2
+#nRun=2
 
 # Iterate over indices
-#for k in ${!values[@]}; do
-for k in $(seq 0 $((nRun-1))); do
+for k in ${!values[@]}; do
+#for k in $(seq 0 $((nRun-1))); do
     (
         echo "starting task $k"
 
 	# Create a name for the output directory which will store this run's data.
-	# The name for the 99th run will look like test_00099
+	# The name for the 99th run will look like test_00098
 	printf -v name "$pathname/$dirname/job_%05d" $k
 	mkdir -p $name
 
@@ -38,7 +38,7 @@ for k in $(seq 0 $((nRun-1))); do
 	sed -i "s:oDir .*:oDir $name:g" $pathname/$paramname
 	
         # Run learning code using the param file copy we just modified.
-	$pathname/build/learn $name/$paramname
+	$pathname/build/learn
     )
 
 done

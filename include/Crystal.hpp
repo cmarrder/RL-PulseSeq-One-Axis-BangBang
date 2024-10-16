@@ -11,7 +11,7 @@
 #include "Param.hpp"
 
 constexpr std::complex<double> I(0.0, 1.0);
-constexpr double cutoffEps = 1e-21;
+constexpr double cutoffEps = 1e-12;
 
 using namespace Eigen;
 
@@ -52,20 +52,25 @@ class Crystal {
   VectorXd computeSOmega() const
   {
     VectorXd somega = VectorXd::Zero(nFreq);
-    
+   
+     
     //// FERMI-DIRAC:
-    //VectorXd ONE = VectorXd::Ones(nFreq);
-    //VectorXd v = (freq - noiseParam1 * ONE) / noiseParam2;
-    //somega = ONE.array() / (v.array().exp() + ONE.array());
+    VectorXd ONE = VectorXd::Ones(nFreq);
+    VectorXd v = (freq - noiseParam1 * ONE) / noiseParam2;
+    somega = ONE.array() / (v.array().exp() + ONE.array());
+    
 
+    /*
     //// SUM OF LORENTZIANS:
-    //VectorXd centers = peakLocCPMG(); // Place Lorentzian at each peak of CPMG Filter function
-    //int nPeaks = centers.size(); 
-    //VectorXd fwhms = VectorXd::Ones(nPeaks).array() / 2;
-    //VectorXd heights = pow(centers.array(), -2);
-    ////// Divide output by number of elements in centers to normalize.
-    //somega = lorentzians(freq, centers, fwhms, heights);
-  
+    VectorXd centers = peakLocCPMG(); // Place Lorentzian at each peak of CPMG Filter function
+    int nPeaks = centers.size(); 
+    VectorXd fwhms = VectorXd::Ones(nPeaks).array() / 2;
+    VectorXd heights = pow(centers.array(), -2);
+    //// Divide output by number of elements in centers to normalize.
+    somega = lorentzians(freq, centers, fwhms, heights);
+    */
+   
+    /* 
     //// STEP FUNCTION:
     double cpmgPeakFreq = nPulse / (2 * maxTime); // The first peak frequency of the CPMG filter function
     double bandMin = noiseParam1 * cpmgPeakFreq;
@@ -75,6 +80,7 @@ class Crystal {
       std::cout << "Error: Noise cutoff larger than max frequency!";
     }
     somega = reciprocal(freq).array() * (heaviside(freq.array() - 0.0) - heaviside(freq.array() - bandMin) + heaviside(freq.array() - bandMax) - heaviside(freq.array() - freq(nFreq - 1))).array();
+    */
 
     return somega; 
   }

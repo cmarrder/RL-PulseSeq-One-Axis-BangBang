@@ -4,11 +4,11 @@
 #include <cmath>
 #include "Sequence.hpp"
 
-constexpr double actionInterval = 2 * M_PI * 2;
+constexpr double actionInterval = 4 * M_PI;
 constexpr size_t numAction = 7;
-constexpr double eta1 = 0.5;
-constexpr double eta2 = 0.25;
-constexpr double eta4 = 0.125;
+constexpr double eta1 = 0.2;
+constexpr double eta2 = 0.1;
+constexpr double eta4 = 0.05;
 
 // Make typedef named CollectiveTransform which is a function that takes as argument Sequence and returns void.
 typedef VectorXd (*CollectiveTransform)(const VectorXd&);

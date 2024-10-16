@@ -127,8 +127,12 @@ def plot_job(max_time,
     noiseLinestyle = 'dashdot'
     noiseLabel = r'$S(\nu)$'
 
-    lwps = 2 # Linewidth for pulse sequence plots
-    maxIdx = int(0.5 * len(noise))
+    lwps = 3 # Linewidth for pulse sequence plots
+    # Find max index for plotting
+    for i in range(len(noise)-1, -1, -1):
+        if (noise[i] / freq[i] < 1e-12):
+            cutoffIdx = i
+    #cutoffIdx = int(0.5 * len(noise))
     
     if title is not None:
         fig.suptitle(title)
@@ -140,63 +144,57 @@ def plot_job(max_time,
     axd['A'].vlines(pulse_timings[1], 0, 1, color=UDDColor, linestyle=UDDLinestyle, linewidth = lwps)
     axd['A'].yaxis.set_major_locator(ticker.NullLocator()) # Remove y axis labels/ticks
     axd['A'].tick_params(labelbottom=False) # Remove x axis labels
-   
+    axd['A'].grid(axis = 'x')
+
     axd['B'].set_title('Agent ($N_{{time step}} = {0}, N_{{pulse}} = {1}$)'.format(int(Nts), int(Npa)))
     axd['B'].sharex(axd['C'])
     axd['B'].vlines(pulse_timings[0], 0, 1, color=agentColor, linewidth = lwps)
     axd['B'].yaxis.set_major_locator(ticker.NullLocator()) # Remove y axis labels/ticks
     axd['B'].tick_params(labelbottom=False) # Remove x axis labels
+    axd['B'].grid(axis = 'x')
    
     axd['C'].set_title('CPMG ($N_{{pulse}} = {}$)'.format(int(Npa)))
     axd['C'].set_xlabel('Time')
     axd['C'].set_xlim(0, max_time)
     axd['C'].vlines(pulse_timings[2], 0, 1, color=CPMGColor, linestyle=CPMGLinestyle, linewidth=lwps)
     axd['C'].yaxis.set_major_locator(ticker.NullLocator()) # Remove y axis labels/ticks
+    axd['C'].grid(axis = 'x')
 
     # Plot filter functions and noise PSD
    
-    #axd['D'].sharex(axd['F'])
     axd['D'].set_ylabel(r'$F(\nu)$')
     axUDDNoise = axd['D'].twinx()
     axUDDNoise.set_ylabel(noiseLabel)
-    filterPlotUDD = axd['D'].plot(freq[:maxIdx], filters[1][:maxIdx], color=UDDColor, linestyle=UDDLinestyle, label = r'$F(\nu)_{UDD}$')
-    #axd['D'].plot(freq, noise, color=noiseColor, linestyle=noiseLinestyle, label = r'$|S(\nu)|^2$')
-    noisePlotUDD = axUDDNoise.plot(freq[:maxIdx], noise[:maxIdx], color=noiseColor, linestyle=noiseLinestyle, label = r'$S(\nu)$')
+    filterPlotUDD = axd['D'].plot(freq[:cutoffIdx], filters[1][:cutoffIdx], color=UDDColor, linestyle=UDDLinestyle, label = r'$F(\nu)_{UDD}$')
+    noisePlotUDD = axUDDNoise.plot(freq[:cutoffIdx], noise[:cutoffIdx], color=noiseColor, linestyle=noiseLinestyle, label = r'$S(\nu)$')
     linesUDD = filterPlotUDD + noisePlotUDD
     labelsUDD = [l.get_label() for l in linesUDD]
     axd['D'].tick_params(labelbottom=False) # Remove x axis labels
-    #axUDDNoise.set_ylim(top = maxNoise + 0.1)
-    #axUDDNoise.relim()
     axd['D'].set_title(UDDLabel)
     axd['D'].legend(linesUDD, labelsUDD)
 
 
-    #axd['E'].sharex(axd['F'])
     axd['E'].set_ylabel(r'$F(\nu)$')
     axAgentNoise = axd['E'].twinx()
     axAgentNoise.set_ylabel(noiseLabel)
-    filterPlotAgent = axd['E'].plot(freq[:maxIdx], filters[0][:maxIdx], color=agentColor, linestyle=agentLinestyle, label = r'$F(\nu)_{Agent}$')
-    noisePlotAgent = axAgentNoise.plot(freq[:maxIdx], noise[:maxIdx], color=noiseColor, linestyle=noiseLinestyle, label = r'$S(\nu)$')
+    filterPlotAgent = axd['E'].plot(freq[:cutoffIdx], filters[0][:cutoffIdx], color=agentColor, linestyle=agentLinestyle, label = r'$F(\nu)_{Agent}$')
+    noisePlotAgent = axAgentNoise.plot(freq[:cutoffIdx], noise[:cutoffIdx], color=noiseColor, linestyle=noiseLinestyle, label = r'$S(\nu)$')
     linesAgent = filterPlotAgent + noisePlotAgent
     labelsAgent = [l.get_label() for l in linesAgent]
     axd['E'].tick_params(labelbottom=False) # Remove x axis labels
     axd['E'].set_title(agentLabel)
     axd['E'].legend(linesAgent, labelsAgent)
-    # ONLY NEED THIS FOR FERMI-DIRAC
-    #axd['E'].set_title('$\mu = {0}, T = {1}$'.format(chem_pot, temp))
 
     axd['F'].set_ylabel(r'$F(\nu)$')
     axCPMGNoise = axd['F'].twinx()
     axCPMGNoise.set_ylabel(noiseLabel)
-    filterPlotCPMG = axd['F'].plot(freq[:maxIdx], filters[2][:maxIdx], color=CPMGColor, linestyle=CPMGLinestyle, label = r'$F(\nu)_{CPMG}$')
-    noisePlotCPMG = axCPMGNoise.plot(freq[:maxIdx], noise[:maxIdx], color=noiseColor, linestyle=noiseLinestyle, label = r'$S(\nu)$')
+    filterPlotCPMG = axd['F'].plot(freq[:cutoffIdx], filters[2][:cutoffIdx], color=CPMGColor, linestyle=CPMGLinestyle, label = r'$F(\nu)_{CPMG}$')
+    noisePlotCPMG = axCPMGNoise.plot(freq[:cutoffIdx], noise[:cutoffIdx], color=noiseColor, linestyle=noiseLinestyle, label = r'$S(\nu)$')
     linesCPMG = filterPlotCPMG + noisePlotCPMG
     labelsCPMG = [l.get_label() for l in linesCPMG]
     axd['F'].set_title(CPMGLabel)
     axd['F'].set_xlabel(r'$\nu$ [1/time]')
     axd['F'].legend(linesCPMG, labelsCPMG)
-    # ONLY NEED THIS FOR FERMI-DIRAC
-    #axd['E'].set_title('$\mu = {0}, T = {1}$'.format(chem_pot, temp))
 
     # Plot reward and loss over trials
     
@@ -221,7 +219,7 @@ def plot_job(max_time,
     #fig.tight_layout()
     if show:
         plt.show()
-    elif save:
+    elif save is not None:
         plt.savefig(save)
         plt.close()
 
@@ -238,6 +236,11 @@ def temperature_sweep(data_dir, plot_dir, subdir_prefix='job', show = True):
     RETURNS:
     None
     """
+
+    # Check if plot directory exists
+    if os.path.exists(plot_dir) == False:
+        raise ValueError("Path " + plot_dir + " does not exist.")
+
     # List will store temperature values
     temperatures = []
 
@@ -357,7 +360,11 @@ def temperature_sweep(data_dir, plot_dir, subdir_prefix='job', show = True):
     noiseColor = '#4DAF4A'# Fruit Salad, green
     noiseLinestyle = 'dashdot'
     noiseLabel = r'$|S(\nu)|^2$'
-    
+
+    # Find max index for plotting
+    for i in range(len(S_temp_max)-1, -1, -1):
+        if (S_temp_max[i] / freq[i] < 1e-12):
+            cutoffIdx = i
     
     # Plot overlaps. Use scatter since temperatures might be out of order due to file reading.
     axd['A'].scatter(temperatures, max_chi, color = agentColor, label = agentLabel)
@@ -382,8 +389,8 @@ def temperature_sweep(data_dir, plot_dir, subdir_prefix='job', show = True):
     axd['C'].set_title('$\mu =$ {:.3e}'.format(chemPotential))
     axd['C'].set_ylabel(r'$|S(\nu)|^2$')
     axd['C'].set_xlabel(r'$\nu$ in Hz')
-    axd['C'].plot(freq, S_temp_min, label = '$T_{{min}}$ = {:.3e}'.format(temp_min), color = noiseColor)
-    axd['C'].plot(freq, S_temp_max, label = '$T_{{max}}$ = {:.3e}'.format(temp_max), color = noiseColor)
+    axd['C'].plot(freq[:cutoffIdx], S_temp_min[:cutoffIdx], label = '$T_{{min}}$ = {:.3e}'.format(temp_min), color = noiseColor, linestyle = 'dashed')
+    axd['C'].plot(freq[:cutoffIdx], S_temp_max[:cutoffIdx], label = '$T_{{max}}$ = {:.3e}'.format(temp_max), color = noiseColor)
     axd['C'].legend()
 
     # Plot the UDD and CPMG filter functions
@@ -391,8 +398,8 @@ def temperature_sweep(data_dir, plot_dir, subdir_prefix='job', show = True):
     CPMGFilter = filters[2]
     axd['D'].set_ylabel(r'$F(\nu)$')
     axd['D'].set_xlabel(r'$\nu$ in Hz')
-    axd['D'].plot(freq, UDDFilter, color = UDDColor, label = UDDLabel)
-    axd['D'].plot(freq, CPMGFilter, color = CPMGColor, label = CPMGLabel)
+    axd['D'].plot(freq[:cutoffIdx], UDDFilter[:cutoffIdx], color = UDDColor, label = UDDLabel)
+    axd['D'].plot(freq[:cutoffIdx], CPMGFilter[:cutoffIdx], color = CPMGColor, label = CPMGLabel)
     axd['D'].legend()
     
     plt.savefig(os.path.join(plot_dir, 'temperature.png'))
@@ -405,17 +412,15 @@ def temperature_sweep(data_dir, plot_dir, subdir_prefix='job', show = True):
 
 
 if __name__=='__main__':
-    
+    """ 
     # Load data
-
-    oDir = '/home/charlie/Documents/ml/CollectiveAction/data/job_00001'
-
+    oDir = '/home/charlie/Documents/ml/CollectiveAction/data/job_00000'
 
     nPulse = int( np.loadtxt(os.path.join(oDir, 'nPulse.txt')) ) # Number of pulse applications
     nTimeStep = int( np.loadtxt(os.path.join(oDir, 'nTimeStep.txt')) )# Number of pulse chances/locations
     tMax = np.loadtxt(os.path.join(oDir, 'maxTime.txt'))
-    chemPotential = np.loadtxt(os.path.join(oDir, 'noiseParam1.txt'))
-    temperature = np.loadtxt(os.path.join(oDir, 'noiseParam2.txt'))
+    noiseParam1 = np.loadtxt(os.path.join(oDir, 'noiseParam1.txt'))
+    noiseParam2 = np.loadtxt(os.path.join(oDir, 'noiseParam2.txt'))
 
     freq = np.loadtxt(os.path.join(oDir, 'freq.txt'))
     sOmega = np.loadtxt(os.path.join(oDir, 'sOmega.txt'))
@@ -427,25 +432,18 @@ if __name__=='__main__':
     print('finalState')
     print(finalState)
 
-    save = False # 'tplot.png'
+    save = True # 'tplot.png'
     show = True
-    #one_temp_one_agent(tMax,
-    #                   chemPotential,
-    #                   temperature,
-    #                   freq,
-    #                   sOmega,
-    #                   finalState,
-    #                   agentFilter,
-    #                   reward,
-    #                   loss,
-    #                   save=save,
-    #                   show=show)
    
     pulse_timings, filters, overlaps, rewards = crunch_job(tMax,
                                                           freq,
                                                           sOmega,
                                                           finalState,
                                                           reward)
+
+    #job_title = '$\mu = {0}, T = {1}$'.format(noiseParam1, noiseParam2)
+    job_title = '$leftBand = {0}*cpmgPeak, rightBand = {1}*cpmgPeak$'.format(noiseParam1, noiseParam2)
+
     plot_job(tMax,
              freq,
              sOmega,
@@ -456,8 +454,10 @@ if __name__=='__main__':
              overlaps,
              rewards,
              loss,
-             save = None, show = True, title = '$\mu = {0}, T = {1}$'.format(chemPotential, temperature))
+             save = None, show = True, title = job_title)
 
-    #dd = '/home/charlie/Documents/ml/Filter/temp_scan_data'
-    #pd = '/home/charlie/Documents/ml/Filter/temp_scan_plots'
-    #temperature_sweep(dd, pd, show=False)
+    """
+    dd = '/home/charlie/Documents/ml/CollectiveAction/data_FD1_noboot'
+    pd = '/home/charlie/Documents/ml/CollectiveAction/plots_FD1_noboot'
+    temperature_sweep(dd, pd, show=False)
+    
