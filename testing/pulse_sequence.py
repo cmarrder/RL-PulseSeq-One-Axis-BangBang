@@ -290,8 +290,20 @@ def chi_avg(freqs, noise, maxTime, nPulseChances, weights=None):
 
 def RewardFunc(chi_array):
     small = 1e-8
-    rewardScale = 0.1
-    return rewardScale * np.where(chi_array < small, 1 / small, 1 / chi_array)
+    rewardScale = 1#0.1
+    #rewardExponent = -10
+    #return rewardScale * np.where(chi_array < small, small**(rewardExponent), chi_array**(rewardExponent))
+    rewards = np.zeros_like(chi_array)
+    for i, x in np.ndenumerate(chi_array):
+        if x < 0:
+            rewards[i] = 1 / small
+        elif x < small:
+            rewards[i] = 1 / small
+        else:
+            rewards[i] = 1 / x
+    #rewards = np.where(chi_array < 0, small, chi_array)
+    #rewards = np.where(rewards < small, 1 / small, 1 / rewards)
+    return rewardScale * rewards 
 
 def calc_sign_seq(pulse_seq, Nb=1):
     """ Given a pulse sequence of zeros and ones, calculates the

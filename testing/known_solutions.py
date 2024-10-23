@@ -12,11 +12,11 @@ oDir = '/home/charlie/Documents/ml/CollectiveAction/data/job_00000'
 nPulse = int( np.loadtxt(os.path.join(oDir, 'nPulse.txt')) ) # Number of pulse applications
 #nTimeStep = int( np.loadtxt(os.path.join(oDir, 'nTimeStep.txt')) )# Number of pulse chances/locations
 tMax = np.loadtxt(os.path.join(oDir, 'maxTime.txt'))
-#chemPotential = np.loadtxt(os.path.join(oDir, 'noiseParam1.txt'))
-#temperature = np.loadtxt(os.path.join(oDir, 'noiseParam2.txt'))
+param1 = np.loadtxt(os.path.join(oDir, 'noiseParam1.txt'))
+param2 = np.loadtxt(os.path.join(oDir, 'noiseParam2.txt'))
 
 freq = np.loadtxt(os.path.join(oDir, 'freq.txt'))
-#sOmega = np.loadtxt(os.path.join(oDir, 'sOmega.txt'))
+sOmega = np.loadtxt(os.path.join(oDir, 'sOmega.txt'))
 
 #finalState = np.loadtxt(os.path.join(oDir, 'state.txt'))
 #reward = np.loadtxt(os.path.join(oDir, 'reward.txt'))
@@ -25,10 +25,12 @@ freq = np.loadtxt(os.path.join(oDir, 'freq.txt'))
 # Choose noise PSD profile
 
 cpmgPeak = nPulse / 2 / tMax
-chemPotential = cpmgPeak / 8
-temperature = 0.4#0.01
+param1 = cpmgPeak / 8
+param2 = 0.4#0.01
 # Fermi-Dirac distribution for studying hard to smooth cutoff (low temp to high temp)
-S = ps.fermi_dirac(freq, chemPotential, temperature)
+#S = ps.fermi_dirac(freq, param1, param2)
+
+S = sOmega
 
 # Sum of Lorentzians peaked at the CPMG filter function peaks so we make it hard for CPMG to perform well
 #tau = tMax / (2 * nPulse)
@@ -67,26 +69,28 @@ if plotCurves == True:
     fig, axs = plt.subplots(3, sharex=True, layout='constrained')
     
     string_Na = '$N_{{pulse}} = {}$, '.format(nPulse)
-    string_mu = '$\mu$ = {:.3e}, '.format(chemPotential)
-    string_temp = '$T$ = {:.3e}'.format(temperature)
+    string_mu = '$\mu$ = {:.3e}, '.format(param1)
+    string_temp = '$T$ = {:.3e}'.format(param2)
     
     # Find max index for plotting
+    cutoffIdx = len(S)-1 # Initialize
     for i in range(len(S)-1, -1, -1):
-        if (S[i] / freq[i] < 1e-12):
-            maxIdx = i
+        if (S[i] / freq[i] > 1e-12):
+            cutoffIdx = i
+            break
     
     #axs[0].set_title('$N_{{pulse}} = {}$'.format(nPulse))
     axs[0].set_title(string_Na + string_mu + string_temp)
-    axs[0].plot(freq[:maxIdx], S[:maxIdx])
+    axs[0].plot(freq[:cutoffIdx], S[:cutoffIdx])
     axs[0].set_ylabel(r"$S(\nu)$")
     
-    axs[1].plot(freq[:maxIdx], UDDFilter[:maxIdx], label = "UDD", color = UDDColor)
-    axs[1].plot(freq[:maxIdx], CPMGFilter[:maxIdx], label = "CPMG", color = CPMGColor)
+    axs[1].plot(freq[:cutoffIdx], UDDFilter[:cutoffIdx], label = "UDD", color = UDDColor)
+    axs[1].plot(freq[:cutoffIdx], CPMGFilter[:cutoffIdx], label = "CPMG", color = CPMGColor)
     axs[1].set_ylabel(r"$F(\nu)$")
     axs[1].legend()
     
-    axs[2].plot(freq[:maxIdx], S[:maxIdx]*UDDFilter[:maxIdx], label = '$\chi_{{UDD}}$ = {:.4e}'.format(UDDOverlap), color = UDDColor)
-    axs[2].plot(freq[:maxIdx], S[:maxIdx]*CPMGFilter[:maxIdx], label = '$\chi_{{CPMG}}$ = {:.4e}'.format(CPMGOverlap), color = CPMGColor)
+    axs[2].plot(freq[:cutoffIdx], S[:cutoffIdx]*UDDFilter[:cutoffIdx], label = '$\chi_{{UDD}}$ = {:.4e}'.format(UDDOverlap), color = UDDColor)
+    axs[2].plot(freq[:cutoffIdx], S[:cutoffIdx]*CPMGFilter[:cutoffIdx], label = '$\chi_{{CPMG}}$ = {:.4e}'.format(CPMGOverlap), color = CPMGColor)
     axs[2].set_ylabel(r"$F(\nu) * S(\nu)$")
     axs[2].set_xlabel(r"$\nu$ in Hz")
     axs[2].legend()

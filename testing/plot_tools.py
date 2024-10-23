@@ -10,6 +10,7 @@ def crunch_job(max_time,
                noise,
                agent_state,
                agent_reward,
+               initial_state,
                weights=None):
     """
     PARAMETERS:
@@ -49,21 +50,41 @@ def crunch_job(max_time,
     filters[0] = ps.FilterFunc(freq, pulse_timings[0], max_time) # Agent Filter 
     filters[1] = ps.FilterFunc(freq, pulse_timings[1], max_time) # UDD filter 
     filters[2] = ps.FilterFunc(freq, pulse_timings[2], max_time) # CPMG filter
+    initial_filter = ps.FilterFunc(freq, initial_state, max_time)
 
     # Calculate overlap functions and put into an array
     overlaps = np.zeros(3)
     overlaps[0] = ps.chi(freq, noise, filters[0], weights=weights) # Overlap associated with agent's best filter
     overlaps[1] = ps.chi(freq, noise, filters[1], weights=weights) # Overlap for UDD
     overlaps[2] = ps.chi(freq, noise, filters[2], weights=weights) # Overlap for CPMG
+    initial_chi = ps.chi(freq, noise, initial_filter, weights=weights)
+
 
     # Calculate rewards over trial for UDD and CPMG. (Will be constant across trial number).
     # Put these into array with agent_reward
     nTrial = len(agent_reward)
     rewards = np.zeros((3, nTrial))
     rewards[0] = agent_reward
-    rewards[1] = ps.RewardFunc(overlaps[1]) * np.ones(nTrial) # UDD filter
-    rewards[2] = ps.RewardFunc(overlaps[2]) * np.ones(nTrial) # CPMG filter
+    rewards[1] = ps.RewardFunc(overlaps[1] - initial_chi / 10) * np.ones(nTrial) # UDD filter
+    rewards[2] = ps.RewardFunc(overlaps[2] - initial_chi / 10) * np.ones(nTrial) # CPMG filter
     
+    print("overlaps")
+    print(overlaps)
+    print("initial chi")
+    print(initial_chi)
+
+    print("Agent reward python")
+    print(ps.RewardFunc(overlaps[0] - initial_chi / 10))
+    print("UDD reward")
+    print(ps.RewardFunc(overlaps[1] - initial_chi / 10))
+    print("CPMG reward")
+    print(ps.RewardFunc(overlaps[2] - initial_chi / 10))
+
+    print("C++ initial state")
+    print(initial_state)
+    print("python initial state")
+    print(pulse_timings[2])
+
     return pulse_timings, filters, overlaps, rewards
 
 def plot_job(max_time,
@@ -93,7 +114,7 @@ def plot_job(max_time,
     agent_loss (np.ndarray): loss for every learning trial
     save (Optional, string): indicates whether or not to save. If string is provided, figure is saved to the filename represented by string.
     show (Optional, bool): indicated whether to show figure using matplotlib's interactive environment
-    
+   
     Note: for all of the arrays mentioned above, the quantity/quantities associated with
           the agent are in row 0,
           UDD are in row 1,
@@ -129,11 +150,14 @@ def plot_job(max_time,
 
     lwps = 3 # Linewidth for pulse sequence plots
     # Find max index for plotting
+    cutoffIdx = len(noise)-1 # Initialize
     for i in range(len(noise)-1, -1, -1):
-        if (noise[i] / freq[i] < 1e-12):
+        if (noise[i] / freq[i] > 1e-12):
             cutoffIdx = i
-    #cutoffIdx = int(0.5 * len(noise))
-    
+            break
+    print("cutoffFreq = {}".format(freq[cutoffIdx]))
+
+
     if title is not None:
         fig.suptitle(title)
     
@@ -161,8 +185,9 @@ def plot_job(max_time,
     axd['C'].grid(axis = 'x')
 
     # Plot filter functions and noise PSD
-   
+
     axd['D'].set_ylabel(r'$F(\nu)$')
+    axd['D'].sharey(axd['F'])
     axUDDNoise = axd['D'].twinx()
     axUDDNoise.set_ylabel(noiseLabel)
     filterPlotUDD = axd['D'].plot(freq[:cutoffIdx], filters[1][:cutoffIdx], color=UDDColor, linestyle=UDDLinestyle, label = r'$F(\nu)_{UDD}$')
@@ -175,6 +200,7 @@ def plot_job(max_time,
 
 
     axd['E'].set_ylabel(r'$F(\nu)$')
+    axd['E'].sharey(axd['F'])
     axAgentNoise = axd['E'].twinx()
     axAgentNoise.set_ylabel(noiseLabel)
     filterPlotAgent = axd['E'].plot(freq[:cutoffIdx], filters[0][:cutoffIdx], color=agentColor, linestyle=agentLinestyle, label = r'$F(\nu)_{Agent}$')
@@ -195,6 +221,11 @@ def plot_job(max_time,
     axd['F'].set_title(CPMGLabel)
     axd['F'].set_xlabel(r'$\nu$ [1/time]')
     axd['F'].legend(linesCPMG, labelsCPMG)
+    axd['F'].set_yscale(filterScale)
+
+    axUDDNoise.sharey(axCPMGNoise)
+    axAgentNoise.sharey(axCPMGNoise)
+    axCPMGNoise.set_yscale(noiseScale)
 
     # Plot reward and loss over trials
     
@@ -205,7 +236,7 @@ def plot_job(max_time,
     axd['G'].plot(trials, rewards[0], color=agentColor, label = 'Agent') 
     axd['G'].plot(trials, rewards[1], color=UDDColor, linestyle=UDDLinestyle, label = 'UDD') 
     axd['G'].plot(trials, rewards[2], color=CPMGColor, linestyle=CPMGLinestyle, label = 'CPMG')
-    axd['G'].set_yscale('log')
+    #axd['G'].set_yscale('log')
 
     # Get index of maximum rewards
     idxMax = np.argmax(rewards[0])
@@ -276,6 +307,7 @@ def temperature_sweep(data_dir, plot_dir, subdir_prefix='job', show = True):
                 weights = None
                 #sOmega = ps.fermi_dirac(freq, chemPotential, temperature)
                 finalState = np.loadtxt(os.path.join(oDir, 'state.txt'))
+                initialState = np.loadtxt(os.path.join(oDir, 'initialState.txt'))
                 reward = np.loadtxt(os.path.join(oDir, 'reward.txt'))
                 loss = np.loadtxt(os.path.join(oDir, 'loss.txt'))
                 
@@ -299,6 +331,7 @@ def temperature_sweep(data_dir, plot_dir, subdir_prefix='job', show = True):
                                                                       sOmega,
                                                                       finalState,
                                                                       reward,
+                                                                      initialState,
                                                                       weights=weights)
                 plot_job(tMax,
                          freq,
@@ -363,7 +396,7 @@ def temperature_sweep(data_dir, plot_dir, subdir_prefix='job', show = True):
 
     # Find max index for plotting
     for i in range(len(S_temp_max)-1, -1, -1):
-        if (S_temp_max[i] / freq[i] < 1e-12):
+        if (S_temp_max[i] / freq[i] > 1e-12):
             cutoffIdx = i
     
     # Plot overlaps. Use scatter since temperatures might be out of order due to file reading.
@@ -412,7 +445,7 @@ def temperature_sweep(data_dir, plot_dir, subdir_prefix='job', show = True):
 
 
 if __name__=='__main__':
-    """ 
+     
     # Load data
     oDir = '/home/charlie/Documents/ml/CollectiveAction/data/job_00000'
 
@@ -428,6 +461,7 @@ if __name__=='__main__':
     finalState = np.loadtxt(os.path.join(oDir, 'state.txt'))
     reward = np.loadtxt(os.path.join(oDir, 'reward.txt'))
     loss = np.loadtxt(os.path.join(oDir, 'loss.txt'))
+    initialState = np.loadtxt(os.path.join(oDir, 'initialState.txt'))
 
     print('finalState')
     print(finalState)
@@ -439,10 +473,12 @@ if __name__=='__main__':
                                                           freq,
                                                           sOmega,
                                                           finalState,
-                                                          reward)
+                                                          reward,
+                                                          initialState)
 
     #job_title = '$\mu = {0}, T = {1}$'.format(noiseParam1, noiseParam2)
-    job_title = '$leftBand = {0}*cpmgPeak, rightBand = {1}*cpmgPeak$'.format(noiseParam1, noiseParam2)
+    job_title = '$bandCenter = {0}*cpmgPeak, bandWidth = {1} / maxTime$'.format(noiseParam2, noiseParam1)
+    #job_title = 'Sum of Lorentzians on CPMG Peaks'
 
     plot_job(tMax,
              freq,
@@ -454,10 +490,11 @@ if __name__=='__main__':
              overlaps,
              rewards,
              loss,
-             save = None, show = True, title = job_title)
+             save = None, show = True, title = job_title,
+             filterScale = 'log', noiseScale = 'linear')
 
     """
     dd = '/home/charlie/Documents/ml/CollectiveAction/data_FD1_noboot'
     pd = '/home/charlie/Documents/ml/CollectiveAction/plots_FD1_noboot'
     temperature_sweep(dd, pd, show=False)
-    
+    """ 

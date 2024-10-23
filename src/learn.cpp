@@ -62,9 +62,9 @@ int main()
       std::cout << std::setprecision(3);
       std::cout << std::setw(3) << trial 
         << " Epsilon: " << std::setw(7) << epsilon 
-        << " Avgloss: " << std::setw(7) << avgLoss / lossCtr 
-        << " MaxRewardTrial: " << std::setw(7) << maxRewardTrial
-        << " MaxReward: " << std::setw(7) << maxReward 
+        << " Avgloss: " << std::setw(8) << avgLoss / lossCtr 
+        << " MaxRewardTrial: " << std::setw(8) << maxRewardTrial
+        << " MaxReward: " << std::setw(8) << maxReward 
         << std::endl;
       std::cout << std::setprecision(default_precision);
     }

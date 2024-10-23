@@ -7,7 +7,8 @@ using namespace Eigen;
 
 const int nPulse = 4;
 const double maxTime = 1;
-const int nTimeStep = 500; // Number of time steps in mesh.
+const int nTimeStep = 1000; // Number of time steps in mesh.
+const int nZero = 32768 - (nTimeStep + 1); // Number of zeros for padding signal in FFT.
 //typedef Matrix<Pulse, nPulse, 1> Sequence;
 
 class Pulse {
@@ -17,7 +18,6 @@ class Pulse {
   public:
   
     Pulse() {};
-    //Pulse(const double t) : t(t) {}
     Pulse(double t) {
       centerTime = t;
     }
