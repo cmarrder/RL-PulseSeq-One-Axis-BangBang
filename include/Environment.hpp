@@ -5,8 +5,8 @@
 #include "Crystal.hpp"
 #include "Action.hpp"
 
-const double SMALL = 1e-8;
-const double rewardScale = 1;//0.1;
+//const double SMALL = 1e-8;
+//const double rewardScale = 1;//0.1;
 
 constexpr size_t maxSteps = 20;
 
@@ -44,23 +44,23 @@ public:
 
   double reward() const
   {
-   if (done())
-   {
-     //double chi = crystal.chi();
-     double rchi = crystal.recenteredChi();
-     if (rchi < 0)
-     {
-       return 1 / SMALL;
-     }
-     else
-     {
-       return rewardScale * (rchi < SMALL ? 1.0 / SMALL : 1.0 / rchi );
-     }
-   }
-   else
-   {
-     return 0;
-   }
+    if (done())
+    {
+     return crystal.getInitialChi() / crystal.chi();
+     //double rchi = crystal.recenteredChi();
+     //if (rchi < 0)
+     //{
+     //  return 1 / SMALL;
+     //}
+     //else
+     //{
+     //  return rewardScale * (rchi < SMALL ? 1.0 / SMALL : 1.0 / rchi );
+     //}
+    }
+    else
+    {
+      return 0;
+    }
   }
 
   void applyAction(int action)
@@ -74,13 +74,5 @@ public:
     return actionsDone;
   }
 
-  double chi() const
-  {
-	  return crystal.chi();
-  }
-  double recenteredChi() const
-  {
-	  return crystal.recenteredChi();
-  }
 
 };

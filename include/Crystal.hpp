@@ -103,14 +103,14 @@ class Crystal {
   VectorXd initialCenterTimes()
   {
     // Wrapper function used to choose the initial pulse center times.
-    return CPMGCenterTimes();
-    //return PDDCenterTimes();
+    //return CPMGCenterTimes();
+    return PDDCenterTimes();
   }
   
   VectorXd peakLocCPMG() const
   {
     // Calculate the peaks of the CPMG filter function 
-    int nPeaks = nPulse; // Currently only use nPulse peaks. Can add more if need be.
+    int nPeaks = nPulse; // Currently only use nPulse many peaks. Can add more if need be.
     VectorXd range = VectorXd::LinSpaced(nPeaks, 0, nPeaks - 1); // range of integers from 0 to nPeaks - 1
     double denom = maxTime / nPulse;
     VectorXd centers = (range.array() + 0.5) / denom;
@@ -120,8 +120,10 @@ class Crystal {
   VectorXd computeSOmega() const
   {
     VectorXd somega = VectorXd::Zero(nFreq);
-   
-    /* 
+    
+    //// UNCOMMENT THE NOISE MODEL YOU WANT BELOW: 
+    
+    /*
     //// FERMI-DIRAC:
     VectorXd ONE = VectorXd::Ones(nFreq);
     VectorXd v = (freq - noiseParam1 * ONE) / noiseParam2;
@@ -129,22 +131,41 @@ class Crystal {
     */
 
     /* 
-    //// SUM OF LORENTZIANS:
-    VectorXd centers = peakLocCPMG(); // Place Lorentzian at each peak of CPMG Filter function
-    int nPeaks = centers.size(); 
-    VectorXd fwhms = VectorXd::Ones(nPeaks).array() / 2;
-    VectorXd heights = pow(centers.array(), -2);
-    //// Divide output by number of elements in centers to normalize.
-    somega = lorentzians(freq, centers, fwhms, heights) / nPeaks;
+    //// 1/f NOISE:
+    somega = reciprocal(freq);
     */
 
+    /*     
+    //// LORENTZIAN:
+    double flipRate = (1.0 / 10.0) * (1.0 / maxTime);
+    double fwhm = 4 * flipRate;
+    //// Divide output by number of elements in centers to normalize.
+    somega = lorentzian(freq, 0, fwhm);
+    */
+
+     
+    //// SUM OF LORENTZIANS:
+    //VectorXd centers = peakLocCPMG(); // Place Lorentzian at each peak of CPMG Filter function
+    //VectorXd fwhms = VectorXd::Ones(nPeaks).array() / 2;
+    //VectorXd heights = pow(centers.array(), -2);
+    double cpmgPeakFreq = nPulse / (2 * maxTime); // The first peak frequency of the CPMG filter function
+    Vector2d centers(0.0, 0.7 * cpmgPeakFreq); // Place Lorentzian at each peak of CPMG Filter function
+    int nPeaks = centers.size(); 
+    Vector2d fwhms(1.0 / 2.0, 1.0 / 4.0); // MAKE SURE FWHM IS NOT SMALLER THAN KEY FREQUENCIES IN TIME MESH
+    VectorXd heights = reciprocal(2 * M_PI * fwhms); 
+    //// Divide output by number of elements in centers to normalize.
+    somega = lorentzians(freq, centers, fwhms, heights) / nPeaks;
+    
+
+    /*
     //// SUM OF GAUSSIANS:
-    VectorXd centers = peakLocCPMG(); // Place Lorentzian at each peak of CPMG Filter function
+    VectorXd centers = peakLocCPMG(); // Place Gaussian at each peak of CPMG Filter function
+    centers = (centers.array() + centers(0) / 2).matrix(); // Shift so that noise peaks are in between CPMG filter function peaks
     int nPeaks = centers.size(); 
     VectorXd sigmas = VectorXd::Ones(nPeaks).array() / 2;
     VectorXd heights = pow(centers.array(), -2);
-    //// Divide output by number of elements in centers to normalize.
     somega = gaussians(freq, centers, sigmas, heights);
+    */
    
     /* 
     //// BOXCAR FUNCTION:
@@ -165,13 +186,15 @@ class Crystal {
     double boxcar2Left = bandCenter + bandWidth / 2; // Left boundary of 2nd boxcar
     double center2 = (freq(idxMaxFreq) + boxcar2Left) / 2;
     double width2 = freq(idxMaxFreq) - boxcar2Left;
-    somega = 5 * boxcar(freq, center1, width1) + boxcar(freq, center2, width2);
+    somega = boxcar(freq, center1, width1) + boxcar(freq, center2, width2);
     */
     
     /* 
     //// STEP FUNCTION
-    double freqResolution = 1.0 / maxTime;
-    double bandWidth = noiseParam1 * freqResolution;
+    //double freqResolution = 1.0 / maxTime;
+    //double bandWidth = noiseParam1 * freqResolution;
+    double cpmgPeakFreq = nPulse / (2 * maxTime); // The first peak frequency of the CPMG filter function
+    double bandWidth = noiseParam1 * cpmgPeakFreq;
     somega = heaviside(freq.array()) - heaviside(freq.array() - bandWidth);
     */
 
@@ -396,9 +419,9 @@ class Crystal {
     return overlap;
   }
 
-  double recenteredChi() const
+  double getInitialChi() const
   {
-    return chi() - initialChi / 10.0;
+    return initialChi;
   }
 
 };

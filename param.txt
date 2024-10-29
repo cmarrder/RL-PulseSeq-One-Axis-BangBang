@@ -1,4 +1,4 @@
 oDir /home/charlie/Documents/ml/CollectiveAction/data/job_00000
 verbose 1
-noiseParam1 2
-noiseParam2 4
+noiseParam1 1
+noiseParam2 1 

@@ -65,8 +65,8 @@ def crunch_job(max_time,
     nTrial = len(agent_reward)
     rewards = np.zeros((3, nTrial))
     rewards[0] = agent_reward
-    rewards[1] = ps.RewardFunc(overlaps[1] - initial_chi / 10) * np.ones(nTrial) # UDD filter
-    rewards[2] = ps.RewardFunc(overlaps[2] - initial_chi / 10) * np.ones(nTrial) # CPMG filter
+    rewards[1] = ps.RewardFunc(overlaps[1], initial_chi) * np.ones(nTrial) # UDD filter
+    rewards[2] = ps.RewardFunc(overlaps[2], initial_chi) * np.ones(nTrial) # CPMG filter
     
     print("overlaps")
     print(overlaps)
@@ -74,11 +74,11 @@ def crunch_job(max_time,
     print(initial_chi)
 
     print("Agent reward python")
-    print(ps.RewardFunc(overlaps[0] - initial_chi / 10))
+    print(ps.RewardFunc(overlaps[0], initial_chi))
     print("UDD reward")
-    print(ps.RewardFunc(overlaps[1] - initial_chi / 10))
+    print(ps.RewardFunc(overlaps[1], initial_chi))
     print("CPMG reward")
-    print(ps.RewardFunc(overlaps[2] - initial_chi / 10))
+    print(ps.RewardFunc(overlaps[2], initial_chi))
 
     print("C++ initial state")
     print(initial_state)
@@ -376,7 +376,7 @@ def temperature_sweep(data_dir, plot_dir, subdir_prefix='job', show = True):
              """
     axd = fig.subplot_mosaic(mosaic)
     
-    UDDColor = '#377EB8'# Curious Blue
+    UDDColor = '#1F77B4'#'#377EB8'# Curious Blue
     UDDLinestyle = 'solid'
     UDDLabel = 'UDD'
     UDDMarker = 'x'
@@ -385,12 +385,12 @@ def temperature_sweep(data_dir, plot_dir, subdir_prefix='job', show = True):
     agentLinestyle = 'solid'
     agentLabel = 'Agent' 
     
-    CPMGColor = '#FF7F00'# Dark Orange
+    CPMGColor = '#FF7F0E'#'#FF7F00'# Dark Orange
     CPMGLinestyle = 'solid'
     CPMGLabel = 'CPMG'
     CPMGMarker = '+'
 
-    noiseColor = '#4DAF4A'# Fruit Salad, green
+    noiseColor = '#2CA02C'#'#4DAF4A'# Fruit Salad, green
     noiseLinestyle = 'dashdot'
     noiseLabel = r'$|S(\nu)|^2$'
 
@@ -491,10 +491,10 @@ if __name__=='__main__':
              rewards,
              loss,
              save = None, show = True, title = job_title,
-             filterScale = 'log', noiseScale = 'linear')
+             filterScale = 'linear', noiseScale = 'linear')
 
     """
-    dd = '/home/charlie/Documents/ml/CollectiveAction/data_FD1_noboot'
-    pd = '/home/charlie/Documents/ml/CollectiveAction/plots_FD1_noboot'
+    dd = '/home/charlie/Documents/ml/CollectiveAction/data'
+    pd = '/home/charlie/Documents/ml/CollectiveAction/plots'
     temperature_sweep(dd, pd, show=False)
     """ 
