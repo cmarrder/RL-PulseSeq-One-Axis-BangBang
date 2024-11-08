@@ -1,0 +1,9 @@
+UDDColor '#377EB8' Blue
+
+agentColor '#984EA3' Lilac
+
+CPMGColor '#FF7F00' Orange
+
+noiseColor '#2CA02C' Green
+
+actionColor '#D62728' Red

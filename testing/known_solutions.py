@@ -9,7 +9,7 @@ plotCurves = True
 
 oDir = '/home/charlie/Documents/ml/CollectiveAction/data/job_00000'
 
-nPulse = int( np.loadtxt(os.path.join(oDir, 'nPulse.txt')) ) # Number of pulse applications
+nPulse = 1 + int( np.loadtxt(os.path.join(oDir, 'nPulse.txt')) ) # Number of pulse applications
 #nTimeStep = int( np.loadtxt(os.path.join(oDir, 'nTimeStep.txt')) )# Number of pulse chances/locations
 tMax = np.loadtxt(os.path.join(oDir, 'maxTime.txt'))
 param1 = np.loadtxt(os.path.join(oDir, 'noiseParam1.txt'))

@@ -56,11 +56,11 @@ VectorXd sinHarmonic4Minus(const VectorXd& centerTimes)
 
 // MAKE SURE THE LENGTH OF THIS ARRAY IS EQUAL TO numAction !!!
 const std::array<CollectiveTransform, numAction> actionList {
-  reverseTransform,
   sinHarmonic1Plus,
   sinHarmonic1Minus,
   sinHarmonic2Plus,
   sinHarmonic2Minus,
   sinHarmonic4Plus,
-  sinHarmonic4Minus};
+  sinHarmonic4Minus,
+  reverseTransform};
 

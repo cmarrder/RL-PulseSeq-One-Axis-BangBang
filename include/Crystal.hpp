@@ -149,6 +149,7 @@ class Crystal {
     //VectorXd fwhms = VectorXd::Ones(nPeaks).array() / 2;
     //VectorXd heights = pow(centers.array(), -2);
     double cpmgPeakFreq = nPulse / (2 * maxTime); // The first peak frequency of the CPMG filter function
+    //Vector2d centers(0.0, 0.7 * cpmgPeakFreq); // Place Lorentzian at each peak of CPMG Filter function
     Vector2d centers(0.0, 0.7 * cpmgPeakFreq); // Place Lorentzian at each peak of CPMG Filter function
     int nPeaks = centers.size(); 
     Vector2d fwhms(1.0 / 2.0, 1.0 / 4.0); // MAKE SURE FWHM IS NOT SMALLER THAN KEY FREQUENCIES IN TIME MESH

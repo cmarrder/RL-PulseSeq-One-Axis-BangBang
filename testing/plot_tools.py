@@ -132,19 +132,19 @@ def plot_job(max_time,
              """
     axd = fig.subplot_mosaic(mosaic, width_ratios=[1, 2, 2])
     
-    UDDColor = '#377EB8'# Curious Blue
+    UDDColor = '#377EB8'# Blue
     UDDLinestyle = 'solid'
     UDDLabel = r'$\chi_{UDD} = $' + '{:.3e}'.format(overlaps[1])
 
-    agentColor = '#984EA3'# Deep Lilac
+    agentColor = '#984EA3'# Lilac
     agentLinestyle = 'solid'
     agentLabel = r'$\chi_{Agent} = $' + '{:.3e}'.format(overlaps[0])
     
-    CPMGColor = '#FF7F00'# Dark Orange
+    CPMGColor = '#FF7F00'# Orange
     CPMGLinestyle = 'solid'
     CPMGLabel = r'$\chi_{CPMG} = $' + '{:.3e}'.format(overlaps[2])
 
-    noiseColor = '#4DAF4A'# Fruit Salad, green
+    noiseColor = '#2CA02C'# Green
     noiseLinestyle = 'dashdot'
     noiseLabel = r'$S(\nu)$'
 
