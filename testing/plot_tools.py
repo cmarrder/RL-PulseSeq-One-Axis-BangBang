@@ -466,7 +466,7 @@ if __name__=='__main__':
     print('finalState')
     print(finalState)
 
-    save = True # 'tplot.png'
+    save = False # 'tplot.png'
     show = True
    
     pulse_timings, filters, overlaps, rewards = crunch_job(tMax,

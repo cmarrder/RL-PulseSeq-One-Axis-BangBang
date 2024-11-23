@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cmath>
-
 #include "Crystal.hpp"
 #include "Action.hpp"
 
@@ -46,16 +45,8 @@ public:
   {
     if (done())
     {
-     return crystal.getInitialChi() / crystal.chi();
-     //double rchi = crystal.recenteredChi();
-     //if (rchi < 0)
-     //{
-     //  return 1 / SMALL;
-     //}
-     //else
-     //{
-     //  return rewardScale * (rchi < SMALL ? 1.0 / SMALL : 1.0 / rchi );
-     //}
+     //return crystal.getInitialChi() / crystal.chi();
+     return 100 * 0.5 * ( 1 + std::exp( -crystal.chi() ) );
     }
     else
     {
