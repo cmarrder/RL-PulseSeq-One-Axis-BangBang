@@ -299,8 +299,12 @@ def RewardFunc(chi_array, initial_chi = 1.0):
     #    else:
     #        rewards[i] = 1 / x
     #
-    #return initial_chi / chi_array 
-    return 100 * 0.5 * (1 + np.exp( -chi_array ) )
+    #return initial_chi / chi_array
+    #return 100 * 0.5 * (1 + np.exp( -chi_array ) )
+    avgInfid = 1 - 0.5 * (1 + np.exp( -chi_array ) )
+    initialAvgInfid = 1 - 0.5 * np.full_like(avgInfid, 1 + np.exp(-initial_chi))
+    relativeAvgInfid = avgInfid / initialAvgInfid
+    return 1 / (relativeAvgInfid + 1e-8)
 
 def calc_sign_seq(pulse_seq, Nb=1):
     """ Given a pulse sequence of zeros and ones, calculates the

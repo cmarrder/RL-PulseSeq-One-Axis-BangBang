@@ -6,8 +6,8 @@
 #include "Greedy.hpp"
 #include "Param.hpp"
 
-constexpr int numTrial = 100;
-constexpr int numEpisode = 100;
+constexpr int numTrial = 200;
+constexpr int numEpisode = 50;
 
 int main()
 { 
@@ -72,6 +72,8 @@ int main()
   }
   //agent.save("/home/charlie/Documents/ml/CollectiveAction/data/model");
 
+  // Print number of times we need to calculate average infidelity.
+  std::cout << "Number of times needed to calculate average infidelity: " << environment.getRewardCalls() << std::endl;
   
   // Apply optimal action sequence and write it to file. Print if verbose.
   std::ofstream out_action(param.oDir + "/action.txt");

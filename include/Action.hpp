@@ -10,14 +10,57 @@ constexpr double eta1 = 0.2;
 constexpr double eta2 = 0.1;
 constexpr double eta4 = 0.05;
 
-// Make typedef named CollectiveTransform which is a function that takes as argument Sequence and returns void.
+// Make typedef named CollectiveTransform which is a function that takes as argument VectorXd and returns VectorXd.
 typedef VectorXd (*CollectiveTransform)(const VectorXd&);
+
+// Do actionInterval and wbTimes method but with new functions and T = 1?
 
 VectorXd reverseTransform(const VectorXd& centerTimes)
 {
   return (maxTime - centerTimes.array()).reverse();
 }
 
+VectorXd kappaPlus1(const VectorXd& centerTimes)
+{
+  return centerTimes.array() + eta1 * (1.0 * M_PI * centerTimes.array() / maxTime).sin();
+}
+
+VectorXd kappaMinus1(const VectorXd& centerTimes)
+{
+  return centerTimes.array() + eta1 * (-1.0 * M_PI * centerTimes.array() / maxTime).sin();
+}
+
+VectorXd kappaPlus2(const VectorXd& centerTimes)
+{
+  return centerTimes.array() + eta2 * (2.0 * M_PI * centerTimes.array() / maxTime).sin();
+}
+
+VectorXd kappaMinus2(const VectorXd& centerTimes)
+{
+  return centerTimes.array() + eta2 * (-2.0 * M_PI * centerTimes.array() / maxTime).sin();
+}
+
+VectorXd kappaPlus4(const VectorXd& centerTimes)
+{
+  return centerTimes.array() + eta4 * (4.0 * M_PI * centerTimes.array() / maxTime).sin();
+}
+
+VectorXd kappaMinus4(const VectorXd& centerTimes)
+{
+  return centerTimes.array() + eta4 * (-4.0 * M_PI * centerTimes.array() / maxTime).sin();
+}
+
+// MAKE SURE THE LENGTH OF THIS ARRAY IS EQUAL TO numAction !!!
+const std::array<CollectiveTransform, numAction> actionList {
+  kappaPlus1,
+  kappaMinus1,
+  kappaPlus2,
+  kappaMinus2,
+  kappaPlus4,
+  kappaMinus4,
+  reverseTransform};
+
+/*
 VectorXd sinHarmonic1Plus(const VectorXd& centerTimes)
 {
   VectorXd wbTimes = centerTimes / maxTime * actionInterval;
@@ -63,4 +106,4 @@ const std::array<CollectiveTransform, numAction> actionList {
   sinHarmonic4Plus,
   sinHarmonic4Minus,
   reverseTransform};
-
+*/

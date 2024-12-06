@@ -99,6 +99,7 @@ class Crystal {
   double noiseParam1;
   double noiseParam2;
   double initialChi;
+  double initialAvgInfid;
 
   VectorXd initialCenterTimes()
   {
@@ -123,14 +124,14 @@ class Crystal {
     
     //// UNCOMMENT THE NOISE MODEL YOU WANT BELOW: 
     
-    /*
+    
     //// FERMI-DIRAC:
     VectorXd ONE = VectorXd::Ones(nFreq);
     VectorXd v = (freq - noiseParam1 * ONE) / noiseParam2;
     somega = ONE.array() / (v.array().exp() + ONE.array());
-    */
+    
 
-    /* 
+    /*     
     //// 1/f NOISE:
     somega = reciprocal(freq);
     */
@@ -143,7 +144,7 @@ class Crystal {
     somega = lorentzian(freq, 0, fwhm);
     */
 
-     
+    /*  
     //// SUM OF LORENTZIANS:
     //VectorXd centers = peakLocCPMG(); // Place Lorentzian at each peak of CPMG Filter function
     //VectorXd fwhms = VectorXd::Ones(nPeaks).array() / 2;
@@ -156,7 +157,7 @@ class Crystal {
     VectorXd heights = reciprocal(2 * M_PI * fwhms); 
     //// Divide output by number of elements in centers to normalize.
     somega = lorentzians(freq, centers, fwhms, heights) / nPeaks;
-    
+    */
 
     /*
     //// SUM OF GAUSSIANS:
@@ -223,37 +224,6 @@ class Crystal {
     return fourier_ft.cwiseAbs2();
   }
 
-
-  //VectorXd computeCtrlSig() const
-  //{
-  //  // Compute control signal f(t) using the pulse sequence.
-  //  VectorXd controlSignal = VectorXd::Ones(nTimeStep);
-  //  double tau = maxTime / (nTimeStep);
-  //  int pulseCounter = 0;
-  //  VectorXd pulseCenters = sequence.getCenterTimes();
-  //  double currentCenter = pulseCenters(pulseCounter);
-  //  double sign = 1.0;
-
-  //  for (int k = 0; k < nTimeStep; k++)
-  //  {
-  //    while (currentCenter > k * tau && currentCenter <= (k+1) * tau)
-  //    {
-  //      // Increment the count of pulses in the current bin.
-  //      sign = -sign;
-  //      // Increment the index of the pulse to consider.
-  //      pulseCounter = pulseCounter + 1;
-  //      // If the max number of pulses has been reached, end the while loop.
-  //      if (pulseCounter == nPulse) {
-  //        break;
-  //      }
-  //      // Use the next pulse center.
-  //      currentCenter = pulseCenters(pulseCounter);
-
-  //    }
-  //    controlSignal(k) = sign; 
-  //  }
-  //  return controlSignal;
-  //}
   VectorXd computeCtrlSig() const
   {
     // Compute control signal f(t) using the pulse sequence.
@@ -388,9 +358,8 @@ class Crystal {
     sequence.updateCenterTimes(initialCenterTimes());
 
     initialChi = chi();
+    initialAvgInfid = avgInfid();
 
-    std::cout << "initialChi / 2: " << initialChi / 2.0 << std::endl;
-    
     writeInitial(param.oDir);
   }
 
@@ -424,5 +393,16 @@ class Crystal {
   {
     return initialChi;
   }
+
+  double avgInfid() const
+  {
+    // Calculate average infidelity.
+    return 1.0 - 0.5 * (1 + std::exp(-chi()));
+  }
+
+ double relativeAvgInfid() const
+ {
+   return avgInfid() / initialAvgInfid;
+ } 
 
 };

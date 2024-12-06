@@ -80,11 +80,13 @@ def crunch_job(max_time,
     print("CPMG reward")
     print(ps.RewardFunc(overlaps[2], initial_chi))
 
-    print("C++ initial state")
-    print(initial_state)
-    print("python initial state")
-    print(pulse_timings[2])
 
+    print("Agent solutions")
+    print(agent_state)
+    print("UDD timings")
+    print(pulse_timings[1])
+    print("CPMG timings")
+    print(pulse_timings[2])
     return pulse_timings, filters, overlaps, rewards
 
 def plot_job(max_time,

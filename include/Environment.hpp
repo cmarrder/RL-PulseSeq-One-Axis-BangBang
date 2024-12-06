@@ -13,6 +13,7 @@ class Environment {
 
   Crystal crystal;
   std::vector<int> actionsDone;
+  int rewardCalls = 0;
 
 public:
 
@@ -41,12 +42,15 @@ public:
     return stepCount() >= maxSteps;
   }
 
-  double reward() const
+  //double reward() const
+  double reward()
   {
     if (done())
     {
      //return crystal.getInitialChi() / crystal.chi();
-     return 100 * 0.5 * ( 1 + std::exp( -crystal.chi() ) );
+     //return 100 * 0.5 * ( 1 + std::exp( -crystal.chi() ) );
+     rewardCalls ++;
+     return 1.0 / (crystal.relativeAvgInfid() + 1e-8);
     }
     else
     {
@@ -64,6 +68,10 @@ public:
   {
     return actionsDone;
   }
-
+  
+  int getRewardCalls() const
+  {
+    return rewardCalls;
+  }
 
 };
