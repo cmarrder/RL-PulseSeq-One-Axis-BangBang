@@ -34,6 +34,18 @@ def linear_flip_action(x):
     y = max_time - x
     return y
 
+def kappa(t, j, eta):
+    """
+    PARAMETERS:
+    t (np.ndarray): abscissa points to apply function to
+    j (int): harmonic label
+    eta (float): nonlinearity parameter. Should be greater than 0, less than max_time / pi / abs(j).
+    """
+    if eta >= max_time / np.pi / abs(j) or eta <= 0:
+        raise ValueError('eta is outside its domain of validity, (0, max_time / pi / abs(j) ).')
+    return t + eta * sin(np.pi * j * (t / max_time))
+
+
 def make_action_plot_poster(x, func, title, color):
     """
     Illustrate action functions for the POSTER.

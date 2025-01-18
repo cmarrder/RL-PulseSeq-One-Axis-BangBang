@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import pulse_sequence as ps
 
 def fixed_points(harmonic, max_time):
     """
@@ -21,19 +22,18 @@ def fixed_points(harmonic, max_time):
                          since only action functions with nonzero harmonics
                          have attracting and repelling fixed points."""
         raise ValueError(error_message)
-    ell_max = ( abs(harmonic) - 1 - (abs(harmonic)-1)%2 ) / 2
-    ell = np.arange(ell_max + 1)
-    m_max = (abs(harmonic) - abs(harmonic) % 2) / 2
-    m = np.arange(m_max + 1)
+    b = np.arange(abs(harmonic) + 1)
+    even = b[::2] * max_time / abs(harmonic)
+    odd = b[1::2] * max_time / abs(harmonic)
     if harmonic > 0:
-        attracting_pts = (2 * ell + 1) * max_time / harmonic
-        repelling_pts = 2 * m * max_time / harmonic
+        attracting_pts = odd
+        repelling_pts = even
     if harmonic < 0:
-        attracting_pts = - 2 * m * max_time / harmonic
-        repelling_pts = - (2 * ell + 1) * max_time / harmonic
+        attracting_pts = even
+        repelling_pts = odd
     return attracting_pts, repelling_pts
 
-def plot_fixed_points(harmonic_array, max_time, color = 'red', show = True, save = False):
+def plot_fixed_points(harmonic_array, max_time, color = 'red', show = True, save = False, pulseseq = None):
     """
     Plot fixed points for various action functions.
     
@@ -67,7 +67,7 @@ def plot_fixed_points(harmonic_array, max_time, color = 'red', show = True, save
     for idx, h in np.ndenumerate(harmonic_array):
         attracting_pts, repelling_pts = fixed_points(h, max_time)
         # Plot these points. Attracting points are circles. Repelling points are x's.
-        # The y values are the index of the harmonic in the list.
+        # The y values are the list index of the harmonic in the list.
         ax.scatter(attracting_pts, np.full_like(attracting_pts, idx), marker = 'o', c = color, s = marker_size)
         ax.scatter(repelling_pts, np.full_like(repelling_pts, idx), marker = 'x', c = color, s = marker_size)
         # Make yticks.
@@ -85,11 +85,15 @@ def plot_fixed_points(harmonic_array, max_time, color = 'red', show = True, save
     # Remove all border lines except for bottom
     ax.spines[['left', 'top', 'right']].set_visible(False)
    
-    ax.set_title('Attracting and Repelling Fixed Points of $\kappa_j(t)$', fontsize = SIZE_LARGE)
     
     # Set gridlines
     ax.grid()
     
+    if pulseseq is not None:
+        ax.vlines(pulseseq, 0, len(harmonic_array)-1)
+        ax.set_title('Attracting and Repelling Fixed Points of $\kappa_j(t)$ Overlaid with Pulse Sequence', fontsize = SIZE_LARGE)
+    else:
+        ax.set_title('Attracting and Repelling Fixed Points of $\kappa_j(t)$', fontsize = SIZE_LARGE)
     if save:
         plt.savefig(save, dpi=300)
     if show:
@@ -101,5 +105,11 @@ if __name__=='__main__':
     TODO:
     """
     maxTime = 1
-    harmonics = np.array([-4, -3, -2, -1, 1, 2, 3, 4]) 
-    plot_fixed_points(harmonics, maxTime, save = 'paper_plots/fixed_points.png')
+    #harmonics = np.array([-4, -3, -2, -1, 1, 2, 3, 4]) 
+    J = 9
+    positive = np.arange(1, J+1)
+    harmonics = np.concatenate((np.flip(-positive), positive))
+    save = None#'paper_plots/fixed_points.png'
+    show = True
+    pulseseq = ps.PDD(8, maxTime)
+    plot_fixed_points(harmonics, maxTime, save = save, show = show, pulseseq = pulseseq)

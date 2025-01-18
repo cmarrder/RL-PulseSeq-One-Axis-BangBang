@@ -124,17 +124,17 @@ class Crystal {
     
     //// UNCOMMENT THE NOISE MODEL YOU WANT BELOW: 
     
-    
+    /*
     //// FERMI-DIRAC:
     VectorXd ONE = VectorXd::Ones(nFreq);
     VectorXd v = (freq - noiseParam1 * ONE) / noiseParam2;
     somega = ONE.array() / (v.array().exp() + ONE.array());
-    
+    */
 
-    /*     
+             
     //// 1/f NOISE:
     somega = reciprocal(freq);
-    */
+    
 
     /*     
     //// LORENTZIAN:
@@ -144,14 +144,14 @@ class Crystal {
     somega = lorentzian(freq, 0, fwhm);
     */
 
-    /*  
+    /* 
     //// SUM OF LORENTZIANS:
     //VectorXd centers = peakLocCPMG(); // Place Lorentzian at each peak of CPMG Filter function
     //VectorXd fwhms = VectorXd::Ones(nPeaks).array() / 2;
     //VectorXd heights = pow(centers.array(), -2);
     double cpmgPeakFreq = nPulse / (2 * maxTime); // The first peak frequency of the CPMG filter function
     //Vector2d centers(0.0, 0.7 * cpmgPeakFreq); // Place Lorentzian at each peak of CPMG Filter function
-    Vector2d centers(0.0, 0.7 * cpmgPeakFreq); // Place Lorentzian at each peak of CPMG Filter function
+    Vector2d centers(0.0, 0.7 * cpmgPeakFreq); // Place Lorentzian at origin and some fraction of location of peak of CPMG Filter function
     int nPeaks = centers.size(); 
     Vector2d fwhms(1.0 / 2.0, 1.0 / 4.0); // MAKE SURE FWHM IS NOT SMALLER THAN KEY FREQUENCIES IN TIME MESH
     VectorXd heights = reciprocal(2 * M_PI * fwhms); 
@@ -392,6 +392,12 @@ class Crystal {
   double getInitialChi() const
   {
     return initialChi;
+  }
+
+  double avgFid() const
+  {
+    // Calculate average fidelity.
+    return 0.5 * (1 + std::exp(-chi()));
   }
 
   double avgInfid() const

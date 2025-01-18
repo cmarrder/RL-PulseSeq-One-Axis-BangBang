@@ -15,7 +15,7 @@ class Agent {
 
   static constexpr double learningRate = 0.001;
   static constexpr double gamma = 0.95;
-  static constexpr int numHidden = 64;
+  static constexpr int numHidden = 128;//64;
   static constexpr int minSampleSize = 20;
   static constexpr double tau = 0.9;//0.8375;//0.8;
 

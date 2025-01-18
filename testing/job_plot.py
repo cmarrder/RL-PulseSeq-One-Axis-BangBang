@@ -22,10 +22,10 @@ initialState = np.loadtxt(os.path.join(oDir, 'initialState.txt'))
 print('finalState')
 print(finalState)
 
-save = False # 'tplot.png'
+save = '/home/charlie/Documents/ml/CollectiveAction/plots/job_00000.png'
 show = True
 
-pulse_timings, filters, overlaps, rewards = crunch_job(tMax,
+pulse_timings, filters, overlaps, rewards = pt.crunch_job(tMax,
                                                       freq,
                                                       sOmega,
                                                       finalState,
@@ -33,8 +33,9 @@ pulse_timings, filters, overlaps, rewards = crunch_job(tMax,
                                                       initialState)
 
 #job_title = '$\mu = {0}, T = {1}$'.format(noiseParam1, noiseParam2)
-job_title = '$bandCenter = {0}*cpmgPeak, bandWidth = {1} / maxTime$'.format(noiseParam2, noiseParam1)
-#job_title = 'Sum of Lorentzians on CPMG Peaks'
+#job_title = '$bandCenter = {0}*cpmgPeak, bandWidth = {1} / maxTime$'.format(noiseParam2, noiseParam1)
+#job_title = 'Sum of Lorentzians'
+job_title = '1/f noise'
 
 pt.plot_job(tMax,
             freq,
@@ -46,5 +47,5 @@ pt.plot_job(tMax,
             overlaps,
             rewards,
             loss,
-            save = None, show = True, title = job_title,
+            save = save, show = show, title = job_title,
             filterScale = 'linear', noiseScale = 'linear')

@@ -154,7 +154,7 @@ def plot_job(max_time,
     # Find max index for plotting
     cutoffIdx = len(noise)-1 # Initialize
     for i in range(len(noise)-1, -1, -1):
-        if (noise[i] / freq[i] > 1e-12):
+        if (noise[i] / freq[i]**2 > 1e-3):
             cutoffIdx = i
             break
     print("cutoffFreq = {}".format(freq[cutoffIdx]))
@@ -250,11 +250,11 @@ def plot_job(max_time,
     axd['H'].plot(trials, agent_loss, color=agentColor)
 
     #fig.tight_layout()
+    if save is not None:
+        plt.savefig(save)
     if show:
         plt.show()
-    elif save is not None:
-        plt.savefig(save)
-        plt.close()
+    plt.close()
 
     return
 
@@ -396,11 +396,15 @@ def temperature_sweep(data_dir, plot_dir, subdir_prefix='job', show = True):
     noiseLinestyle = 'dashdot'
     noiseLabel = r'$|S(\nu)|^2$'
 
+    cutoffIdx = len(S_temp_max) - 1 # Initialize
     # Find max index for plotting
-    for i in range(len(S_temp_max)-1, -1, -1):
-        if (S_temp_max[i] / freq[i] > 1e-12):
+    for i in range(cutoffIdx, -1, -1):
+        if (S_temp_max[i] / freq[i]**2 > 1e-3):
             cutoffIdx = i
+            break
     
+    print("cutoffIdx: {}".format(cutoffIdx))
+
     # Plot overlaps. Use scatter since temperatures might be out of order due to file reading.
     axd['A'].scatter(temperatures, max_chi, color = agentColor, label = agentLabel)
     axd['A'].scatter(temperatures, UDD_chi, color = UDDColor, label = UDDLabel, marker = UDDMarker)

@@ -6,7 +6,7 @@
 #include "Greedy.hpp"
 #include "Param.hpp"
 
-constexpr int numTrial = 200;
+constexpr int numTrial = 400;
 constexpr int numEpisode = 50;
 
 int main()
@@ -26,11 +26,13 @@ int main()
   std::vector<double> rewardHistory;
   std::vector<double> lossHistory;
   double maxReward = 0;
+  double maxFid = 0;
 
   for (int trial = 0; trial < numTrial; trial++) {
     double epsilon = epsilonByProportion(trial / (double)numTrial);
     double avgLoss = 0;
     double maxRewardTrial = 0;
+    double maxFidTrial = 0;
     int lossCtr = 0;
     for (int episode = 0; episode < numEpisode; episode++) {
       environment.reset();
@@ -48,8 +50,10 @@ int main()
         state = next_state;
       }
       maxRewardTrial = std::max(maxRewardTrial, environment.reward());
+      maxFidTrial = maxRewardTrial * (1 + 1e-6) / (1 + maxRewardTrial); // Don't need this but helpful
       if (maxReward < environment.reward()) {
         maxReward = environment.reward();
+        maxFid = maxReward * (1 + 1e-6) / (1 + maxReward); // Don't need this but helpful
         actionRecord = environment.actionRecord();
       }
     }
@@ -65,6 +69,8 @@ int main()
         << " Avgloss: " << std::setw(8) << avgLoss / lossCtr 
         << " MaxRewardTrial: " << std::setw(8) << maxRewardTrial
         << " MaxReward: " << std::setw(8) << maxReward 
+        << " MaxFidTrial: " << std::setw(8) << maxFidTrial
+        << " MaxFid: " << std::setw(8) << maxFid 
         << std::endl;
       std::cout << std::setprecision(default_precision);
     }
@@ -73,7 +79,7 @@ int main()
   //agent.save("/home/charlie/Documents/ml/CollectiveAction/data/model");
 
   // Print number of times we need to calculate average infidelity.
-  std::cout << "Number of times needed to calculate average infidelity: " << environment.getRewardCalls() << std::endl;
+  std::cout << "Number of times we needed to calculate average fidelity: " << environment.getRewardCalls() << std::endl;
   
   // Apply optimal action sequence and write it to file. Print if verbose.
   std::ofstream out_action(param.oDir + "/action.txt");
