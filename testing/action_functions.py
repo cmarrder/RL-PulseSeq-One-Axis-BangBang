@@ -200,6 +200,7 @@ def make_action_list():
 
 def plot_action_sequence(action_idxs):
     """
+    Plots example transitions in separate plots.
     PARAMETERS:
     action_idxs (list): list of integers corresponding to each action
     RETURNS:

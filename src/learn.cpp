@@ -6,8 +6,8 @@
 #include "Greedy.hpp"
 #include "Param.hpp"
 
-constexpr int numTrial = 400;
-constexpr int numEpisode = 50;
+constexpr int numTrial = 250;//400;
+constexpr int numEpisode = 10;
 
 int main()
 { 
