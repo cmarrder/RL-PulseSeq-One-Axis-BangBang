@@ -19,6 +19,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_RL_FLAGS} ${TORCH_CXX_FLAGS}")
 
 add_executable(learn src/learn.cpp
+	            include/Param.hpp
 		    include/Sequence.hpp
                     include/Action.hpp
                     include/Crystal.hpp

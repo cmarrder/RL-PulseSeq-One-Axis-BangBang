@@ -90,6 +90,8 @@ class Crystal {
   Sequence sequence;
   VectorXd freq;
   VectorXd sOmega;
+  VectorXd actionHarmonics;
+  VectorXd actionEtas;
   double dFreq;
   double dTime;
   int idxMaxFreq;
@@ -98,6 +100,7 @@ class Crystal {
   int nTimePts;
   double noiseParam1;
   double noiseParam2;
+  double etaN;
   double initialChi;
   double initialAvgInfid;
 
@@ -106,6 +109,9 @@ class Crystal {
     // Wrapper function used to choose the initial pulse center times.
     //return CPMGCenterTimes();
     return PDDCenterTimes();
+    //VectorXd centerTimes(5);
+    //centerTimes << 0, 0.25, 0.25, 0.25, 0.75;
+    //return centerTimes;
   }
   
   VectorXd peakLocCPMG() const
@@ -226,13 +232,43 @@ class Crystal {
 
   VectorXd computeCtrlSig() const
   {
+    /*
+    Schematic to illustrate the binning with nTime=3 for simplicity:
+    time points: t0          t1          t2          t3
+    bins:        [    b0      )
+                              [    b1     )
+			                  [    b2     ]
+    Here, bracket [ signifies inclusive bound, parentheses ( signifies exclusive bound.
+    */
+
     // Compute control signal f(t) using the pulse sequence.
     VectorXd controlSignal = VectorXd::Ones(nTimeStep);
     VectorXd pulseCenters = sequence.getCenterTimes();
     double binWidth = maxTime / (nTimeStep);
-    VectorXi binCounts = VectorXi::Zero(nTimeStep);
+
+
+    ///////////////////////////////////
+    /// NEW VERSION:
+
+    //VectorXi binIdxs = (floor(pulseCenters.array() / binWidth)).cast<int>();
+    //// If an element of binIdxs is equal to nTimeStep, make it nTimeStep-1.
+    //binIdxs = (binIdxs.array() == nTimeStep).select(VectorXi::Constant(nPulse, nTimeStep-1), binIdxs);
+    //
+    //int maxBinIdx = nTimeStep - 1;
+    //for (int k = 0; k < nPulse; k++)
+    //{
+    //  int b = binIdxs(k);
+    //  controlSignal(seq(b, maxBinIdx)) = -controlSignal(seq(b, maxBinIdx));
+    //}
+    /////////////////////////////////
+
+    //// OLD VERSION:
     VectorXi binIdxs = (floor(pulseCenters.array() / binWidth)).cast<int>();
+    // If an element of binIdxs is equal to nTimeStep, make it nTimeStep-1.
+    binIdxs = (binIdxs.array() == nTimeStep).select(VectorXi::Constant(nPulse, nTimeStep-1), binIdxs);
+    VectorXi binCounts = VectorXi::Zero(nTimeStep);
     double sign = 1.0;
+    
     for (int k = 0; k < nPulse; k++)
     {
       binCounts(binIdxs(k)) += 1;
@@ -245,6 +281,7 @@ class Crystal {
       }
       controlSignal(i) = sign;
     }
+    
     return controlSignal;
   }
 
@@ -306,6 +343,14 @@ class Crystal {
     std::ofstream out_noiseParam2(dir + "/noiseParam2.txt");
     out_noiseParam2 << noiseParam2 << std::endl;
     out_noiseParam2.close(); 
+    
+    std::ofstream out_etaN(dir + "/etaN.txt");
+    out_etaN << etaN << std::endl;
+    out_etaN.close(); 
+
+    std::ofstream out_harmonics(dir + "/harmonics.txt");
+    out_harmonics << actionHarmonics << std::endl;
+    out_harmonics.close(); 
 
     std::ofstream out_maxTime(dir + "/maxTime.txt");
     out_maxTime << maxTime << std::endl;
@@ -340,6 +385,18 @@ class Crystal {
   {
     noiseParam1 = param.noiseParam1;
     noiseParam2 = param.noiseParam2;
+    etaN = param.etaN; // The eta associated with the highest harmonic action, that whose harmonic number = nPulse.
+
+    // Initialize harmonics for action functions. We need to do this in a roundabout way because
+    // C++ doesn't allow comma initialization of Eigen::VectorXd instances when in a class but outside of a method.
+    VectorXd harmonics(6);
+    harmonics << 1, -1, 2, -2, 8, -8;
+    actionHarmonics = harmonics;
+    actionEtas = (nPulse / actionHarmonics.array()).abs() * etaN; 
+
+    std::cout << "actionHarmonics:" << std::endl << actionHarmonics.transpose() <<std::endl;
+    std::cout << "actionEtas:" << std::endl << actionEtas.transpose() <<std::endl;
+
     nTimePts = (nTimeStep + 1) + nZero; // Make a power of 2 to make FFT faster
     dTime = maxTime / nTimeStep;
 
@@ -354,11 +411,15 @@ class Crystal {
     sOmega = computeSOmega();
 
     cutoffIdx = getCutoffIndex();
-    
+
     sequence.updateCenterTimes(initialCenterTimes());
 
-    initialChi = chi();
-    initialAvgInfid = avgInfid();
+    //initialChi = chi();
+    //initialAvgInfid = avgInfid();
+    
+    //std::cout << "f(t)" << std::endl;
+    //std::cout << computeCtrlSig().transpose() << std::endl;
+    //std::exit(0);
 
     writeInitial(param.oDir);
   }
@@ -371,7 +432,9 @@ class Crystal {
   void step(int action)
   {
     VectorXd oldTimes = sequence.getCenterTimes();
-    sequence.updateCenterTimes(actionList[action](oldTimes));
+    //sequence.updateCenterTimes(actionList[action](oldTimes)); // Used this when action functions encoded as fixed function objects.
+    VectorXd newTimes = kappa(oldTimes, actionHarmonics[action], actionEtas[action]);
+    sequence.updateCenterTimes(newTimes);
   }
 
   Feature feature() const

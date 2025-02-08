@@ -24,7 +24,23 @@ class Pulse {
 
     double getCenterTime() const { return centerTime; }
 
-    void updateCenterTime(double t) { centerTime = t; }
+    //void updateCenterTime(double t) { centerTime = t; }
+    void updateCenterTime(double t)
+    {
+      // Make sure the pulse time is not before t=0 or after t=maxTime
+      if (t < 0)
+      {
+        centerTime = 0;
+      }
+      else if (t > maxTime)
+      {
+        centerTime = maxTime;
+      }
+      else
+      {
+        centerTime = t;
+      }
+    }
 };
 
 class Sequence {

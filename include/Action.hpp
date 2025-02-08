@@ -7,18 +7,13 @@
 //constexpr double actionInterval = 4 * M_PI;
 constexpr size_t numAction = 6;
 
-//constexpr double eta1 = 0.016;//0.2;
-//constexpr double eta2 = 0.008;//0.1;
-//constexpr double eta3 = 0.0053;//0.1;
-//constexpr double eta4 = 0.004;//0.05;
-//constexpr double eta8 = 0.002;//0.05;
 
-//constexpr double eta1 = 0.04;//0.2;
-//constexpr double eta2 = 0.02;//0.1;
-//constexpr double eta3 = 0.0053;//0.1;
-//constexpr double eta4 = 0.01;//0.05;
-//constexpr double eta8 = 0.005;//0.05;
+VectorXd kappa(const VectorXd& centerTimes, const double harmonic, const double eta)
+{
+  return centerTimes.array() + eta * (harmonic * M_PI * centerTimes.array() / maxTime).sin();
+}
 
+/*
 constexpr double eta1 = 0.04;//0.2;
 constexpr double eta2 = 0.02;//0.1;
 constexpr double eta3 = 0.0053;//0.1;
@@ -91,9 +86,7 @@ VectorXd kappaMinus8(const VectorXd& centerTimes)
 }
 
 // MAKE SURE THE LENGTH OF THIS ARRAY IS EQUAL TO numAction !!!
-/*
 const std::array<CollectiveTransform, numAction> actionList {
-  kappa0,
   kappaPlus1,
   kappaMinus1,
   kappaPlus4,
@@ -101,10 +94,3 @@ const std::array<CollectiveTransform, numAction> actionList {
   kappaPlus8,
   kappaMinus8};
 */
-const std::array<CollectiveTransform, numAction> actionList {
-  kappaPlus1,
-  kappaMinus1,
-  kappaPlus4,
-  kappaMinus4,
-  kappaPlus8,
-  kappaMinus8};

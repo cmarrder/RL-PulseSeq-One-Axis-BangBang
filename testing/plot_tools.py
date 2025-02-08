@@ -4,6 +4,8 @@ import matplotlib.ticker as ticker
 import os
 import pulse_sequence as ps
 
+def kappa(t, harmonic, eta, max_time):
+    return t + eta * np.sin(np.pi * harmonic * t / max_time)
 
 def crunch_job(max_time,
                freq,
@@ -242,7 +244,7 @@ def plot_job(max_time,
 
     # Get index of maximum rewards
     idxMax = np.argmax(rewards[0])
-    axd['G'].scatter(trials[idxMax], rewards[0][idxMax], color=agentColor, label = 'Agent Max Reward')
+    axd['G'].scatter(trials[idxMax], rewards[0][idxMax], color=agentColor, label = 'Agent Max Reward', facecolors='none')
     axd['G'].legend()
 
     axd['H'].set_ylabel('Average Loss')
@@ -449,10 +451,322 @@ def temperature_sweep(data_dir, plot_dir, subdir_prefix='job', show = True):
     return
 
 
+def single_eta_multi_run(data_dir, subdir_prefix='run', show = True, save = None):
+    """
+    PARAMETERS:
+    data_dir (string): directory containing the subdirectories which contain the data files
+    subdir_prefix (Optional, string): the prefix of all the subdirectories
+    show (bool): indicates whether to show the eta plot using matplotlib's interactive environment
+
+    RETURNS:
+    None
+    """
+
+    ## Check if plot directory exists
+    #if os.path.exists(plot_dir) == False:
+    #    raise ValueError("Path " + plot_dir + " does not exist.")
+
+    # Lists will store rewards over eta
+    infidelity_list = []
+    final_state_list = []
+    loss_list = []
+
+    run_counter = 0
+    file_fail_counter = 0
+
+    print("Reading from directory "+ data_dir)
+    Nfiles = len(os.listdir(data_dir))
+    for file in os.listdir(data_dir):
+        if file.startswith(subdir_prefix):
+
+            try:
+                oDir = os.path.join(data_dir, file)
+
+                # Load data
+
+                freq = np.loadtxt(os.path.join(oDir, 'freq.txt'))
+                sOmega = np.loadtxt(os.path.join(oDir, 'sOmega.txt'))
+
+                finalState = np.loadtxt(os.path.join(oDir, 'state.txt'))
+                rewards = np.loadtxt(os.path.join(oDir, 'reward.txt'))
+                loss = np.loadtxt(os.path.join(oDir, 'loss.txt'))
+                
+                nPulse = int( np.loadtxt(os.path.join(oDir, 'nPulse.txt')) ) # Number of pulse applications
+                tMax = np.loadtxt(os.path.join(oDir, 'maxTime.txt'))
+                etaN = np.loadtxt(os.path.join(oDir, 'etaN.txt'))
+                harmonics = np.loadtxt(os.path.join(oDir, 'harmonics.txt')).astype(int)
+
+                infidelities = 1 - ps.fid_from_reward(rewards)
+
+                infidelity_list.append(infidelities)
+                final_state_list.append(finalState)
+                loss_list.append(loss)
+                
+                print("Run {} loaded".format(run_counter))
+
+                run_counter += 1
+            
+            except FileNotFoundError:
+                raise FileNotFoundError(f"{file} not found or is missing data.")
+        else:
+            print(f"File {file} is not a target file. Trying next file.")
+            file_fail_counter += 1
+
+    if file_fail_counter == Nfiles:
+        raise Exception("No target files found.")
+                
+
+    UDD_times = ps.UDD(nPulse, tMax) 
+    CPMG_times = ps.CPMG(nPulse, tMax) 
+    UDD_filter = ps.FilterFunc(freq, UDD_times, tMax) # Agent Filter 
+    CPMG_filter = ps.FilterFunc(freq, CPMG_times, tMax) # UDD filter 
+    UDD_chi = ps.chi(freq, sOmega, UDD_filter)
+    CPMG_chi = ps.chi(freq, sOmega, CPMG_filter)
+    UDD_infid = 1 - ps.fidelity(UDD_chi)
+    CPMG_infid = 1 - ps.fidelity(CPMG_chi)
+
+    print("UDD infidelity: ", UDD_infid)
+    print("CPMG infidelity: ", CPMG_infid)
+
+    # Plot chi and reward over eta
+    fig = plt.figure(layout = 'constrained', figsize = (16, 8))
+    mosaic = """
+             AB
+             AC
+             """
+    axd = fig.subplot_mosaic(mosaic)
+    
+    UDDColor = '#1F77B4'#'#377EB8'# Curious Blue
+    UDDLinestyle = 'dashed'
+    UDDLabel = 'UDD'
+
+    CPMGColor = '#FF7F0E'#'#FF7F00'# Dark Orange
+    CPMGLinestyle = 'dashed'
+    CPMGLabel = 'CPMG'
+
+    pulse_seq_lw = 2 # Linewidth for pulse sequences in the plot.
+
+    # X axis for axis X
+    axd['A'].set_xlim( (0, tMax) )
+    xtick_positions = [0, tMax/4, tMax/2, 3*tMax/4, tMax]
+    xtick_labels = ['0', '0.25T', '0.5T', '0.75T', 'T']
+    axd['A'].set_xticks(ticks=xtick_positions, labels=xtick_labels)
+    axd['A'].set_xlabel('Time')
+
+    # Parameters for vlines
+    nRun = len(infidelity_list)
+    vlines_ymin = np.arange(nRun)
+    vlines_ymax = vlines_ymin + 1
+
+    # Lefthand Y axis
+    axd['A'].set_ylim((-1, nRun + 1))
+    y1tick_locs = vlines_ymin + 0.5
+    y1tick_labels = np.arange(1, nRun+1)
+    axd['A'].set_yticks(ticks=y1tick_locs, labels = y1tick_labels)
+    axd['A'].set_ylabel('Runs')
+
+    # Make infidelity and loss plots
+    nTrial = len(infidelities)
+    trials = np.arange(1, nTrial + 1) # Do arange(1, n+1) so that index starts at 1, ends at nTrial
+    axd['B'].set_ylabel('Infidelity')
+    axd['C'].set_ylabel('Average Loss')
+    axd['B'].sharex(axd['C'])
+    axd['C'].set_xlabel('Trials')
+    for i in range(nRun):
+        axd['A'].vlines(final_state_list[i], vlines_ymin[i], vlines_ymax[i], lw=pulse_seq_lw)
+        axd['B'].plot(trials, infidelity_list[i], label = 'Run {}'.format(i)) 
+        axd['C'].plot(trials, loss_list[i], label = 'Run {}'.format(i)) 
+    axd['B'].plot(trials, np.full(nTrial, UDD_infid), color=UDDColor, linestyle=UDDLinestyle, label = 'UDD') 
+    axd['B'].plot(trials, np.full(nTrial, CPMG_infid), color=CPMGColor, linestyle=CPMGLinestyle, label = 'CPMG')
+    #axd['B'].set_yscale('log')
+
+    # Get index of maximum rewards
+    axd['B'].legend()
+
+    # Set title
+    plt.suptitle('$\eta_{{{0}}}$ = {1}, Harmonic Set: {2}'.format(nPulse, etaN, harmonics))
+
+    #fig.tight_layout()
+    if save is not None:
+        plt.savefig(save)
+    if show:
+        plt.show()
+    plt.close()
+
+    return
+
+
+def multi_eta_multi_run(data_dir, subdir_prefix='job', subsubdir_prefix='run', show = True, save = None):
+    """
+    PARAMETERS:
+    data_dir (string): directory containing the subdirectories which contain the data files
+    subdir_prefix (Optional, string): the prefix of all the subdirectories
+    show (bool): indicates whether to show the eta plot using matplotlib's interactive environment
+
+    RETURNS:
+    None
+    """
+
+    ## Check if plot directory exists
+    #if os.path.exists(plot_dir) == False:
+    #    raise ValueError("Path " + plot_dir + " does not exist.")
+
+    # Lists will store values corresponding to each eta
+    eta_list = []
+    avg_min_infid_list = [] # List of average minimum infidelities found in each job directory
+    std_min_infid_list = [] # List of standard deviation of infidelities found in each job directory
+
+
+    print("Reading from directory "+ data_dir)
+    job_counter = 0
+    # For every file in data_dir
+    for file in os.listdir(data_dir):
+        if file.startswith(subdir_prefix):
+            file_fail_counter = 0
+            Nfiles = len(os.listdir(os.path.join(data_dir, file))) # Number files in subdirectory
+            min_infid_list = [] # List of average minimum infidelities found in each job directory
+            etaN_list = []
+
+            run_counter = 0
+            # For every file in the subdirectory
+            for subdir_file in os.listdir(os.path.join(data_dir, file)):
+                if subdir_file.startswith(subsubdir_prefix):
+                    try:
+                        oDir = os.path.join(data_dir, file, subdir_file) # Directory with output data
+
+                        # Load data
+                        if run_counter == 0:
+                            etaN = np.loadtxt(os.path.join(oDir, 'etaN.txt')).item()
+                            eta_list.append(etaN)
+                        if job_counter == 0:
+                            harmonics = np.loadtxt(os.path.join(oDir, 'harmonics.txt')).astype(int)
+                            freq = np.loadtxt(os.path.join(oDir, 'freq.txt'))
+                            sOmega = np.loadtxt(os.path.join(oDir, 'sOmega.txt'))
+                            nPulse = int( np.loadtxt(os.path.join(oDir, 'nPulse.txt')) ) # Number of pulse applications
+                            tMax = np.loadtxt(os.path.join(oDir, 'maxTime.txt'))
+                            
+                        rewards = np.loadtxt(os.path.join(oDir, 'reward.txt'))
+                        infidelities = 1 - ps.fid_from_reward(rewards)
+                        min_infid_list.append(np.min(infidelities))
+                        
+                        print("Run {} loaded".format(run_counter))
+
+                        run_counter += 1
+                    
+                    except FileNotFoundError:
+                        raise FileNotFoundError(f"{oDir} not found or is missing data.")
+                else:
+                    print(f"File {oDir} is not a target file. Trying next file.")
+                    file_fail_counter += 1
+
+            if file_fail_counter == Nfiles:
+                raise Exception("No target files found in {os.path.join(data_dir, file)}.")
+        avg_min_infid_list.append( np.mean(np.array(min_infid_list)) )
+        std_min_infid_list.append( np.std(np.array(min_infid_list)) )
+        job_counter += 1
+
+    UDD_times = ps.UDD(nPulse, tMax) 
+    CPMG_times = ps.CPMG(nPulse, tMax) 
+    UDD_filter = ps.FilterFunc(freq, UDD_times, tMax) # Agent Filter 
+    CPMG_filter = ps.FilterFunc(freq, CPMG_times, tMax) # UDD filter 
+    UDD_chi = ps.chi(freq, sOmega, UDD_filter)
+    CPMG_chi = ps.chi(freq, sOmega, CPMG_filter)
+    UDD_infid = 1 - ps.fidelity(UDD_chi)
+    CPMG_infid = 1 - ps.fidelity(CPMG_chi)
+
+    print("UDD infidelity: ", UDD_infid)
+    print("CPMG infidelity: ", CPMG_infid)
+
+    ## Plot chi and reward over eta
+    #fig = plt.figure(layout = 'constrained', figsize = (16, 8))
+    #mosaic = """
+    #         AB
+    #         AC
+    #         """
+    #axd = fig.subplot_mosaic(mosaic)
+    
+    UDDColor = '#1F77B4'#'#377EB8'# Curious Blue
+    UDDLinestyle = 'dashed'
+    UDDLabel = 'UDD'
+
+    CPMGColor = '#FF7F0E'#'#FF7F00'# Dark Orange
+    CPMGLinestyle = 'dashed'
+    CPMGLabel = 'CPMG'
+    
+    agentColor = '#984EA3'# Deep Lilac
+    agentLinestyle = 'solid'
+    agentLabel = 'Agent' 
+
+    pulse_seq_lw = 2 # Linewidth for pulse sequences in the plot.
+    
+    Neta = len(eta_list)
+    # Sort values because sometimes data gets loaded out of order
+    sort_indices = np.argsort(eta_list)
+    eta_arr = np.array(eta_list)[sort_indices]
+    avg_min_infid_arr = np.array(avg_min_infid_list)[sort_indices]
+    std_min_infid_arr = np.array(std_min_infid_list)[sort_indices]
+
+    # Plot
+    plt.errorbar(eta_arr, avg_min_infid_arr, yerr=std_min_infid_arr, color = agentColor, label='Harmonics: {}'.format(harmonics))
+    plt.plot(eta_list, np.full(Neta, CPMG_infid), color = CPMGColor, label='CPMG')
+    plt.plot(eta_list, np.full(Neta, UDD_infid), color = UDDColor, label='UDD')
+    plt.ylabel('Average of Minimum Infidelity')
+    plt.xlabel('$\eta_{{{}}}$'.format(nPulse))
+    plt.title('Max Step = {}'.format(20))
+
+    plt.legend()
+
+    plt.show()
+
+
+    return
+
+def multi_single_eta_plots(data_dir, save, subdir_prefix='job'):
+    """
+    PARAMETERS:
+    data_dir (string): directory containing the subdirectories which contain the data files
+    subdir_prefix (Optional, string): the prefix of all the subdirectories
+    show (bool): indicates whether to show the eta plot using matplotlib's interactive environment
+
+    RETURNS:
+    None
+    """
+
+    ## Check if plot directory exists
+    #if os.path.exists(plot_dir) == False:
+    #    raise ValueError("Path " + plot_dir + " does not exist.")
+
+    run_counter = 0
+    file_fail_counter = 0
+
+    print("Reading from directory "+ data_dir)
+    Nfiles = len(os.listdir(data_dir))
+    for file in os.listdir(data_dir):
+        if file.startswith(subdir_prefix):
+
+            try:
+                oDir = os.path.join(data_dir, file)
+                single_eta_multi_run(oDir, show=False, save=os.path.join(save, file))
+                
+                print("Run {} loaded".format(run_counter))
+
+                run_counter += 1
+            
+            except FileNotFoundError:
+                raise FileNotFoundError(f"{file} not found or is missing data.")
+        else:
+            print(f"File {file} is not a target file. Trying next file.")
+            file_fail_counter += 1
+
+    if file_fail_counter == Nfiles:
+        raise Exception("No target files found.")
+
+    return
 
 if __name__=='__main__':
      
     # Load data
+    """
     oDir = '/home/charlie/Documents/ml/CollectiveAction/data/job_00000'
 
     nPulse = int( np.loadtxt(os.path.join(oDir, 'nPulse.txt')) ) # Number of pulse applications
@@ -498,9 +812,12 @@ if __name__=='__main__':
              loss,
              save = None, show = True, title = job_title,
              filterScale = 'linear', noiseScale = 'linear')
-
     """
+
+    
     dd = '/home/charlie/Documents/ml/CollectiveAction/data'
-    pd = '/home/charlie/Documents/ml/CollectiveAction/plots'
-    temperature_sweep(dd, pd, show=False)
-    """ 
+    pd = '/home/charlie/Documents/ml/CollectiveAction/paper_plots'
+    #temperature_sweep(dd, pd, show=False)
+    #single_eta_multi_run(dd, show=True)
+    #multi_eta_multi_run(dd, show=True)
+    multi_single_eta_plots(dd, save=pd)

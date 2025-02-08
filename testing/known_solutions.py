@@ -7,7 +7,7 @@ plotCurves = True
 
 # Load data
 
-oDir = '/home/charlie/Documents/ml/CollectiveAction/data/job_00000'
+oDir = '/home/charlie/Documents/ml/CollectiveAction/data/job_00000/run_00000'
 
 nPulse = 1 + int( np.loadtxt(os.path.join(oDir, 'nPulse.txt')) ) # Number of pulse applications
 #nTimeStep = int( np.loadtxt(os.path.join(oDir, 'nTimeStep.txt')) )# Number of pulse chances/locations
@@ -75,7 +75,7 @@ if plotCurves == True:
     # Find max index for plotting
     cutoffIdx = len(S)-1 # Initialize
     for i in range(len(S)-1, -1, -1):
-        if (S[i] / freq[i] > 1e-12):
+        if (S[i] / freq[i] > 1e-3):
             cutoffIdx = i
             break
     

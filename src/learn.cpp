@@ -6,8 +6,8 @@
 #include "Greedy.hpp"
 #include "Param.hpp"
 
-constexpr int numTrial = 250;//400;
-constexpr int numEpisode = 10;
+constexpr int numTrial = 100;//250;//400;
+constexpr int numEpisode = 100;
 
 int main()
 { 
@@ -50,10 +50,10 @@ int main()
         state = next_state;
       }
       maxRewardTrial = std::max(maxRewardTrial, environment.reward());
-      maxFidTrial = maxRewardTrial * (1 + 1e-6) / (1 + maxRewardTrial); // Don't need this but helpful
+      maxFidTrial = maxRewardTrial * (1 + 1e-8) / (1 + maxRewardTrial); // Don't need this but helpful
       if (maxReward < environment.reward()) {
         maxReward = environment.reward();
-        maxFid = maxReward * (1 + 1e-6) / (1 + maxReward); // Don't need this but helpful
+        maxFid = maxReward * (1 + 1e-8) / (1 + maxReward); // Don't need this but helpful
         actionRecord = environment.actionRecord();
       }
     }

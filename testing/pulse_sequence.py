@@ -288,6 +288,9 @@ def chi_avg(freqs, noise, maxTime, nPulseChances, weights=None):
     ff = (nPulseChances + 1) * (pulse_spacing * np.sinc(freqs * pulse_spacing))**2
     return chi(freqs, noise, ff, weights=weights)
 
+def fidelity(chi_array):
+    return 0.5 * (1 + np.exp(-chi_array))
+
 def RewardFunc(chi_array, initial_chi = 1.0):
     #small = 1e-8
     #rewards = np.zeros_like(chi_array)
@@ -306,8 +309,11 @@ def RewardFunc(chi_array, initial_chi = 1.0):
     #initialAvgInfid = 1 - 0.5 * np.full_like(avgInfid, 1 + np.exp(-initial_chi))
     #relativeAvgInfid = avgInfid / initialAvgInfid
     #return 1 / (relativeAvgInfid + 1e-8)
-    avgFid = 0.5 * (1 + np.exp(-chi_array))
+    avgFid = fidelity(-chi_array)
     return avgFid / (1 - avgFid + 1e-6)
+
+def fid_from_reward(reward):
+    return reward * (1 + 1e-8) / (reward + 1)
 
 def calc_sign_seq(pulse_seq, Nb=1):
     """ Given a pulse sequence of zeros and ones, calculates the

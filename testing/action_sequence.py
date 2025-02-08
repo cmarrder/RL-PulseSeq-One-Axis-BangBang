@@ -81,12 +81,102 @@ def kappa(t, harmonic, eta, max_time):
 #    plt.show()
 #    return
 
+#def action_sequence_plot(initial_times,
+#                         action_sequence,
+#                         harmonic_set,
+#                         eta_set,
+#                         max_time,
+#                         show=True,
+#                         save=None):
+#    """
+#    PARAMETERS:
+#    initial_times (list like)
+#    action_sequence (list)
+#    harmonic_set (list)
+#    eta_set (list)
+#    max_time (float)
+#    """
+#
+#    # Define font sizes
+#    SIZE_DEFAULT = 16
+#    SIZE_LARGE = 22
+#    # Define pad sizes
+#    PAD_DEFAULT = 10
+#    # matplotlib metaparameters 
+#    mpl.rcParams['axes.linewidth'] = 2
+#    mpl.rcParams['xtick.major.size'] = 7#5
+#    mpl.rcParams['xtick.major.width'] = 2 
+#    mpl.rcParams['xtick.minor.size'] = 1
+#    mpl.rcParams['xtick.minor.width'] = 1
+#    mpl.rcParams['ytick.major.size'] = 7#5
+#    mpl.rcParams['ytick.major.width'] = 2 
+#    mpl.rcParams['ytick.minor.size'] = 1
+#    mpl.rcParams['ytick.minor.width'] = 1
+#    mpl.rcParams['axes.titlepad'] = PAD_DEFAULT
+#    plt.rcParams['figure.constrained_layout.use'] = True
+#    pulse_seq_lw = 2 # Linewidth for pulse sequences in the plot.
+#    agent_color = '#984EA3'# Lilac
+#
+#    fig = plt.figure(layout = 'constrained', figsize=(6, 12))
+#    mosaic = """
+#             P
+#             """
+#    axd = fig.subplot_mosaic(mosaic)
+#    #fig, ax1 = plt.subplots()
+#    #ax2 = ax1.twinx()
+#    #ax1.grid(axis='y')
+#    axH = axd['P'].twinx()
+#    axd['P'].grid(axis='y')
+#
+#    # X axis
+#    axd['P'].set_xlim( (0, max_time) )
+#    xtick_positions = [0, max_time/4, max_time/2, 3*max_time/4, max_time]
+#    xtick_labels = ['0', '0.25T', '0.5T', '0.75T', 'T']
+#    axd['P'].set_xticks(ticks=xtick_positions, labels=xtick_labels)
+#    axd['P'].set_xlabel('Time')
+#
+#    # Parameters for vlines
+#    Nstep = len(action_sequence)
+#    vlines_ymin = np.arange(Nstep + 1)
+#    vlines_ymax = vlines_ymin + 1
+#
+#    # Lefthand Y axis
+#    axd['P'].set_ylim((-1, Nstep + 2))
+#    y1tick_locs = vlines_ymin + 0.5
+#    y1tick_labels = np.arange(Nstep + 1)
+#    axd['P'].set_yticks(ticks=y1tick_locs, labels = y1tick_labels)
+#    axd['P'].set_ylabel('Steps')
+#
+#    # Righthand Y axis
+#    axH.set_ylim((-1, Nstep + 2))
+#    y2tick_locs = y1tick_locs[1:] 
+#    y2tick_labels = [harmonic_set[a] for a in action_sequence]
+#    axH.set_yticks(ticks=y2tick_locs, labels = y2tick_labels)
+#    axH.set_ylabel('Harmonics Chosen')
+#
+#
+#    # Plot pulse sequence vertical lines for the initial state and then each subsequent state.
+#    step = 0
+#    pulse_times = np.copy(initial_times)
+#    axd['P'].vlines(pulse_times, vlines_ymin[step], vlines_ymax[step], color = agent_color, lw=pulse_seq_lw) # Plot initial state
+#    for action in action_sequence:
+#        step += 1
+#        pulse_times = kappa(pulse_times, harmonic_set[action], eta_set[action], max_time)
+#        axd['P'].vlines(pulse_times, vlines_ymin[step], vlines_ymax[step], color = agent_color, lw=pulse_seq_lw)
+#    plt.title('Effect of Actions on Pulse Sequence Timings')
+#    if show is True:
+#        plt.show()
+#    if save is not None:
+#        plt.savefig(save, dpi=300)
+#    return
 
 def action_sequence_plot(initial_times,
                          action_sequence,
                          harmonic_set,
                          eta_set,
-                         max_time):
+                         max_time,
+                         show=True,
+                         save=None):
     """
     PARAMETERS:
     initial_times (list like)
@@ -100,7 +190,7 @@ def action_sequence_plot(initial_times,
     SIZE_DEFAULT = 16
     SIZE_LARGE = 22
     # Define pad sizes
-    PAD_DEFAULT = 10
+    PAD_DEFAULT = 15
     # matplotlib metaparameters 
     mpl.rcParams['axes.linewidth'] = 2
     mpl.rcParams['xtick.major.size'] = 7#5
@@ -116,16 +206,24 @@ def action_sequence_plot(initial_times,
     pulse_seq_lw = 2 # Linewidth for pulse sequences in the plot.
     agent_color = '#984EA3'# Lilac
 
-    fig, ax1 = plt.subplots()
-    ax2 = ax1.twinx()
-    ax1.grid(axis='y')
+    fig = plt.figure(layout = 'constrained', figsize=(12, 12))
+    mosaic = """
+             FPPP11
+             FPPP22
+             FPPP33
+             """
+    axd = fig.subplot_mosaic(mosaic)
+
+    ##### PULSE SEQUENCE PLOT #####
+    axH = axd['P'].twinx()
+    axd['P'].grid(axis='y')
 
     # X axis
-    plt.xlim( (0, max_time) )
+    axd['P'].set_xlim( (0, max_time) )
     xtick_positions = [0, max_time/4, max_time/2, 3*max_time/4, max_time]
     xtick_labels = ['0', '0.25T', '0.5T', '0.75T', 'T']
-    plt.xticks(ticks=xtick_positions, labels=xtick_labels)
-    ax1.set_xlabel('Time')
+    axd['P'].set_xticks(ticks=xtick_positions, labels=xtick_labels)
+    axd['P'].set_xlabel('Time')
 
     # Parameters for vlines
     Nstep = len(action_sequence)
@@ -133,30 +231,34 @@ def action_sequence_plot(initial_times,
     vlines_ymax = vlines_ymin + 1
 
     # Lefthand Y axis
-    ax1.set_ylim((-1, Nstep + 2))
+    axd['P'].set_ylim((-1, Nstep + 2))
     y1tick_locs = vlines_ymin + 0.5
     y1tick_labels = np.arange(Nstep + 1)
-    ax1.set_yticks(ticks=y1tick_locs, labels = y1tick_labels)
-    ax1.set_ylabel('Steps')
+    axd['P'].set_yticks(ticks=y1tick_locs, labels = y1tick_labels)
+    axd['P'].set_ylabel('Steps')
 
     # Righthand Y axis
-    ax2.set_ylim((-1, Nstep + 2))
+    axH.set_ylim((-1, Nstep + 2))
     y2tick_locs = y1tick_locs[1:] 
     y2tick_labels = [harmonic_set[a] for a in action_sequence]
-    ax2.set_yticks(ticks=y2tick_locs, labels = y2tick_labels)
-    ax2.set_ylabel('Harmonics Chosen')
+    axH.set_yticks(ticks=y2tick_locs, labels = y2tick_labels)
+    axH.set_ylabel('Harmonics Chosen', rotation=270, labelpad=PAD_DEFAULT)
 
 
     # Plot pulse sequence vertical lines for the initial state and then each subsequent state.
     step = 0
     pulse_times = np.copy(initial_times)
-    ax1.vlines(pulse_times, vlines_ymin[step], vlines_ymax[step], color = agent_color, lw=pulse_seq_lw)
+    axd['P'].vlines(pulse_times, vlines_ymin[step], vlines_ymax[step], color = agent_color, lw=pulse_seq_lw) # Plot initial state
     for action in action_sequence:
         step += 1
         pulse_times = kappa(pulse_times, harmonic_set[action], eta_set[action], max_time)
-        ax1.vlines(pulse_times, vlines_ymin[step], vlines_ymax[step], color = agent_color, lw=pulse_seq_lw)
-    plt.title('Effect of Actions on Pulse Sequence Timings')
-    plt.show()
+        axd['P'].vlines(pulse_times, vlines_ymin[step], vlines_ymax[step], color = agent_color, lw=pulse_seq_lw)
+    axd['P'].set_title('Effect of Actions on Pulse Sequence Timings')
+
+    if show is True:
+        plt.show()
+    if save is not None:
+        plt.savefig(save, dpi=300)
     return
 
 if __name__=="__main__":
@@ -167,9 +269,9 @@ if __name__=="__main__":
     harmonic_set = [1, -1, 4, -4, 8, -8]
     eta_set = [eta1, eta1, eta4, eta4, eta8, eta8]
 
-    job_dir = '/home/charlie/Documents/ml/CollectiveAction/data/job_00000'
+    job_dir = '/home/charlie/Documents/ml/CollectiveAction/data'
     action_data = os.path.join(job_dir, 'action.txt')
-    save_dir = '/home/charlie/Documents/ml/CollectiveAction/action_seq'
+    #save_dir = '/home/charlie/Documents/ml/CollectiveAction/action_seq'
     action_sequence = list(np.loadtxt(action_data, dtype=int))
     
     max_time = 1
