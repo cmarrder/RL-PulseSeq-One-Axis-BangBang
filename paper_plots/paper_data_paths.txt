@@ -1,0 +1,2 @@
+Fig3 '/home/charlie/Documents/ml/CollectiveAction/eta_scan_data/1_over_f/harmonics_01_02_08/job_00002/run_00001'
+

@@ -598,6 +598,7 @@ def single_eta_multi_run(data_dir, subdir_prefix='run', show = True, save = None
 
 def multi_eta_multi_run(data_dir, subdir_prefix='job', subsubdir_prefix='run', show = True, save = None):
     """
+    Make plot of eta on the x axis and fidelity on the y axis.
     PARAMETERS:
     data_dir (string): directory containing the subdirectories which contain the data files
     subdir_prefix (Optional, string): the prefix of all the subdirectories
@@ -649,8 +650,6 @@ def multi_eta_multi_run(data_dir, subdir_prefix='job', subsubdir_prefix='run', s
                         infidelities = 1 - ps.fid_from_reward(rewards)
                         min_infid_list.append(np.min(infidelities))
                         
-                        print("Run {} loaded".format(run_counter))
-
                         run_counter += 1
                     
                     except FileNotFoundError:
@@ -723,6 +722,8 @@ def multi_eta_multi_run(data_dir, subdir_prefix='job', subsubdir_prefix='run', s
 
 def multi_single_eta_plots(data_dir, save, subdir_prefix='job'):
     """
+    Make many single eta plots.
+
     PARAMETERS:
     data_dir (string): directory containing the subdirectories which contain the data files
     subdir_prefix (Optional, string): the prefix of all the subdirectories
@@ -815,9 +816,9 @@ if __name__=='__main__':
     """
 
     
-    dd = '/home/charlie/Documents/ml/CollectiveAction/data'
+    dd = '/home/charlie/Documents/ml/CollectiveAction/eta_scan_data/1_over_f/harmonics_01_02_08/job_00001'
     pd = '/home/charlie/Documents/ml/CollectiveAction/paper_plots'
     #temperature_sweep(dd, pd, show=False)
-    #single_eta_multi_run(dd, show=True)
+    single_eta_multi_run(dd, show=True)
     #multi_eta_multi_run(dd, show=True)
-    multi_single_eta_plots(dd, save=pd)
+    #multi_single_eta_plots(dd, save=pd)

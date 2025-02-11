@@ -7,9 +7,9 @@ plotCurves = True
 
 # Load data
 
-oDir = '/home/charlie/Documents/ml/CollectiveAction/data/job_00000/run_00000'
+oDir = '/home/charlie/Documents/ml/CollectiveAction/eta_scan_data/1_over_f/harmonics_01_02_08/job_00002/run_00001'
 
-nPulse = 1 + int( np.loadtxt(os.path.join(oDir, 'nPulse.txt')) ) # Number of pulse applications
+nPulse = int( np.loadtxt(os.path.join(oDir, 'nPulse.txt')) ) # Number of pulse applications
 #nTimeStep = int( np.loadtxt(os.path.join(oDir, 'nTimeStep.txt')) )# Number of pulse chances/locations
 tMax = np.loadtxt(os.path.join(oDir, 'maxTime.txt'))
 param1 = np.loadtxt(os.path.join(oDir, 'noiseParam1.txt'))
@@ -54,7 +54,12 @@ print(CPMGTime)
 #UDDSteps = np.diff(UDDTime)
 #CPMGSteps = np.diff(CPMGTime)
 
+
 if plotCurves == True:
+    UDDColor = '#377EB8' #Blue
+    agentColor = '#984EA3' #Lilac
+    CPMGColor = '#FF7F00' #Orange
+    noiseColor = '#2CA02C' #Green
 
     UDDFilter = ps.FilterFunc(freq, UDDTime, tMax)
     CPMGFilter = ps.FilterFunc(freq, CPMGTime, tMax)
@@ -62,9 +67,6 @@ if plotCurves == True:
     dfreq = freq[1] - freq[0]
     UDDOverlap = np.sum(S * UDDFilter * dfreq)
     CPMGOverlap = np.sum(S * CPMGFilter * dfreq)
-    
-    UDDColor = 'blue'
-    CPMGColor = 'red'
     
     fig, axs = plt.subplots(3, sharex=True, layout='constrained')
     
@@ -81,7 +83,7 @@ if plotCurves == True:
     
     #axs[0].set_title('$N_{{pulse}} = {}$'.format(nPulse))
     axs[0].set_title(string_Na + string_mu + string_temp)
-    axs[0].plot(freq[:cutoffIdx], S[:cutoffIdx])
+    axs[0].plot(freq[:cutoffIdx], S[:cutoffIdx], color = noiseColor)
     axs[0].set_ylabel(r"$S(\nu)$")
     
     axs[1].plot(freq[:cutoffIdx], UDDFilter[:cutoffIdx], label = "UDD", color = UDDColor)
