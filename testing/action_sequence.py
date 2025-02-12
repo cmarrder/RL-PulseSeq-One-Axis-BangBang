@@ -334,10 +334,11 @@ def action_sequence_plot(initial_times,
         if (noise[i] / freqs[i]**2 > 1e-3):
             cutoff_idx = i
             break
+    angfreqs = 2 * np.pi * freqs # Convert to angular frequency
     for j in range(3):
         ax_key = str(j)
-        axd[ax_key].plot(freqs[:cutoff_idx], ff_slices[j, :cutoff_idx], color=agent_color, label='$F(\omega)$', lw=LW_CURVES)
-        axd[ax_key].plot(freqs[:cutoff_idx], noise[:cutoff_idx], color = noise_color, label='$S(\omega)$', lw=LW_CURVES)
+        axd[ax_key].plot(angfreqs[:cutoff_idx], ff_slices[j, :cutoff_idx], color=agent_color, label='$F(\omega)$', lw=LW_CURVES)
+        axd[ax_key].plot(angfreqs[:cutoff_idx], noise[:cutoff_idx], color = noise_color, label='$S(\omega)$', lw=LW_CURVES)
         axd[ax_key].tick_params(axis='both', which='major', labelsize=SIZE_TICK_LABEL) 
         axd[ax_key].set_yscale('log')
         axd[ax_key].legend(prop={'size': SIZE_TICK_LABEL})
@@ -373,5 +374,6 @@ if __name__=="__main__":
     pulse_times = ps.PDD(Npulse, max_time)
     eta_arr = np.abs(Npulse / harmonics_arr) * etaN
 
-    action_sequence_plot(pulse_times, action_sequence, harmonics_arr, eta_arr, max_time, freqs_arr, noise_arr, save=save_dir)
+    action_sequence_plot(pulse_times, action_sequence, harmonics_arr, eta_arr, max_time, freqs_arr, noise_arr, save=save_dir, show=False)
+    #action_sequence_plot(pulse_times, action_sequence, harmonics_arr, eta_arr, max_time, freqs_arr, noise_arr)
 

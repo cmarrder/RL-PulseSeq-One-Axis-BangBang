@@ -277,6 +277,11 @@ def lorentzians(abscissa, centers, fwhms):
     return sum
 
 def chi(freqs, noise, filter_func, weights=None):
+    """
+    freqs (np.ndarray): frequencies in units of 1/time
+    noise (np.ndarray): noise spectrum
+    filter_func (np.ndarray): filter function calculated with the ordinary frequency, unitary Fourier transform convention
+    """
     if weights is None:
         dfreq = freqs[1] - freqs[0]
         return np.sum(filter_func * noise * dfreq)
