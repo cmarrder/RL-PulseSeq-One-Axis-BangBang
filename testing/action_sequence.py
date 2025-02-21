@@ -214,6 +214,7 @@ def action_sequence_plot(initial_times,
     plt.rcParams['figure.constrained_layout.use'] = True
     agent_color = '#984EA3'# Lilac
     noise_color = '#2CA02C'# Green
+    noise_linestyle = 'dashed'
 
     fig = plt.figure(layout = 'constrained', figsize=(12, 10))
     #mosaic = """
@@ -338,7 +339,7 @@ def action_sequence_plot(initial_times,
     for j in range(3):
         ax_key = str(j)
         axd[ax_key].plot(angfreqs[:cutoff_idx], ff_slices[j, :cutoff_idx], color=agent_color, label='$F(\omega)$', lw=LW_CURVES)
-        axd[ax_key].plot(angfreqs[:cutoff_idx], noise[:cutoff_idx], color = noise_color, label='$S(\omega)$', lw=LW_CURVES)
+        axd[ax_key].plot(angfreqs[:cutoff_idx], noise[:cutoff_idx], color = noise_color, label='$S(\omega)$', lw=LW_CURVES, linestyle=noise_linestyle)
         axd[ax_key].tick_params(axis='both', which='major', labelsize=SIZE_TICK_LABEL) 
         axd[ax_key].set_yscale('log')
         axd[ax_key].legend(prop={'size': SIZE_TICK_LABEL})
