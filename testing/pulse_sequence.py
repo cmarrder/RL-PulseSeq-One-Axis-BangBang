@@ -19,6 +19,12 @@ def CPMG(Npulse, maxTime):
     deltas = (2 * pulse_indices - 1) / (2 * Npulse) 
     return deltas * maxTime
 
+def CPMGPeakFreq(Npulse, maxTime):
+    """
+    The first peak frequency of the CPMG filter function
+    """
+    return Npulse / (2 * maxTime)
+
 def fTilde(freqs, timePulses, maxTime):
     """
     PARAMETERS:

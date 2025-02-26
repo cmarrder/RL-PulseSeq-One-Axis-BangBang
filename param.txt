@@ -2,4 +2,4 @@ oDir /home/charlie/Documents/ml/CollectiveAction/data
 verbose 1
 noiseParam1 0.25
 noiseParam2 1.000000000000000021e-02
-etaN 3.789403406949889280e-02
+eta1 0.303152 

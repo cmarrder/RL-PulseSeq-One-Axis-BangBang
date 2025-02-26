@@ -5,7 +5,7 @@
 #include "Sequence.hpp"
 
 //constexpr double actionInterval = 4 * M_PI;
-constexpr size_t numAction = 6;
+constexpr size_t numAction = 8;
 
 
 VectorXd kappa(const VectorXd& centerTimes, const double harmonic, const double eta)

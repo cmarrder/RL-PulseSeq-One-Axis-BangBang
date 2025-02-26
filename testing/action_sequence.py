@@ -324,6 +324,7 @@ def action_sequence_plot(initial_times,
     axd['F'].set_ylabel('Steps', fontsize=SIZE_AXIS_LABEL)
     axd['F'].tick_params(axis='both', which='major', labelsize=SIZE_TICK_LABEL) 
     axd['F'].grid(axis='y') # Add gridlines
+    axd['F'].set_xlim(0.5, 1)
     axd['F'].scatter(fid_array, np.flip(np.arange(nStep + 1)), s=SIZE_SCATTER)
 
     ##########         FILTER PLOTS         ##########
@@ -362,19 +363,20 @@ def action_sequence_plot(initial_times,
 
 if __name__=="__main__":
 
-    job_dir = '/home/charlie/Documents/ml/CollectiveAction/eta_scan_data/1_over_f/harmonics_01_02_08/job_00002/run_00001'
+    #job_dir = '/home/charlie/Documents/ml/CollectiveAction/eta_scan_data/1_over_f/harmonics_01_02_08/job_00002/run_00001'
+    job_dir = '/home/charlie/Documents/ml/CollectiveAction/data'
     save_dir = '/home/charlie/Documents/ml/CollectiveAction/paper_plots/Fig3.svg'
     action_sequence = list(np.loadtxt(os.path.join(job_dir, 'action.txt'), dtype=int))
     harmonics_arr = np.loadtxt(os.path.join(job_dir, 'harmonics.txt'), dtype=int)
-    etaN = np.loadtxt(os.path.join(job_dir, 'etaN.txt'))
+    eta1 = np.loadtxt(os.path.join(job_dir, 'eta1.txt'))
     freqs_arr = np.loadtxt(os.path.join(job_dir, 'freq.txt'))
     noise_arr = np.loadtxt(os.path.join(job_dir, 'sOmega.txt'))
-    
+
     max_time = 1
     Npulse = 8
     pulse_times = ps.PDD(Npulse, max_time)
-    eta_arr = np.abs(Npulse / harmonics_arr) * etaN
+    eta_arr = np.abs(1 / harmonics_arr) * eta1
 
-    action_sequence_plot(pulse_times, action_sequence, harmonics_arr, eta_arr, max_time, freqs_arr, noise_arr, save=save_dir, show=False)
-    #action_sequence_plot(pulse_times, action_sequence, harmonics_arr, eta_arr, max_time, freqs_arr, noise_arr)
+    #action_sequence_plot(pulse_times, action_sequence, harmonics_arr, eta_arr, max_time, freqs_arr, noise_arr, save=save_dir, show=False)
+    action_sequence_plot(pulse_times, action_sequence, harmonics_arr, eta_arr, max_time, freqs_arr, noise_arr)
 

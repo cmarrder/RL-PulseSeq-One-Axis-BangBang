@@ -38,10 +38,10 @@ for j in ${!values[@]}; do
 	printf -v jobname "$pathname/$dirname/job_%05d" $j
 	mkdir -p $jobname
 
-        # Replace value for etaN in param.txt with the jth element of values array.
+        # Replace value for eta1 in param.txt with the jth element of values array.
 	# Using symbol : as the regex delimiter for clarity. This is because we will be manipulating strings containing symbol / ,
 	# which is what we would normally use as the delimeter.
-	sed -i "s:etaN .*:etaN ${values[$j]}:g" $pathname/$paramname
+	sed -i "s:eta1 .*:eta1 ${values[$j]}:g" $pathname/$paramname
 	
         # Make runs.
         for ((k = 0 ; k < 10 ; k++ )); do

@@ -219,7 +219,7 @@ def average_change(attracting_pt, repelling_pt, harmonic, eta, max_time):
 if __name__=='__main__':
     maxTime = 1
     #harmonics = np.array([-4, -3, -2, -1, 1, 2, 3, 4]) 
-    J = 1
+    J = 8
     positive = np.arange(1, J+1)
     harmonics = np.concatenate((np.flip(-positive), positive))
     apts, rpts = ha.fixed_points(J, maxTime)
@@ -234,11 +234,11 @@ if __name__=='__main__':
     print("Exact_avg: ", 2*test_eta/np.pi)
 
     # Plot Fixed Points
-    #plot_fixed_points(harmonics, maxTime, save = save, show = show, pulseseq = pulseseq)
+    plot_fixed_points(harmonics, maxTime, save = save, show = show, pulseseq = pulseseq)
 
     # Plot Convergence to Fixed Points
     #plot_apps_vs_eta(apts[0], rpts[0], J, maxTime)
-    plot3d_eta_apps_distance(apts[0], rpts[0], J, maxTime, fit=True)
+    #plot3d_eta_apps_distance(apts[0], rpts[0], J, maxTime, fit=True)
 
     """
     Jmax = 20

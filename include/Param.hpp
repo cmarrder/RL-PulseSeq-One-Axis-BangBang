@@ -9,7 +9,7 @@ typedef struct Param {
   bool verbose;
   double noiseParam1;
   double noiseParam2;
-  double etaN;
+  double eta1;
 } Param;
 
 std::ostream& operator<< (std::ostream& o, const Param& param)
@@ -18,7 +18,7 @@ std::ostream& operator<< (std::ostream& o, const Param& param)
   o << "verbose: " << param.verbose << std::endl;
   o << "noiseParam1: " << param.noiseParam1 << std::endl;
   o << "noiseParam2: " << param.noiseParam2 << std::endl;
-  o << "etaN: " << param.etaN << std::endl;
+  o << "eta1: " << param.eta1 << std::endl;
   return o;
 }
 
@@ -51,8 +51,8 @@ Param getParam(std::string& pfile)
     else if (dummy.compare("noiseParam2") == 0) {
       configInput >> param.noiseParam2;
     }
-    else if (dummy.compare("etaN") == 0) {
-      configInput >> param.etaN;
+    else if (dummy.compare("eta1") == 0) {
+      configInput >> param.eta1;
     }
     else {
       //cout << "Error: invalid label " << dummy << " in param.txt" << endl;

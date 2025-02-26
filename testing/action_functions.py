@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import os
 import harmonic_actions as ha
+import pulse_sequence as ps
 
 max_time = 1
 
@@ -98,18 +99,6 @@ def plot_1_kappa_paper(x, harmonic, eta, xsample, title, color, ax=None, save=No
 
     y = kappa(x, harmonic, eta)
 
-    # Size for lines in plot for the PAPER.
-    mpl.rcParams['axes.linewidth'] = 2
-    mpl.rcParams['xtick.major.size'] = 7#5
-    mpl.rcParams['xtick.major.width'] = 2 
-    mpl.rcParams['xtick.minor.size'] = 1
-    mpl.rcParams['xtick.minor.width'] = 1
-    mpl.rcParams['ytick.major.size'] = 7#5
-    mpl.rcParams['ytick.major.width'] = 2 
-    mpl.rcParams['ytick.minor.size'] = 1
-    mpl.rcParams['ytick.minor.width'] = 1
-    plt.rcParams['figure.constrained_layout.use'] = True
-
     if ax is None:
         fig, ax = plt.subplots()
 
@@ -121,12 +110,12 @@ def plot_1_kappa_paper(x, harmonic, eta, xsample, title, color, ax=None, save=No
     ax.set_yticks(ticks=tick_positions, labels=tick_labels)
 
     # Define font sizes
-    SIZE_DEFAULT = 16
-    SIZE_LARGE = 24#18
+    SIZE_DEFAULT = 24
+    SIZE_LARGE = 36#24#18
 
     # Define pad sizes
     PAD_DEFAULT = 0#10
-    PAD_LARGE = 10
+    PAD_LARGE = 15
 
     ax.set_xlabel('Old Times', fontsize = SIZE_DEFAULT, labelpad=PAD_DEFAULT)
     ax.set_ylabel('New Times', fontsize = SIZE_DEFAULT, labelpad=PAD_DEFAULT)
@@ -134,12 +123,12 @@ def plot_1_kappa_paper(x, harmonic, eta, xsample, title, color, ax=None, save=No
     ax.set_aspect('equal')
 
     # Define linewidth size
-    lw = 3
+    lw = 6
 
     if xsample is not None:
         ysample = kappa(xsample, harmonic, eta)
         ax.vlines(xsample, np.zeros_like(xsample), ysample, linewidth=lw/2, linestyles='dashed')
-        ax.hlines(ysample, np.zeros_like(ysample), xsample, linewidth=lw/2, linestyles='dashed')
+        ax.hlines(ysample, np.zeros_like(ysample), xsample, linewidth=lw/2, linestyles='solid')
 
     if title is not None:
         ax.set_title(title, fontsize = SIZE_LARGE, pad=PAD_LARGE)
@@ -157,15 +146,33 @@ def plot_1_kappa_paper(x, harmonic, eta, xsample, title, color, ax=None, save=No
     return
 
 def plot_3_kappas_paper(x, xsample, color, save=None, show=True):
-    fig = plt.figure(layout='constrained', figsize=(4, 12))
+    fig = plt.figure(layout='constrained', figsize=(12, 4))
     mosaic = """
-             A
-             B
-             C
+             ABC
              """
     axd = fig.subplot_mosaic(mosaic) 
     axd_keys = ['A', 'B', 'C']
-    harmonics = [1, -2, 8]
+    harmonics = [1, -2, 3]
+    for key, j in zip(axd_keys, harmonics):
+        eta = ha.eta_exclusive_bounds(j, max_time)[1] - 1e-6
+        title = '$\kappa_{{{}}}$'.format(j)
+        plot_1_kappa_paper(x, j, eta, xsample, title, color, ax=axd[key], show=False)
+
+    if save is not None:
+        plt.savefig(save, dpi=300)
+    if show is True:
+        plt.show()
+
+    return
+
+def plot_4_kappas_paper(x, xsample, color, save=None, show=True):
+    fig = plt.figure(layout='constrained', figsize=(16, 4))
+    mosaic = """
+             ABCD
+             """
+    axd = fig.subplot_mosaic(mosaic) 
+    axd_keys = ['A', 'B', 'C', 'D']
+    harmonics = [1, -2, 3, -4]
     for key, j in zip(axd_keys, harmonics):
         eta = ha.eta_exclusive_bounds(j, max_time)[1] - 1e-6
         title = '$\kappa_{{{}}}$'.format(j)
@@ -179,15 +186,29 @@ def plot_3_kappas_paper(x, xsample, color, save=None, show=True):
     return
 
 if __name__=="__main__":
+    # Size for lines in plot for the PAPER.
+    mpl.rcParams['axes.linewidth'] = 4
+    mpl.rcParams['xtick.major.size'] = 7#5
+    mpl.rcParams['xtick.major.width'] = 2 
+    mpl.rcParams['xtick.minor.size'] = 1
+    mpl.rcParams['xtick.minor.width'] = 1
+    mpl.rcParams['ytick.major.size'] = 7#5
+    mpl.rcParams['ytick.major.width'] = 2 
+    mpl.rcParams['ytick.minor.size'] = 1
+    mpl.rcParams['ytick.minor.width'] = 1
+    plt.rcParams['figure.constrained_layout.use'] = True
+    mpl.rcParams['font.sans-serif'] = ['Droid Sans']
+
     x = np.linspace(0, max_time, 1000)
     c = '#984EA3' # Deep Lilac
 
     # Make initial sequence PDD of length 6
-    Nsample = 8
-    xsample = np.linspace(x[0], x[-1], Nsample)[1:7]
-    harmonic_list = [1, -2, 8]
+    Nsample = 4
+    xsample = ps.PDD(Nsample, max_time) 
 
     plot_3_kappas_paper(x, xsample, c, save='paper_plots/Figure2b.svg')
+    #plot_3_kappas_paper(x, xsample, c)
+    #plot_4_kappas_paper(x, xsample, c, save='paper_plots/Figure2b.svg')
      
     #for j in harmonic_list:
     #    title = '$\kappa_{{{}}}$'.format(j)

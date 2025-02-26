@@ -80,7 +80,7 @@ VectorXd gaussians(const VectorXd& x, const VectorXd& mus, const VectorXd& sigma
 VectorXd reciprocal(const VectorXd& x)
 {
   // Calculate reciprocal of x. If |x| < 1e-12, then return 1e+12.
-  VectorXd zeroRemoved = (x.array().abs() < 1e-12).select(VectorXd::Constant(x.size(), 1e12), x);
+  VectorXd zeroRemoved = (x.array().abs() < 1e-12).select(VectorXd::Constant(x.size(), 1e-12), x);
   return 1 / zeroRemoved.array();
 }
 
@@ -100,7 +100,8 @@ class Crystal {
   int nTimePts;
   double noiseParam1;
   double noiseParam2;
-  double etaN;
+  //double etaN;
+  double eta1;
   double initialChi;
   double initialAvgInfid;
 
@@ -344,9 +345,9 @@ class Crystal {
     out_noiseParam2 << noiseParam2 << std::endl;
     out_noiseParam2.close(); 
     
-    std::ofstream out_etaN(dir + "/etaN.txt");
-    out_etaN << etaN << std::endl;
-    out_etaN.close(); 
+    std::ofstream out_eta1(dir + "/eta1.txt");
+    out_eta1 << eta1 << std::endl;
+    out_eta1.close(); 
 
     std::ofstream out_harmonics(dir + "/harmonics.txt");
     out_harmonics << actionHarmonics << std::endl;
@@ -385,14 +386,16 @@ class Crystal {
   {
     noiseParam1 = param.noiseParam1;
     noiseParam2 = param.noiseParam2;
-    etaN = param.etaN; // The eta associated with the highest harmonic action, that whose harmonic number = nPulse.
+    //etaN = param.etaN; // The eta associated with the highest harmonic action, that whose harmonic number = nPulse.
+    eta1 = param.eta1; // The eta associated with j=1.
 
     // Initialize harmonics for action functions. We need to do this in a roundabout way because
     // C++ doesn't allow comma initialization of Eigen::VectorXd instances when in a class but outside of a method.
-    VectorXd harmonics(6);
-    harmonics << 1, -1, 2, -2, 8, -8;
+    VectorXd harmonics(8);
+    harmonics << 1, -1, 2, -2, 7, -7, 8, -8;
     actionHarmonics = harmonics;
-    actionEtas = (nPulse / actionHarmonics.array()).abs() * etaN; 
+    //actionEtas = (nPulse / actionHarmonics.array()).abs() * etaN; 
+    actionEtas = (1 / actionHarmonics.array()).abs() * eta1; 
 
     std::cout << "actionHarmonics:" << std::endl << actionHarmonics.transpose() <<std::endl;
     std::cout << "actionEtas:" << std::endl << actionEtas.transpose() <<std::endl;
