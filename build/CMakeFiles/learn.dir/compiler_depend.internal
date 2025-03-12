@@ -7,6 +7,7 @@ CMakeFiles/learn.dir/src/learn.cpp.o
  /home/charlie/Documents/ml/CollectiveAction/include/Agent.hpp
  /home/charlie/Documents/ml/CollectiveAction/include/Crystal.hpp
  /home/charlie/Documents/ml/CollectiveAction/include/Environment.hpp
+ /home/charlie/Documents/ml/CollectiveAction/include/GaussQuad.hpp
  /home/charlie/Documents/ml/CollectiveAction/include/Greedy.hpp
  /home/charlie/Documents/ml/CollectiveAction/include/Network.hpp
  /home/charlie/Documents/ml/CollectiveAction/include/Param.hpp

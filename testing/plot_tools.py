@@ -493,7 +493,7 @@ def single_eta_multi_run(data_dir, subdir_prefix='run', show = True, save = None
                 
                 nPulse = int( np.loadtxt(os.path.join(oDir, 'nPulse.txt')) ) # Number of pulse applications
                 tMax = np.loadtxt(os.path.join(oDir, 'maxTime.txt'))
-                etaN = np.loadtxt(os.path.join(oDir, 'etaN.txt'))
+                eta1 = np.loadtxt(os.path.join(oDir, 'eta1.txt'))
                 harmonics = np.loadtxt(os.path.join(oDir, 'harmonics.txt')).astype(int)
 
                 infidelities = 1 - ps.fid_from_reward(rewards)
@@ -584,7 +584,7 @@ def single_eta_multi_run(data_dir, subdir_prefix='run', show = True, save = None
     axd['B'].legend()
 
     # Set title
-    plt.suptitle('$\eta_{{{0}}}$ = {1}, Harmonic Set: {2}'.format(nPulse, etaN, harmonics))
+    plt.suptitle('$\eta_{{{0}}}$ = {1}, Harmonic Set: {2}'.format(1, eta1, harmonics))
 
     #fig.tight_layout()
     if save is not None:
@@ -626,7 +626,7 @@ def multi_eta_multi_run(data_dir, subdir_prefix='job', subsubdir_prefix='run', s
             file_fail_counter = 0
             Nfiles = len(os.listdir(os.path.join(data_dir, file))) # Number files in subdirectory
             min_infid_list = [] # List of average minimum infidelities found in each job directory
-            etaN_list = []
+            eta1_list = []
 
             run_counter = 0
             # For every file in the subdirectory
@@ -637,8 +637,8 @@ def multi_eta_multi_run(data_dir, subdir_prefix='job', subsubdir_prefix='run', s
 
                         # Load data
                         if run_counter == 0:
-                            etaN = np.loadtxt(os.path.join(oDir, 'etaN.txt')).item()
-                            eta_list.append(etaN)
+                            eta1 = np.loadtxt(os.path.join(oDir, 'eta1.txt')).item()
+                            eta_list.append(eta1)
                         if job_counter == 0:
                             harmonics = np.loadtxt(os.path.join(oDir, 'harmonics.txt')).astype(int)
                             freq = np.loadtxt(os.path.join(oDir, 'freq.txt'))
@@ -710,7 +710,7 @@ def multi_eta_multi_run(data_dir, subdir_prefix='job', subsubdir_prefix='run', s
     plt.plot(eta_list, np.full(Neta, CPMG_infid), color = CPMGColor, label='CPMG')
     plt.plot(eta_list, np.full(Neta, UDD_infid), color = UDDColor, label='UDD')
     plt.ylabel('Average of Minimum Infidelity')
-    plt.xlabel('$\eta_{{{}}}$'.format(nPulse))
+    plt.xlabel('$\eta_{{{}}}$'.format(1))
     plt.title('Max Step = {}'.format(20))
 
     plt.legend()
@@ -816,9 +816,12 @@ if __name__=='__main__':
     """
 
     
-    dd = '/home/charlie/Documents/ml/CollectiveAction/eta_scan_data/1_over_f/harmonics_01_02_08/job_00001'
+    #dd = '/home/charlie/Documents/ml/CollectiveAction/eta_scan_data/1_over_f/harmonics_01_02_08/job_00001'
+    dd = '/home/charlie/Documents/ml/CollectiveAction/data'
+    #dd = '/home/charlie/Documents/ml/CollectiveAction/data/job_00003'
+    #dd = '/home/charlie/Documents/ml/CollectiveAction/data_partial_eta1_scan_oops/job_00007'
     pd = '/home/charlie/Documents/ml/CollectiveAction/paper_plots'
     #temperature_sweep(dd, pd, show=False)
-    single_eta_multi_run(dd, show=True)
-    #multi_eta_multi_run(dd, show=True)
+    #single_eta_multi_run(dd, show=True)
+    multi_eta_multi_run(dd, show=True)
     #multi_single_eta_plots(dd, save=pd)

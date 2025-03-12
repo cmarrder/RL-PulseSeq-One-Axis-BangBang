@@ -55,6 +55,8 @@ int main()
         maxReward = environment.reward();
         maxFid = maxReward * (1 + 1e-8) / (1 + maxReward); // Don't need this but helpful
         actionRecord = environment.actionRecord();
+      std::cout << "Chi: " << environment.getChi() << std::endl;
+      std::cout << "Sum: " << environment.getSum() << std::endl;
       }
     }
 
@@ -120,6 +122,11 @@ int main()
   }
   out_loss.close();
 
+  std::ofstream out_filter(param.oDir + "/bestFilter.txt");
+  out_filter << environment.getFilter() << std::endl;
+  out_filter.close();
+
+  std::cout << "final chi" << std::endl << environment.getChi() << std::endl; 
 
   exit(0);
 }

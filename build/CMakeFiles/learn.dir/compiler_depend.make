@@ -6,6 +6,7 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
   /home/charlie/Documents/ml/CollectiveAction/include/Agent.hpp \
   /home/charlie/Documents/ml/CollectiveAction/include/Crystal.hpp \
   /home/charlie/Documents/ml/CollectiveAction/include/Environment.hpp \
+  /home/charlie/Documents/ml/CollectiveAction/include/GaussQuad.hpp \
   /home/charlie/Documents/ml/CollectiveAction/include/Greedy.hpp \
   /home/charlie/Documents/ml/CollectiveAction/include/Network.hpp \
   /home/charlie/Documents/ml/CollectiveAction/include/Param.hpp \
@@ -7800,8 +7801,6 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 
 /usr/local/lib/libtorch/include/ATen/ops/gelu_backward_meta.h:
 
-/usr/local/lib/libtorch/include/ATen/ops/gelu.h:
-
 /usr/local/lib/libtorch/include/ATen/ops/ge_ops.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/values_native.h:
@@ -8262,15 +8261,7 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 
 /usr/local/lib/libtorch/include/ATen/ops/erfinv_meta.h:
 
-/usr/local/lib/libtorch/include/ATen/ops/special_log_ndtr_native.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/pow_ops.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/_foreach_zero_ops.h:
-
-/usr/local/lib/libtorch/include/c10/core/GradMode.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/acos.h:
+/usr/local/lib/libtorch/include/ATen/ops/erfinv.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/permute_copy.h:
 
@@ -9768,8 +9759,6 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 
 /usr/include/c++/12/utility:
 
-/usr/local/lib/libtorch/include/ATen/core/IListRef.h:
-
 /usr/include/eigen3/Eigen/src/Core/TriangularMatrix.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/_sparse_sparse_matmul_native.h:
@@ -10500,12 +10489,6 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 
 /usr/include/bits/stdint-uintn.h:
 
-/usr/local/lib/libtorch/include/ATen/ops/hinge_embedding_loss_native.h:
-
-/usr/include/c++/12/numeric:
-
-/usr/local/lib/libtorch/include/ATen/ops/_values.h:
-
 /usr/include/bits/types/cookie_io_functions_t.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/hstack.h:
@@ -10566,9 +10549,9 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 
 /usr/local/lib/libtorch/include/ATen/ops/_reshape_alias_copy.h:
 
-/usr/local/lib/libtorch/include/ATen/ops/special_psi.h:
+/usr/local/lib/libtorch/include/ATen/core/IListRef.h:
 
-/usr/include/eigen3/Eigen/src/Core/BandMatrix.h:
+/usr/include/bits/libc-header-start.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/_fake_quantize_learnable_per_tensor_affine.h:
 
@@ -10604,8 +10587,6 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 
 /usr/include/eigen3/Eigen/src/Core/arch/Default/ConjHelper.h:
 
-/usr/include/bits/fp-logb.h:
-
 /usr/local/lib/libtorch/include/ATen/ops/linalg_ldl_solve_meta.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/glu_ops.h:
@@ -10617,6 +10598,58 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 /usr/include/bits/mathcalls-narrow.h:
 
 /usr/include/bits/types/timer_t.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/_test_string_default_ops.h:
+
+/usr/local/lib/libtorch/include/torch/csrc/api/include/torch/imethod.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/_masked_scale_ops.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/addcdiv_native.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/fft_fftn_ops.h:
+
+/usr/include/bits/libm-simd-decl-stubs.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/_is_zerotensor_native.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/fractional_max_pool2d_backward.h:
+
+/usr/lib/gcc/x86_64-redhat-linux/12/include/serializeintrin.h:
+
+/usr/include/c++/12/cmath:
+
+/usr/include/eigen3/Eigen/src/Core/Product.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/rot90_native.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/new_empty_ops.h:
+
+/usr/lib/gcc/x86_64-redhat-linux/12/include/xtestintrin.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/_foreach_acos_ops.h:
+
+/usr/local/lib/libtorch/include/c10/util/UniqueVoidPtr.h:
+
+/usr/local/lib/libtorch/include/ATen/core/LegacyTypeDispatch.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/_fw_primal_ops.h:
+
+/usr/include/c++/12/cinttypes:
+
+/usr/local/lib/libtorch/include/ATen/ops/to_padded_tensor.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/_fake_quantize_learnable_per_tensor_affine_ops.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/linalg_solve_ops.h:
+
+/usr/include/c++/12/x86_64-redhat-linux/bits/error_constants.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/_foreach_maximum.h:
+
+/usr/lib/gcc/x86_64-redhat-linux/12/include/avx512fp16intrin.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/embedding_renorm_native.h:
 
 /usr/local/lib/libtorch/include/ATen/ATen.h:
 
@@ -10658,58 +10691,6 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 
 /usr/local/lib/libtorch/include/ATen/ops/adaptive_max_pool3d_ops.h:
 
-/usr/local/lib/libtorch/include/ATen/ops/rot90_native.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/new_empty_ops.h:
-
-/usr/lib/gcc/x86_64-redhat-linux/12/include/xtestintrin.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/_foreach_acos_ops.h:
-
-/usr/local/lib/libtorch/include/c10/util/UniqueVoidPtr.h:
-
-/usr/local/lib/libtorch/include/ATen/core/LegacyTypeDispatch.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/_fw_primal_ops.h:
-
-/usr/include/c++/12/cinttypes:
-
-/usr/local/lib/libtorch/include/ATen/ops/to_padded_tensor.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/_fake_quantize_learnable_per_tensor_affine_ops.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/linalg_solve_ops.h:
-
-/usr/include/c++/12/x86_64-redhat-linux/bits/error_constants.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/_foreach_maximum.h:
-
-/usr/lib/gcc/x86_64-redhat-linux/12/include/avx512fp16intrin.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/embedding_renorm_native.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/_test_string_default_ops.h:
-
-/usr/local/lib/libtorch/include/torch/csrc/api/include/torch/imethod.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/_masked_scale_ops.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/addcdiv_native.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/fft_fftn_ops.h:
-
-/usr/include/bits/libm-simd-decl-stubs.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/_is_zerotensor_native.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/fractional_max_pool2d_backward.h:
-
-/usr/lib/gcc/x86_64-redhat-linux/12/include/serializeintrin.h:
-
-/usr/include/c++/12/cmath:
-
-/usr/include/eigen3/Eigen/src/Core/Product.h:
-
 /usr/local/lib/libtorch/include/ATen/ops/randn_ops.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/_conj_physical_native.h:
@@ -10724,11 +10705,21 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 
 /home/charlie/Documents/ml/CollectiveAction/include/Network.hpp:
 
+/usr/local/lib/libtorch/include/ATen/ops/special_psi.h:
+
+/usr/include/eigen3/Eigen/src/Core/BandMatrix.h:
+
+/usr/include/bits/fp-logb.h:
+
 /usr/local/lib/libtorch/include/ATen/ops/_amp_update_scale_native.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/mkldnn_convolution_ops.h:
 
 /usr/include/c++/12/bits/stl_list.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/gelu.h:
+
+/home/charlie/Documents/ml/CollectiveAction/include/GaussQuad.hpp:
 
 /usr/local/lib/libtorch/include/ATen/ops/roll.h:
 
@@ -10791,8 +10782,6 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 /usr/local/lib/libtorch/include/ATen/ops/_foreach_exp_ops.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/_masked_softmax_backward.h:
-
-/usr/include/bits/libc-header-start.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/special_zeta_native.h:
 
@@ -11273,6 +11262,12 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 /usr/local/lib/libtorch/include/ATen/ops/scatter_add_meta.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/cudnn_batch_norm_backward_native.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/hinge_embedding_loss_native.h:
+
+/usr/include/c++/12/numeric:
+
+/usr/local/lib/libtorch/include/ATen/ops/_values.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/special_hermite_polynomial_h.h:
 
@@ -12171,6 +12166,16 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 /usr/local/lib/libtorch/include/ATen/ops/clone_ops.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/_nested_view_from_buffer_ops.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/special_log_ndtr_native.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/pow_ops.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/_foreach_zero_ops.h:
+
+/usr/local/lib/libtorch/include/c10/core/GradMode.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/acos.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/sin.h:
 
@@ -14895,5 +14900,3 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 /usr/local/lib/libtorch/include/ATen/ops/_empty_affine_quantized_ops.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/erf_native.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/erfinv.h:

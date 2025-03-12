@@ -76,4 +76,19 @@ public:
     return rewardCalls;
   }
 
+  double getChi() const
+  {
+	  return crystal.chi();
+  }
+
+  VectorXd getSum() const
+  {
+	  return crystal.getSum();
+  }
+
+  VectorXd getFilter() const
+  {
+	  return crystal.getFilter();
+  }
+
 };

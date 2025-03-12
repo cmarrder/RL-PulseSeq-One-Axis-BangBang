@@ -4877,4 +4877,5 @@ CMakeFiles/learn.dir/src/learn.cpp.o: \
  /home/charlie/Documents/ml/CollectiveAction/include/Action.hpp \
  /home/charlie/Documents/ml/CollectiveAction/include/Sequence.hpp \
  /home/charlie/Documents/ml/CollectiveAction/include/Param.hpp \
+ /home/charlie/Documents/ml/CollectiveAction/include/GaussQuad.hpp \
  /home/charlie/Documents/ml/CollectiveAction/include/Greedy.hpp

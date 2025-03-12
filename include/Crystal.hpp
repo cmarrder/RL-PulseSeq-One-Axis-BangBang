@@ -9,9 +9,12 @@
 #include "Action.hpp"
 #include "Sequence.hpp"
 #include "Param.hpp"
+#include "GaussQuad.hpp"
+
+constexpr bool useFFT = false;
+constexpr double cutoffEps = 1e-6;
 
 constexpr std::complex<double> I(0.0, 1.0);
-constexpr double cutoffEps = 1e-12;
 
 using namespace Eigen;
 
@@ -29,6 +32,16 @@ VectorXd boxcar(const VectorXd& x, const double center, const double width)
   double left = center - width / 2.0;
   double right = center + width / 2.0;
   return heaviside(x.array() - left) - heaviside(x.array() - right);
+}
+
+VectorXd sinc(const VectorXd& x)
+{
+  double EPS = 1e-20;
+  int dim = x.size();
+  VectorXd res(dim);
+  for (int i = 0; i < dim; i++)
+    res(i) = (fabs(x(i)) < EPS ? 1 : sin(M_PI * x(i)) / (M_PI * x(i)));
+  return res;
 }
 
 VectorXd lorentzian(const VectorXd& x, const double center, const double fwhm)
@@ -89,7 +102,9 @@ class Crystal {
 
   Sequence sequence;
   VectorXd freq;
+  VectorXd weights;
   VectorXd sOmega;
+  VectorXd weightedSOmega;
   VectorXd actionHarmonics;
   VectorXd actionEtas;
   double dFreq;
@@ -100,7 +115,6 @@ class Crystal {
   int nTimePts;
   double noiseParam1;
   double noiseParam2;
-  //double etaN;
   double eta1;
   double initialChi;
   double initialAvgInfid;
@@ -125,7 +139,7 @@ class Crystal {
     return centers;
   }
   
-  VectorXd computeSOmega() const
+  VectorXd computeSOmega(VectorXd frequencies) const
   {
     VectorXd somega = VectorXd::Zero(nFreq);
     
@@ -133,14 +147,14 @@ class Crystal {
     
     /*
     //// FERMI-DIRAC:
-    VectorXd ONE = VectorXd::Ones(nFreq);
-    VectorXd v = (freq - noiseParam1 * ONE) / noiseParam2;
+    VectorXd ONE = VectorXd::Ones(frequencies.size());
+    VectorXd v = (frequncies - noiseParam1 * ONE) / noiseParam2;
     somega = ONE.array() / (v.array().exp() + ONE.array());
     */
 
              
     //// 1/f NOISE:
-    somega = reciprocal(freq);
+    somega = reciprocal(frequencies);
     
 
     /*     
@@ -163,7 +177,7 @@ class Crystal {
     Vector2d fwhms(1.0 / 2.0, 1.0 / 4.0); // MAKE SURE FWHM IS NOT SMALLER THAN KEY FREQUENCIES IN TIME MESH
     VectorXd heights = reciprocal(2 * M_PI * fwhms); 
     //// Divide output by number of elements in centers to normalize.
-    somega = lorentzians(freq, centers, fwhms, heights) / nPeaks;
+    somega = lorentzians(frequencies, centers, fwhms, heights) / nPeaks;
     */
 
     /*
@@ -173,7 +187,7 @@ class Crystal {
     int nPeaks = centers.size(); 
     VectorXd sigmas = VectorXd::Ones(nPeaks).array() / 2;
     VectorXd heights = pow(centers.array(), -2);
-    somega = gaussians(freq, centers, sigmas, heights);
+    somega = gaussians(frequencies, centers, sigmas, heights);
     */
    
     /* 
@@ -186,16 +200,16 @@ class Crystal {
     {
       std::cout << "Error: Noise bandwidth is less than the frequency resolution!" << std::endl;
     }
-    //somega = reciprocal(freq).array() * (1.0 - boxcar(freq, bandCenter, bandWidth)).array();
-    //somega = 1.0 - boxcar(freq, bandCenter, bandWidth).array();
+    //somega = reciprocal(frequencies).array() * (1.0 - boxcar(frequencies, bandCenter, bandWidth)).array();
+    //somega = 1.0 - boxcar(frequencies, bandCenter, bandWidth).array();
     // Noise which is a sum of two boxcars, each with distinct centers and widths.
     double boxcar1Right = bandCenter - bandWidth / 2; // Right boundary of 1st boxcar
     double center1 = (boxcar1Right + 0) / 2;
     double width1 = boxcar1Right - 0;
     double boxcar2Left = bandCenter + bandWidth / 2; // Left boundary of 2nd boxcar
-    double center2 = (freq(idxMaxFreq) + boxcar2Left) / 2;
-    double width2 = freq(idxMaxFreq) - boxcar2Left;
-    somega = boxcar(freq, center1, width1) + boxcar(freq, center2, width2);
+    double center2 = (frequencies(idxMaxFreq) + boxcar2Left) / 2;
+    double width2 = frequencies(idxMaxFreq) - boxcar2Left;
+    somega = boxcar(frequencies, center1, width1) + boxcar(frequencies, center2, width2);
     */
     
     /* 
@@ -204,7 +218,7 @@ class Crystal {
     //double bandWidth = noiseParam1 * freqResolution;
     double cpmgPeakFreq = nPulse / (2 * maxTime); // The first peak frequency of the CPMG filter function
     double bandWidth = noiseParam1 * cpmgPeakFreq;
-    somega = heaviside(freq.array()) - heaviside(freq.array() - bandWidth);
+    somega = heaviside(frequencies.array()) - heaviside(frequencies.array() - bandWidth);
     */
 
     return somega; 
@@ -212,22 +226,40 @@ class Crystal {
 
   VectorXcd computeFOmega() const
   {
-    VectorXd ctrlSig = computeCtrlSig();
-    VectorXd ctrlSigPadded = VectorXd::Zero(nTimePts);
-    ctrlSigPadded.head(nTimeStep) = ctrlSig;
-    
-    VectorXcd fourier_ft = VectorXcd::Zero(nTimePts);
-    FFT<double> fft;
-    fft.fwd(fourier_ft, ctrlSigPadded);
-    //return fourier_ft(seq(0, idxMaxFreq)); // Only consider the positive freqs
-    return dTime * fourier_ft(seq(0, idxMaxFreq)); // Only consider the positive freqs. Normalize by multiplying by dTime.
+    if (useFFT == true)
+    {
+        VectorXd ctrlSig = computeCtrlSig();
+        VectorXd ctrlSigPadded = VectorXd::Zero(nTimePts);
+        ctrlSigPadded.head(nTimeStep) = ctrlSig;
+        
+        VectorXcd fourier_ft = VectorXcd::Zero(nTimePts);
+        FFT<double> fft;
+        fft.fwd(fourier_ft, ctrlSigPadded);
+        return dTime * fourier_ft(seq(0, idxMaxFreq)); // Only consider the positive freqs. Normalize by multiplying by dTime.
+    }
+    else
+    {
+        VectorXd timeWithEnds = VectorXd::Zero(nPulse + 2);
+        timeWithEnds(0) = 0;
+        timeWithEnds(nPulse + 1) = maxTime;
+        timeWithEnds(seq(1, nPulse)) = sequence.getCenterTimes();
+        
+        VectorXd boxcarWidths = timeWithEnds(seq(1, nPulse+1)) - timeWithEnds(seq(0, nPulse));
+        VectorXd boxcarCenters = (timeWithEnds(seq(1, nPulse+1)) + timeWithEnds(seq(0, nPulse))) / 2;
 
+        
+        VectorXcd fourier_f_of_t = VectorXcd::Zero(nFreq);
+        for (int k = 0; k < nPulse + 1; k++) {
+                VectorXd boxFT = sinc(freq * boxcarWidths(k));
+                fourier_f_of_t += (std::pow(-1, k) * (-I * 2.0 * M_PI * freq * boxcarCenters(k)).array().exp() * boxcarWidths(k) * boxFT.array()).matrix();
+        }
+        return fourier_f_of_t;
+    }
   }
 
   VectorXd computeFOmegaAbs2() const
   {
     VectorXcd fourier_ft = computeFOmega();
-    //return (fourier_ft(seq(0, idxMaxFreq))).cwiseAbs2(); // Only consider the positive freqs
     return fourier_ft.cwiseAbs2();
   }
 
@@ -286,52 +318,71 @@ class Crystal {
     return controlSignal;
   }
 
-  /*
-  VectorXd makeFreq()
+  int getCutoffIndex(VectorXd somega, VectorXd frequencies)
   {
-     if (useFFT == True)
-     {
-       // Make nZero a global constexpr ?
-       int nZero = 32768 - (nTimeStep + 1);//8 * (nTimeStep + 1); // Number of zeros for padding.
-       nTimePts = (nTimeStep + 1) + nZero; // Make a power of 2 to make FFT faster
-       dTime = maxTime / nTimeStep;
-
-       idxMaxFreq = (nTimePts - 1 - (nTimePts - 1) % 2) / 2;
-
-       VectorXd range = VectorXd::LinSpaced(idxMaxFreq + 1, 0, idxMaxFreq); // range of integers from 0 to idxMaxFreq
-       
-       freq = range / (nTimePts * dTime);
-       dFreq = freq(1) - freq(0);
-       nFreq = freq.size();
-     }
-     else
-     {
-       // Make maxfreq Shannon freq, check at what point noise / freq^2 > cutoffEps, make that new maxfreq
-     }
-  }
-  */
-
-  int getCutoffIndex()
-  {
-    for (int k = nFreq - 1; k > -1; k--)
+    if (somega.size() != frequencies.size())
+    {
+      std::cout << "In getCutoffIndex, somega and frequencies of different sizes." << std::endl;
+    }
+    int numF = frequencies.size();
+    for (int k = numF - 1; k > -1; k--)
     {
       // Based on upper bounds on filter, do we need factor of nPulse in numerator of following expression?
-      if (sOmega(k) / std::pow(freq(k), 2) > cutoffEps)
+      if (somega(k) / std::pow(frequencies(k), 2) > cutoffEps)
       {
-	std::cout << "cutOff Index: " << k << std::endl;
-	std::cout << "max Index: " << nFreq - 1 << std::endl;
-	std::cout << "cutOff Freq: " << freq(k) << std::endl;
         return k;
       }
     }
-    return nFreq - 1;
+    return numF - 1;
   }
+
+  double getCutoffFrequency()
+  {
+    // HERE
+  }
+
+  void initializeTimeFreqData()
+  {
+    dTime = maxTime / nTimeStep; // Global variable
+    if (useFFT == true)
+    {
+      nTimePts = (nTimeStep + 1) + nZero; // Global variable
+      idxMaxFreq = (nTimePts - 1 - (nTimePts - 1) % 2) / 2; // Global variable. Index of max positive frequency in fft freq mesh.
+      VectorXd range = VectorXd::LinSpaced(idxMaxFreq + 1, 0, idxMaxFreq); // range of integers from 0 to idxMaxFreq
+      
+      freq = range / (nTimePts * dTime); // Global variable
+      nFreq = freq.size(); // Global variable
+      dFreq = freq(1) - freq(0); // Global variable
+    } 
+    else
+    {
+      nFreq = 1000; // Global variable. Should be factor of 5.
+      double nyquistFreq = 0.5 / dTime; 
+      dFreq = nyquistFreq / (nFreq + 1); // Make temporary frequency increment. Will be finalized later. 
+      VectorXd tempFreqs = VectorXd::LinSpaced(nFreq, 0, nyquistFreq);
+      VectorXd tempSOmega = computeSOmega(tempFreqs);
+      double maxFreq = tempFreqs(getCutoffIndex(tempSOmega, tempFreqs));
+
+      // Gaussian quadrature points and weights
+      MatrixXd gQuad = shiftedGaussQuad5(0, maxFreq, nFreq/5);
+  
+      //freq = VectorXd::LinSpaced(nFreq, 0, maxFreq); // Global variable
+      freq = gQuad.col(0);
+      weights = gQuad.col(1);
+
+    }
+  }
+
 
   void writeInitial(std::string& dir)
   {
     std::ofstream out_freq(dir + "/freq.txt");
     out_freq << freq << std::endl;
     out_freq.close();
+
+    std::ofstream out_weights(dir + "/weights.txt");
+    out_weights << weights << std::endl;
+    out_weights.close();
 
     std::ofstream out_sOmega(dir + "/sOmega.txt");
     out_sOmega << sOmega << std::endl;
@@ -399,30 +450,17 @@ class Crystal {
 
     std::cout << "actionHarmonics:" << std::endl << actionHarmonics.transpose() <<std::endl;
     std::cout << "actionEtas:" << std::endl << actionEtas.transpose() <<std::endl;
+   
+    initializeTimeFreqData(); 
+    sOmega = computeSOmega(freq);
+    weightedSOmega = sOmega.cwiseProduct(weights);
 
-    nTimePts = (nTimeStep + 1) + nZero; // Make a power of 2 to make FFT faster
-    dTime = maxTime / nTimeStep;
-
-    idxMaxFreq = (nTimePts - 1 - (nTimePts - 1) % 2) / 2;
-
-    VectorXd range = VectorXd::LinSpaced(idxMaxFreq + 1, 0, idxMaxFreq); // range of integers from 0 to idxMaxFreq
-    
-    freq = range / (nTimePts * dTime);
-    dFreq = freq(1) - freq(0);
-    nFreq = freq.size();
-    
-    sOmega = computeSOmega();
-
-    cutoffIdx = getCutoffIndex();
+    if (useFFT == true)
+    {
+      cutoffIdx = getCutoffIndex(sOmega, freq);
+    }
 
     sequence.updateCenterTimes(initialCenterTimes());
-
-    //initialChi = chi();
-    //initialAvgInfid = avgInfid();
-    
-    //std::cout << "f(t)" << std::endl;
-    //std::cout << computeCtrlSig().transpose() << std::endl;
-    //std::exit(0);
 
     writeInitial(param.oDir);
   }
@@ -451,7 +489,15 @@ class Crystal {
   double chi() const
   {
     VectorXd fOmegaAbs2 = computeFOmegaAbs2();
-    double overlap =  (fOmegaAbs2.head(cutoffIdx + 1).transpose() * sOmega.head(cutoffIdx + 1))(0) * dFreq; // Select 0 element because technically result is vector of length 1
+    double overlap;
+    if (useFFT == true)
+    {
+      overlap =  (fOmegaAbs2.head(cutoffIdx).transpose() * sOmega.head(cutoffIdx))(0) * dFreq; // Select 0 element because technically result of vector product is vector of length 1
+    }
+    else
+    {
+      overlap =  (fOmegaAbs2.transpose() * weightedSOmega)(0); // Select 0 element because technically result of vector product is vector of length 1
+    }
     return overlap;
   }
 
@@ -476,5 +522,18 @@ class Crystal {
  {
    return avgInfid() / initialAvgInfid;
  } 
+
+ VectorXd getSum() const
+  {
+    VectorXd fOmegaAbs2 = computeFOmegaAbs2();
+    //double overlap =  (fOmegaAbs2.head(cutoffIdx + 1).transpose() * sOmega.head(cutoffIdx + 1))(0) * dFreq; // Select 0 element because technically result of vector product is vector of length 1
+    
+    return fOmegaAbs2.transpose() * sOmega;
+  }
+
+ VectorXd getFilter() const
+ {
+	 return computeFOmegaAbs2();
+ }
 
 };

@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import os
 import pulse_sequence as ps
 
-read_dir = "/home/charlie/Documents/ml/CollectiveAction/data/job_00000" 
+read_dir = "/home/charlie/Documents/ml/CollectiveAction/data" 
 
 freq_file = os.path.join(read_dir, "freq.txt")
 filter_file = os.path.join(read_dir, "initialFilter.txt")
@@ -34,6 +34,6 @@ plt.plot(approxFreq, approxFilter, label="approx")
 plt.plot(exactFreq, exactFilter, label="exact", linestyle="dashed")
 plt.xlabel("freq")
 plt.ylabel("filter function")
-plt.yscale('log')
+#plt.yscale('log')
 plt.legend()
 plt.show()

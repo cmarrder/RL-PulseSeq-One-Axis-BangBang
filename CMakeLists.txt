@@ -29,6 +29,7 @@ add_executable(learn src/learn.cpp
                     include/ReplayBuffer.hpp
                     include/Network.hpp
                     include/Agent.hpp
+		    include/GaussQuad.hpp
                     )
 
 target_include_directories(learn PRIVATE include)

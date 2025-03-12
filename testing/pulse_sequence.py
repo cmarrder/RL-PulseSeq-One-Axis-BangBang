@@ -19,17 +19,23 @@ def CPMG(Npulse, maxTime):
     deltas = (2 * pulse_indices - 1) / (2 * Npulse) 
     return deltas * maxTime
 
+def FID(maxTime):
+    return 
+
 def CPMGPeakFreq(Npulse, maxTime):
     """
     The first peak frequency of the CPMG filter function
     """
     return Npulse / (2 * maxTime)
 
+def FIDFilter(freqs, maxTime):
+    return maxTime**2 * np.sinc(freqs * maxTime)**2
+
 def fTilde(freqs, timePulses, maxTime):
     """
     PARAMETERS:
     freqs (np.ndarray, 1D): frequencies in Hertz. Must be ordered from least to greatest
-    timePulses (np.ndarray, 1D): times at which pulses are applied, sortted from lest to greatest
+    timePulses (np.ndarray, 1D): times at which pulses are applied, sorted from least to greatest, must be greater than 0
     RETURNS:
     FourierTrans_ft (np.ndarray, 1D): Fourier transform of f(t) function 
     """
@@ -45,20 +51,39 @@ def fTilde(freqs, timePulses, maxTime):
     b = (timeWithEnds[1:] + timeWithEnds[:Np+1]) / 2
     
     FourierTrans_ft = np.zeros(Nf, dtype='complex')
-    FF = np.zeros(Nf)
     
     # Make more efficient using vectorization?
     for n in range(Np+1):
         FourierTrans_ft += (-1)**n * np.exp(-1j * 2 * np.pi * freqs * b[n]) * a[n] * np.sinc(freqs * a[n])
+    
+    # Resize arrays into sparse mesh encoding. Similar to numpy's meshgrid.
+    #amesh, bmesh = np.array([a]), np.array([b])
+    #freqsmesh = np.array([freqs]).T
+    #pm_ones = np.array([(-1)**np.arange(Np+1)]) # Array of plus or minus ones
+    #FourierTrans_ft = np.sum(pm_ones * np.exp(-1j * 2 * np.pi * freqsmesh * bmesh) * amesh * np.sinc(freqsmesh * amesh), axis = 1)
+    
+
+    #if timePulses.ndim == 2:
+    #    Nf = len(freqs)
+    #    Nseq = timePulses.shape[0]
+    #    Np = timePulses.shape[1] # number of pulses in each pulse sequence
+    #    zeros = np.zeros((Nseq, 1))
+    #    maxtimes = np.full((Nseq, 1))
+    #    timeWithEnds = np.hstack((zeros, timePulses))
+    #    timeWithEnds = np.hstack((timePulses, maxtimes))
+
+    #    a = timeWithEnds[:, 1:] - timeWithEnds[:, :Np+1]
+    #    b = (timeWithEnds[:, 1:] - timeWithEnds[:, :Np+1]) / 2
+
+    #    FourierTrans_ft = np.zeros((Nseq, Nf), dtype='complex')
 
     return FourierTrans_ft
 
-# Version 4: Modularized
 def FilterFunc(freqs, timePulses, maxTime):
     """
     PARAMETERS:
     freqs (np.ndarray, 1D): frequencies in Hertz. Must be ordered from least to greatest
-    timePulses (np.ndarray, 1D): times at which pulses are applied, sortted from lest to greatest
+    timePulses (np.ndarray, 1D): times at which pulses are applied, sortted from least to greatest
     tol (float): used to determine when to use Taylor expansion of Filter function around angular freq * time = 0
     RETURNS:
     FF (np.ndarray, 1D): filter function for each frequency
@@ -68,184 +93,93 @@ def FilterFunc(freqs, timePulses, maxTime):
     
     return FF
 
-# Version 3: Sinc
-#def FilterFunc(freqs, timePulses, maxTime, tol=0.1):
-#    """
-#    PARAMETERS:
-#    freqs (np.ndarray, 1D): frequencies in Hertz. Must be ordered from least to greatest
-#    timePulses (np.ndarray, 1D): times at which pulses are applied, sortted from lest to greatest
-#    tol (float): used to determine when to use Taylor expansion of Filter function around angular freq * time = 0
-#    RETURNS:
-#    FF (np.ndarray, 1D): filter function for each frequency
-#    """
-#    Np = len(timePulses)
-#    Nf = len(freqs)
-#    
-#    timeWithEnds = np.zeros(Np+2)
-#    timeWithEnds[0] = 0
-#    timeWithEnds[-1] = maxTime
-#    timeWithEnds[1:Np+1] = timePulses
-#
-#    a = timeWithEnds[1:] - timeWithEnds[:Np+1]
-#    b = (timeWithEnds[1:] + timeWithEnds[:Np+1]) / 2
-#    
-#    FourierTrans_ft = np.zeros(Nf, dtype='complex')
-#    FF = np.zeros(Nf)
-#    
-#    # Make more efficient using vectorization?
-#    for n in range(Np+1):
-#        FourierTrans_ft += (-1)**n * np.exp(-1j * 2 * np.pi * freqs * b[n]) * a[n] * np.sinc(freqs * a[n])
-#
-#    FF = ( FourierTrans_ft * FourierTrans_ft.conj() ).real # take real to convert array to real data type
-#    
-#    return FF
+def randomSequence(nPulse, maxTime, nSequence=None):
+    rng = np.random.default_rng() # Random number generator
+    if nSequence is not None:
+        times = rng.uniform(0, maxTime, size=(nSequence, nPulse))
+        return np.sort(times, axis=1)
+    else:
+        times = rng.uniform(0, maxTime, size=nPulse)
+        return np.sort(times)
 
-# VERSION2: Full exponentials
-#def FilterFunc(freqs, timePulses, maxTime, tol=0.1):
-#    """
-#    PARAMETERS:
-#    freqs (np.ndarray, 1D): frequencies in Hertz. Must be ordered from least to greatest
-#    timePulses (np.ndarray, 1D): times at which pulses are applied
-#    tol (float): used to determine when to use Taylor expansion of Filter function around angular freq * time = 0
-#    RETURNS:
-#    filterFunc (np.ndarray, 1D): filter function for each frequency
-#    """
-#    Np = len(timePulses)
-#    Nf = len(freqs)
-#    
-#    timeWithEnds = np.zeros(Np+2)
-#    timeWithEnds[0] = 0
-#    timeWithEnds[-1] = maxTime
-#    timeWithEnds[1:Np+1] = timePulses
-#    
-#    alphas = (-1)**(np.arange(Np+2) + 1) # array that looks like [-1, 1, -1, 1, -1, ... , (-1)**(Np+1)]
-#    alphas[1:Np+1] *= 2 # array now looks like [-1, 2, -2, 2, -2, ... , (-1)**(Np+1)]
-#    
-#    angFreqs = 2 * np.pi * freqs
-#
-#    tol_idx = 0 # Index where angFreqs * maxTime < tol
-#    for i in range(Nf):
-#        if angFreqs[i] * maxTime > tol:
-#            tol_idx = i
-#            break # Exit for loop
-#
-#    afMesh, tMesh = np.meshgrid(angFreqs, timeWithEnds, sparse=True)
-#    phasor = np.zeros((Np+2, Nf), dtype='complex')
-#
-#    # NOTE: afMesh.shape = (1, Nf) and tMesh.shape = (Np+2, 1).
-#    # This means (afMesh * tMesh).shape = (Np+2, Nf).
-#   
-#    # Use power series expansion of the phasor coefficients when angFreqs * maxTime < tol:
-#    # Get frequencies to the left of the tolerance cutoff.
-#    afMeshLeft = afMesh[:,:tol_idx]  
-#    phasor[:, :tol_idx] = tMesh - 1j * afMeshLeft * tMesh**2 / 2 - afMeshLeft**2 * tMesh**3 / 6 + 1j * afMeshLeft**3 * tMesh**4 / 24 + afMeshLeft**4 * tMesh**5 / 120
-#
-#    # Use full expression for rest of phasor coefficients
-#    afMeshRight = afMesh[:, tol_idx:Nf]
-#    phasor[:, tol_idx:Nf] = np.exp(-1j * afMeshRight * tMesh) / afMeshRight
-#
-#    FT_ft = np.matmul(alphas, phasor) # Fourier Transform of f(t). Shape (freqs)
-#    filterFunc = (FT_ft * FT_ft.conj()).real # take real to convert array to real data type
-#    
-#    return filterFunc
-
-# VERSION 1
-#def FilterFunc(freqs, timePulses, maxTime):
-#    """
-#    PARAMETERS:
-#    freqs (np.ndarray, 1D): frequencies in Hertz
-#    timePulses (np.ndarray, 1D): times at which pulses are applied
-#    RETURNS:
-#    filterFunc (np.ndarray, 1D): filter function for each frequency
-#    """
-#    Np = len(timePulses)
-#    Nf = len(freqs)
-#    signs = (-1)**np.arange(Np+1) # array that looks like [1, -1, 1, -1, ...]
-#    timeWithEnds = np.zeros(Np+2)
-#    timeWithEnds[0] = 0
-#    timeWithEnds[-1] = maxTime
-#    timeWithEnds[1:Np+1] = timePulses
-#
-#    phasor = np.zeros((Np+1, Nf), dtype='complex')
-#    angFreqs = 2 * np.pi * freqs
-#    for i in range(Np+1):
-#        t1 = timeWithEnds[i]
-#        t2 = timeWithEnds[i+1]
-#        numerator = np.exp( - 1j* angFreqs * t2) - np.exp( -1j * angFreqs * t1)
-#        # If complex arg is small enough, just do linear order Taylor expansion of terms in the sum
-#        phasor[i] = np.divide(numerator, angFreqs, out = np.full(Nf, t2 - t1, dtype='complex'), where = angFreqs != 0)
-#    
-#    FT_ft = np.matmul(signs, phasor) # Fourier Transform of f(t). Shape (freqs)
-#    filterFunc = (FT_ft * FT_ft.conj()).real # take real to convert array to real data type
-#    
-#    return filterFunc
-
-def randomSequence(nPulseChances):
-    return np.random.randint(low=0, high=2, size=nPulseChances)
-
-def pulse_times(pulse_seq, max_time):
-    "state is now pulse_seq"
-    Nc = len(pulse_seq)
-    
-    tau = max_time / (Nc + 1)
-    
-    time = tau * np.arange(1, Nc + 1) # Times at which agent allowed to apply a pulse
-    time_applied = time[pulse_seq > 0] # Times at which a pulse is actually applied
-
-    return time_applied
-
-# Version 2
-def timeAgentApply(state, maxTime):
-    nPulseChances = len(state)
-    fullSign = np.ones(nPulseChances + 1) # Full sign is just state with extra 1 at the front
-    fullSign[1:] = state
-    
-    agentSequence = np.zeros(nPulseChances, dtype=int)
-    for i in range(nPulseChances):
-        if fullSign[i] * fullSign[i+1] < 0:
-            agentSequence[i] = 1
-    
-    tau = maxTime / (nPulseChances + 1)
-    
-    time = tau * np.arange(1, nPulseChances + 1) # Times at which agent allowed to apply a pulse
-    TAA = time[agentSequence > 0] # Times at which the agent chose to apply a pulse
-
-    return TAA
-
-# Version 1:
-#def timeAgentApply(nPulseChances, state, maxTime):
-#    fullSign = np.ones(nPulseChances + 1) # Full sign is just state with extra 1 at the front
-#    fullSign[1:] = state
-#    
-#    agentSequence = np.zeros(nPulseChances, dtype=int)
-#    for i in range(nPulseChances):
-#        if fullSign[i] * fullSign[i+1] < 0:
-#            agentSequence[i] = 1
-#    
-#    tau = maxTime / (nPulseChances + 1)
-#    
-#    time = tau * np.arange(1, nPulseChances + 1) # Times at which agent allowed to apply a pulse
-#    TAA = time[agentSequence > 0] # Times at which the agent chose to apply a pulse
-#
-#    return TAA
-
-def make_freq(maxTime, nPulseChances, nFreq = 500):
-    tau = maxTime / (nPulseChances + 1)
-    max_freq = 1 / 2 / tau
-    freq_mesh = np.linspace(0, max_freq, nFreq)
-    return freq_mesh
-
-#def make_noise(freqs, mu_frac, cutoff_frac, cutoff_noise = 1e-6):
-#    mu = mu_frac * freqs[-1]
-#    cutoff_freq = cutoff_frac * freqs[-1]
-#    temperature = (cutoff_freq - mu) / np.log(1 / cutoff_noise - 1)
-#    return 1 / (np.exp( (freqs - mu) / temperature ) + 1)
+def optimaWidths(x, f):
+    """
+    Calculate the width of optima in an array representing function values.
+    PARAMETERS:
+    x (np.ndarray): uniformly spaced abscissa
+    f (np.ndarray): uniformly spaced ordinate
+    RETURNS:
+    crest_widths (np.ndarray), trough_widths (np.ndarray): widths of the crests (maxima) and troughs (minima)
+    """
+    if x.ndim != 1:
+        raise ValueError("x is not of dimension 1.")
+    if f.ndim != 1:
+        raise ValueError("f is not of dimension 1.")
+    if len(x) != len(f):
+        raise ValueError("x and f are not of the same size")
+    nPts = len(x)
+    crest_widths = []
+    trough_widths = []
+    for i in range(nPts-2):
+        left_idx = i
+        mid_idx = i + 1
+        right_idx = i + 2
+        # Find a crest (aka maximum).
+        # Take three points. If the middle point is greater than the left and right points:
+        if f[left_idx] < f[mid_idx] and f[mid_idx] > f[right_idx]:
+            # Calculate width of crest.
+            crest_w = x[right_idx] - x[left_idx]
+            # If left_idx or right_idx already have their min or max possible values, respectively,
+            # append the width to the list and go to next for loop iteration.
+            if left_idx == 0 or right_idx == nPts - 1:
+                crest_widths.append(crest_w)
+                continue
+            # While left index is greater than min index and right index is less than max index.
+            while 0 < left_idx and right_idx < nPts - 1:
+                # If next left and right points are less than the previous ones
+                if f[left_idx + 1] < f[left_idx] and f[right_idx] > f[right_idx + 1]:
+                    left_idx -= 1
+                    right_idx += 1
+                    crest_w = x[right_idx] - x[left_idx]
+                else:
+                    crest_widths.append(crest_w)
+                    break # End while loop
+        # Find a trough (aka minimum).
+        # Take three points. If the middle point is less than the left and right points:
+        elif f[left_idx] > f[mid_idx] and f[mid_idx] < f[right_idx]:
+            # Calculate width of trough.
+            trough_w = x[right_idx] - x[left_idx]
+            # If left_idx or right_idx already have their min or max possible values, respectively,
+            # append the width to the list and go to next for loop iteration.
+            if left_idx == 0 or right_idx == nPts - 1:
+                trough_widths.append(trough_w)
+                continue
+            # While left index is greater than min index and right index is less than max index.
+            while 0 < left_idx and right_idx < nPts - 1:
+                # If next left and right points are greater than the previous ones
+                if f[left_idx + 1] > f[left_idx] and f[right_idx] < f[right_idx + 1]:
+                    left_idx -= 1
+                    right_idx += 1
+                    trough_w = x[right_idx] - x[left_idx]
+                else:
+                    trough_widths.append(trough_w)
+                    break # End while loop
+        
+    crest_widths, trough_widths = np.ndarray(crest_widths), np.ndarray(trough_widths)
+    return crest_widths, trough_widths
 
 def temp_from_cutoff(chem_potential, cutoff_freq, cutoff_noise = 1e-6):
     return (cutoff_freq - chem_potential) / np.log( 1/cutoff_noise - 1 )
 
 def fermi_dirac(freqs, chem_potential, temperature):
     return 1 / (np.exp( (freqs - chem_potential) / temperature ) + 1)
+
+def one_over_f_noise(freqs, epsilon=1e-6):
+    # Calculate reciprocal only if element is greater than epsilon
+    recip = np.reciprocal(freqs, where=freqs >= epsilon)
+    # If elements are less than epsilon, replace with 1/epsilon. Else, keep original value.
+    noise = np.where(recip < epsilon, 1/epsilon, recip)
+    return noise
 
 def lorentzian(abscissa, center, fwhm):
     """ Normalized Lorentzian function evaluated at the value(s) specified by
@@ -290,7 +224,7 @@ def chi(freqs, noise, filter_func, weights=None):
     """
     if weights is None:
         dfreq = freqs[1] - freqs[0]
-        return np.sum(filter_func * noise * dfreq)
+        return np.sum(filter_func * noise) * dfreq
     else:
         return np.sum(filter_func * noise * weights)
 
@@ -320,8 +254,8 @@ def RewardFunc(chi_array, initial_chi = 1.0):
     #initialAvgInfid = 1 - 0.5 * np.full_like(avgInfid, 1 + np.exp(-initial_chi))
     #relativeAvgInfid = avgInfid / initialAvgInfid
     #return 1 / (relativeAvgInfid + 1e-8)
-    avgFid = fidelity(-chi_array)
-    return avgFid / (1 - avgFid + 1e-6)
+    avgFid = fidelity(chi_array)
+    return avgFid / (1 - avgFid + 1e-8)
 
 def fid_from_reward(reward):
     return reward * (1 + 1e-8) / (reward + 1)
@@ -353,116 +287,26 @@ def calc_sign_seq(pulse_seq, Nb=1):
         sign_seq[idx1 : idx2 + 1] *= sign # +1 because of numpy slicing
     return sign_seq
 
-if __name__=='__main__':
-    
-    # Load data
+def cutoff_index(v, S):
+    """
+    PARAMETERS:
+    v (np.ndarray): frequency in units 1/time
+    S (np.ndarray): noise spectrum, assumed to be asymptotically decaying 
+    RETURNS:
+    cutoffIdx (int): index to cutoff noise
+    """
+    if v.ndim != 1:
+        raise ValueError("v is not of dimension 1.")
+    if S.ndim != 1:
+        raise ValueError("S is not of dimension 1.")
+    if len(v) != len(S):
+        raise ValueError("v and S are not of the same size")
 
-    param = np.loadtxt('../data/param.txt')
-    tMax = param[0]
-    nPulseTot = int(param[1]) # Total pulses agent allowed to apply
-    nFreq = int(param[2])
-    chemPotential = param[-2]
-    temperature = param[-1]
-
-    freq = np.loadtxt('../data/freq.txt')
-    sModSq = np.loadtxt('../data/sOmegaAbs2.txt')
-    agentFilter = np.loadtxt('../data/fOmegaAbs2.txt')
-    
-    finalState = np.loadtxt('../data/state.txt')
-    reward = np.loadtxt('../data/reward.txt')
-    loss = np.loadtxt('../data/loss.txt')
-    
-    # Crunch numbers
-
-    tau = tMax / (nPulseTot + 1)
-
-    agentTime = timeAgentApply(nPulseTot, finalState, tMax) # Times at which the agent chose to apply a pulse
-    nPulseApp = len(agentTime) # Number of pulses the agent actually applied
-   
-    UDDTime = UDD(nPulseApp, tMax)
-    CPMGTime = CPMG(nPulseApp, tMax)
-
-    #agentFilter = FilterFunc(freq, agentTime, tMax)
-    UDDFilter = FilterFunc(freq, UDDTime, tMax)
-    CPMGFilter = FilterFunc(freq, CPMGTime, tMax)
-
-    UDDReward = RewardFunc(freq, sModSq, UDDFilter, tau, nPulseTot)
-    CPMGReward = RewardFunc(freq, sModSq, CPMGFilter, tau, nPulseTot)
-
-    dfreq = freq[1] - freq[0]
-    agentOverlap = np.sum(agentFilter * sModSq * dfreq)
-    UDDOverlap = np.sum(UDDFilter * sModSq * dfreq)
-    CPMGOverlap = np.sum(CPMGFilter * sModSq * dfreq)
-
-    nTrial = len(reward)
-
-    # Plot
-
-    fig = plt.figure(layout = 'constrained', figsize = (16, 8))
-    mosaic = """
-             ADF
-             BDG
-             CE.
-             """
-    axd = fig.subplot_mosaic(mosaic, width_ratios=[1, 2, 2])
-    
-    UDDColor = 'blue'
-    UDDLinestyle = 'solid'
-    UDDLabel = r'$\chi_{UDD} = $' + '{:.3e}'.format(UDDOverlap)
-
-    agentColor = 'purple'
-    agentLabel = r'$\chi_{Agent} = $' + '{:.3e}'.format(agentOverlap)
-    
-    CPMGColor = 'red'
-    CPMGLinestyle = 'solid'
-    CPMGLabel = r'$\chi_{CPMG} = $' + '{:.3e}'.format(CPMGOverlap)
-
-    lwps = 2 # Linewidth for pulse sequence plots
-    
-    # Plot pulse sequence over time
-
-    axd['A'].set_title('UDD ($N_{{pulse}} = {}$)'.format(nPulseApp))
-    axd['A'].sharex(axd['C'])
-    axd['A'].vlines(UDDTime, 0, 1, color=UDDColor, linestyle=UDDLinestyle, linewidth = lwps)
-    axd['A'].yaxis.set_major_locator(ticker.NullLocator()) # Remove y axis labels/ticks
-    axd['A'].tick_params(labelbottom=False) # Remove x axis labels
-   
-    axd['B'].set_title('Agent ($N_{{allowed}} = {0}, N_{{pulse}} = {1}$)'.format(nPulseTot, nPulseApp))
-    axd['B'].sharex(axd['C'])
-    axd['B'].vlines(agentTime, 0, 1, color=agentColor, linewidth = lwps)
-    axd['B'].yaxis.set_major_locator(ticker.NullLocator()) # Remove y axis labels/ticks
-    axd['B'].tick_params(labelbottom=False) # Remove x axis labels
-   
-    axd['C'].set_title('CPMG ($N_{{pulse}} = {}$)'.format(nPulseApp))
-    axd['C'].set_xlabel('Time')
-    axd['C'].set_xlim(0, tMax)
-    axd['C'].vlines(CPMGTime, 0, 1, color=CPMGColor, linestyle=CPMGLinestyle, linewidth=lwps)
-    axd['C'].yaxis.set_major_locator(ticker.NullLocator()) # Remove y axis labels/ticks
-
-    # Plot filter functions and noise PSD
-   
-    axd['D'].sharex(axd['E'])
-    axd['D'].plot(freq, UDDFilter, color=UDDColor, linestyle=UDDLinestyle, label = UDDLabel)
-    axd['D'].plot(freq, agentFilter, color=agentColor, label = agentLabel)
-    axd['D'].plot(freq, CPMGFilter, color=CPMGColor, linestyle=CPMGLinestyle, label = CPMGLabel)
-    axd['D'].set_ylabel(r'$F(\nu)$')
-    axd['D'].tick_params(labelbottom=False) # Remove x axis labels
-    axd['D'].legend()
-
-    axd['E'].set_ylabel(r'$|S(\nu)|^2$')
-    axd['E'].set_xlabel(r'$\nu$ [1/time]')
-    axd['E'].set_title('$\mu = {0}, T = {1}$'.format(chemPotential, temperature))
-    axd['E'].plot(freq, sModSq)
-
-    # Plot reward and loss over trials
-    
-    axd['F'].set_ylabel('Reward')
-    axd['F'].sharex(axd['G'])
-    axd['F'].plot(range(1, nTrial + 1), reward) # Do range(1, n+1) so that index starts at 1
-
-    axd['G'].set_ylabel('Average Loss')
-    axd['G'].set_xlabel('Trials')
-    axd['G'].plot(range(1, nTrial + 1), loss)
-
-    #fig.tight_layout()
-    plt.show()
+    cutoffEps = 1e-6
+    nPts = len(v)
+    cutoffIdx = nPts - 1 # Initialize to max index
+    for i in range(cutoffIdx, -1, -1):
+        if (S[i] / v[i]**2 > cutoffEps):
+            cutoffIdx = i
+            break
+    return cutoffIdx
