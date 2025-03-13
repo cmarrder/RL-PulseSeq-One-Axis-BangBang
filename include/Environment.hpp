@@ -91,4 +91,9 @@ public:
 	  return crystal.getFilter();
   }
 
+  double getFid() const
+  {
+    return crystal.avgFid();
+  }
+
 };

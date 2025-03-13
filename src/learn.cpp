@@ -85,24 +85,37 @@ int main()
   
   // Apply optimal action sequence and write it to file. Print if verbose.
   std::ofstream out_action(param.oDir + "/action.txt");
+  std::ofstream out_fid(param.oDir + "/fid.txt");
+  std::ofstream out_chi(param.oDir + "/chi.txt");
+
   environment.reset();
   if (param.verbose) {
     std::cout << std::endl << "Initial state:" << std::endl << std::endl; 
     std::cout << environment.state().transpose() << std::endl;
   }
+  // Write initial fidelity and chi
+  out_fid << environment.getFid() << std::endl;
+  out_chi << environment.getChi() << std::endl;
   for (auto &p : actionRecord) {
     environment.applyAction(p);
     if (param.verbose) {
       std::cout << "Action: " << p << std::endl;
       std::cout << "Next state:" << std::endl; 
       std::cout << environment.state().transpose() << std::endl << std::endl;
+      std::cout << std::endl << "Fid: " << environment.getFid() << std::endl;
+      std::cout << std::endl << "Chi: " << environment.getChi() << std::endl;
     }
+    // Write action chosen, new fidelity, and chi
     out_action << p << std::endl;
+    out_fid << environment.getFid() << std::endl;
+    out_chi << environment.getChi() << std::endl;
   }
   if (param.verbose) {
     std::cout << std::endl << "Reward: " << environment.reward() << std::endl;
   }
   out_action.close();
+  out_fid.close();
+  out_chi.close();
 
   // Write best final state to file.
   std::ofstream out_state(param.oDir + "/state.txt");

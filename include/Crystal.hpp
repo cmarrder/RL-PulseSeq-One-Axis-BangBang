@@ -20,6 +20,15 @@ using namespace Eigen;
 
 typedef Matrix<double, nPulse, 1> Feature;
 
+VectorXd myReciprocal(const VectorXd& x, const double epsilon)
+{
+  // Can't just name this function reciprocal because there is a function named reciprocal in Torch library.
+  // Calculate reciprocal of x. If |x| < epsilon, then return epsilon.
+  //VectorXd zeroRemoved = (x.array().abs() < 1e-12).select(VectorXd::Constant(x.size(), 1e-12), x);
+  VectorXd zeroRemoved = (x.array().abs() < epsilon).select(VectorXd::Constant(x.size(), epsilon), x);
+  return 1 / zeroRemoved.array();
+}
+
 VectorXd heaviside(const VectorXd& x)
 {
   // Heaviside step function as a function of x.
@@ -37,10 +46,12 @@ VectorXd boxcar(const VectorXd& x, const double center, const double width)
 VectorXd sinc(const VectorXd& x)
 {
   double EPS = 1e-20;
-  int dim = x.size();
-  VectorXd res(dim);
-  for (int i = 0; i < dim; i++)
-    res(i) = (fabs(x(i)) < EPS ? 1 : sin(M_PI * x(i)) / (M_PI * x(i)));
+  //int dim = x.size();
+  //VectorXd res(dim);
+  //for (int i = 0; i < dim; i++)
+  //  res(i) = (fabs(x(i)) < EPS ? 1 : sin(M_PI * x(i)) / (M_PI * x(i)));
+  VectorXd res;
+  res = (x * M_PI).array().sin() * myReciprocal(x * M_PI, EPS).array();
   return res;
 }
 
@@ -90,12 +101,6 @@ VectorXd gaussians(const VectorXd& x, const VectorXd& mus, const VectorXd& sigma
   return sum;
 }
 
-VectorXd reciprocal(const VectorXd& x)
-{
-  // Calculate reciprocal of x. If |x| < 1e-12, then return 1e+12.
-  VectorXd zeroRemoved = (x.array().abs() < 1e-12).select(VectorXd::Constant(x.size(), 1e-12), x);
-  return 1 / zeroRemoved.array();
-}
 
 
 class Crystal {
@@ -118,7 +123,9 @@ class Crystal {
   double eta1;
   double initialChi;
   double initialAvgInfid;
-
+  VectorXcd FT_of_ft_term1;
+  VectorXcd FT_of_ft_prefactor;
+  
   VectorXd initialCenterTimes()
   {
     // Wrapper function used to choose the initial pulse center times.
@@ -154,7 +161,7 @@ class Crystal {
 
              
     //// 1/f NOISE:
-    somega = reciprocal(frequencies);
+    somega = myReciprocal(frequencies, 1e-3);
     
 
     /*     
@@ -175,7 +182,7 @@ class Crystal {
     Vector2d centers(0.0, 0.7 * cpmgPeakFreq); // Place Lorentzian at origin and some fraction of location of peak of CPMG Filter function
     int nPeaks = centers.size(); 
     Vector2d fwhms(1.0 / 2.0, 1.0 / 4.0); // MAKE SURE FWHM IS NOT SMALLER THAN KEY FREQUENCIES IN TIME MESH
-    VectorXd heights = reciprocal(2 * M_PI * fwhms); 
+    VectorXd heights = myReciprocal(2 * M_PI * fwhms, 1e-6); 
     //// Divide output by number of elements in centers to normalize.
     somega = lorentzians(frequencies, centers, fwhms, heights) / nPeaks;
     */
@@ -200,7 +207,7 @@ class Crystal {
     {
       std::cout << "Error: Noise bandwidth is less than the frequency resolution!" << std::endl;
     }
-    //somega = reciprocal(frequencies).array() * (1.0 - boxcar(frequencies, bandCenter, bandWidth)).array();
+    //somega = myReciprocal(frequencies, 1e-3).array() * (1.0 - boxcar(frequencies, bandCenter, bandWidth)).array();
     //somega = 1.0 - boxcar(frequencies, bandCenter, bandWidth).array();
     // Noise which is a sum of two boxcars, each with distinct centers and widths.
     double boxcar1Right = bandCenter - bandWidth / 2; // Right boundary of 1st boxcar
@@ -226,41 +233,55 @@ class Crystal {
 
   VectorXcd computeFOmega() const
   {
+    // Compute Fourier transform of the switching function f(t).
     if (useFFT == true)
     {
         VectorXd ctrlSig = computeCtrlSig();
         VectorXd ctrlSigPadded = VectorXd::Zero(nTimePts);
         ctrlSigPadded.head(nTimeStep) = ctrlSig;
         
-        VectorXcd fourier_ft = VectorXcd::Zero(nTimePts);
+        VectorXcd FT_of_ft = VectorXcd::Zero(nTimePts);
         FFT<double> fft;
-        fft.fwd(fourier_ft, ctrlSigPadded);
-        return dTime * fourier_ft(seq(0, idxMaxFreq)); // Only consider the positive freqs. Normalize by multiplying by dTime.
+        fft.fwd(FT_of_ft, ctrlSigPadded);
+        return dTime * FT_of_ft(seq(0, idxMaxFreq)); // Only consider the positive freqs. Normalize by multiplying by dTime.
     }
+    //else
+    //{
+    //    VectorXd timeWithEnds = VectorXd::Zero(nPulse + 2);
+    //    timeWithEnds(0) = 0;
+    //    timeWithEnds(nPulse + 1) = maxTime;
+    //    timeWithEnds(seq(1, nPulse)) = sequence.getCenterTimes();
+    //    
+    //    VectorXd boxcarWidths = timeWithEnds(seq(1, nPulse+1)) - timeWithEnds(seq(0, nPulse));
+    //    VectorXd boxcarCenters = (timeWithEnds(seq(1, nPulse+1)) + timeWithEnds(seq(0, nPulse))) / 2;
+
+    //    
+    //    VectorXcd FT_of_ft = VectorXcd::Zero(nFreq);
+    //    for (int k = 0; k < nPulse + 1; k++) {
+    //            VectorXd boxFT = sinc(freq * boxcarWidths(k));
+    //            FT_of_ft += (std::pow(-1, k) * (-I * 2.0 * M_PI * freq * boxcarCenters(k)).array().exp() * boxcarWidths(k) * boxFT.array()).matrix();
+    //    }
+    //    return FT_of_ft;
+    //}
     else
     {
-        VectorXd timeWithEnds = VectorXd::Zero(nPulse + 2);
-        timeWithEnds(0) = 0;
-        timeWithEnds(nPulse + 1) = maxTime;
-        timeWithEnds(seq(1, nPulse)) = sequence.getCenterTimes();
-        
-        VectorXd boxcarWidths = timeWithEnds(seq(1, nPulse+1)) - timeWithEnds(seq(0, nPulse));
-        VectorXd boxcarCenters = (timeWithEnds(seq(1, nPulse+1)) + timeWithEnds(seq(0, nPulse))) / 2;
 
-        
-        VectorXcd fourier_f_of_t = VectorXcd::Zero(nFreq);
-        for (int k = 0; k < nPulse + 1; k++) {
-                VectorXd boxFT = sinc(freq * boxcarWidths(k));
-                fourier_f_of_t += (std::pow(-1, k) * (-I * 2.0 * M_PI * freq * boxcarCenters(k)).array().exp() * boxcarWidths(k) * boxFT.array()).matrix();
+	VectorXd centerTimes = sequence.getCenterTimes();
+
+        VectorXcd FT_of_ft = VectorXcd::Zero(nFreq);
+        for (int k = 0; k < nPulse; k++) {
+		double tk = centerTimes(k);
+		FT_of_ft += ((-I * M_PI * (2 * freq.array() * tk + k + 1)).array().exp()).matrix();
         }
-        return fourier_f_of_t;
+	FT_of_ft = (FT_of_ft_prefactor.array() * (FT_of_ft_term1.array() + 2 * FT_of_ft.array())).matrix();
+        return FT_of_ft;
     }
   }
 
   VectorXd computeFOmegaAbs2() const
   {
-    VectorXcd fourier_ft = computeFOmega();
-    return fourier_ft.cwiseAbs2();
+    VectorXcd FT_of_ft = computeFOmega();
+    return FT_of_ft.cwiseAbs2();
   }
 
   VectorXd computeCtrlSig() const
@@ -336,10 +357,10 @@ class Crystal {
     return numF - 1;
   }
 
-  double getCutoffFrequency()
-  {
-    // HERE
-  }
+  //double getCutoffFrequency()
+  //{
+  //  // HERE
+  //}
 
   void initializeTimeFreqData()
   {
@@ -455,6 +476,10 @@ class Crystal {
     sOmega = computeSOmega(freq);
     weightedSOmega = sOmega.cwiseProduct(weights);
 
+    // Calculate ahead of time:
+    FT_of_ft_term1 = -1 + (-I * M_PI * (2 * freq.array() * maxTime + nPulse + 1)).array().exp();
+    FT_of_ft_prefactor = (I / 2.0 / M_PI) * myReciprocal(freq, 1e-20);
+
     if (useFFT == true)
     {
       cutoffIdx = getCutoffIndex(sOmega, freq);
@@ -463,6 +488,7 @@ class Crystal {
     sequence.updateCenterTimes(initialCenterTimes());
 
     writeInitial(param.oDir);
+
   }
 
   void reset()

@@ -691,12 +691,7 @@ def action_sequence_plot(initial_times,
     #y2tick_locs = y1tick_locs[1:] 
     y2tick_locs = y1tick_locs[:len(y1tick_locs)-1] 
     y2tick_labels = np.flip(np.array([harmonic_set[a] for a in action_sequence]))
-    #y2tick_labels_ints = np.flip(np.array([harmonic_set[a] for a in action_sequence]))
-    #y2tick_labels = []
-    #for intlabel in y2tick_labels_ints:
-    #    if intlabel > 0:
 
-    #y2tick_labels = np.array([harmonic_set[a] for a in action_sequence])
     axd['H'].set_yticks(ticks=y2tick_locs, labels = y2tick_labels, horizontalalignment='center')
     axd['H'].set_yticks(ticks=(y2tick_locs + 0.5)[:-1], minor=True)
     axd['H'].tick_params(axis='both', which='both', length=0, width=0, color='black', size=0, labelsize=SIZE_TICK_LABEL)
@@ -722,54 +717,55 @@ def action_sequence_plot(initial_times,
     fid_array = np.zeros(nStep + 1)
     ff_slices = np.zeros((3, len(freqs)))
     fid_slices = np.zeros(3)
-    step = 0
     pulse_times = np.copy(initial_times)
-    axd['P'].vlines(pulse_times, np.flip(vlines_ymin)[step], np.flip(vlines_ymax)[step], color = agent_color, lw=LW_SEQUENCE) # Plot initial state
-    #axd['P'].vlines(pulse_times, vlines_ymin[step], vlines_ymax[step], color = agent_color, lw=LW_SEQUENCE) # Plot initial state
-    for action in action_sequence:
+    # Find max index for plotting
+    cutoffIdx = len(noise)-1 # Initialize
+    for i in range(len(noise)-1, -1, -1):
+        if (noise[i] / freqs[i]**2 > 1e-12):
+            cutoffIdx = i
+            break
+    for n in range(nStep + 1):
+        axd['P'].vlines(pulse_times, np.flip(vlines_ymin)[n], np.flip(vlines_ymax)[n], color = agent_color, lw=LW_SEQUENCE)
         ff = ps.FilterFunc(freqs, pulse_times, max_time)
         ###########chi = ps.chi(freqs, noise, ff)
-         
-        # Find max index for plotting
-        cutoffIdx = len(noise)-1 # Initialize
-        for i in range(len(noise)-1, -1, -1):
-            if (noise[i] / freqs[i]**2 > 1e-12):
-                cutoffIdx = i
-                break
-        if weights is None:
-            #chi = np.sum(noise[:cutoffIdx+2] * ff[:cutoffIdx+2]) * (freqs[1] - freqs[0])
-            chi = ps.chi(freqs[:cutoffIdx], noise[:cutoffIdx], ff[cutoffIdx])
+        if weights is not None:
+            chi = ps.chi(freqs[:cutoffIdx], noise[:cutoffIdx], ff[:cutoffIdx], weights=weights[:cutoffIdx])
         else:
-            chi = ps.chi(freqs[:cutoffIdx], noise[:cutoffIdx], ff[cutoffIdx], weights=weights[:cutoffIdx])
-        fid_array[step] = ps.fidelity(chi)
+            chi = ps.chi(freqs[:cutoffIdx], noise[:cutoffIdx], ff[:cutoffIdx])
+         
+        fid_array[n] = ps.fidelity(chi)
         # Get fidelity and filter function for the first filter function plot
-        if step == 0:
-            fid_slices[0] = fid_array[step]
+        if n == 0:
+            fid_slices[0] = fid_array[n]
             ff_slices[0] = ff
         # Get fidelity and filter function for the second filter function plot
-        elif step == int(nStep / 2):
-            fid_slices[1] = fid_array[step]
+        elif n == int(nStep / 2):
+            fid_slices[1] = fid_array[n]
             ff_slices[1] = ff
-        step += 1
-        pulse_times = kappa(pulse_times, harmonic_set[action], eta_set[action], max_time)
-        axd['P'].vlines(pulse_times, np.flip(vlines_ymin)[step], np.flip(vlines_ymax)[step], color = agent_color, lw=LW_SEQUENCE)
-    ff = ps.FilterFunc(freqs, pulse_times, max_time)
-    chi = ps.chi(freqs, noise, ff)
-    fid_array[step] = ps.fidelity(chi)
+        if n < nStep:
+            action = action_sequence[n]
+            pulse_times = kappa(pulse_times, harmonic_set[action], eta_set[action], max_time)
     # Get fidelity and filter function for the third filter function plot
     ff_slices[2] = ff
-    fid_slices[2] = fid_array[step]
+    fid_slices[2] = fid_array[n]
     
     ##########         FIDELITY PLOT         ##########
     ###################################################
     
+    infid_array = 1 - fid_array
+    min_infid = np.min(infid_array)
+    max_infid = np.max(infid_array)
     axd['F'].sharey(axd['P'])
-    axd['F'].set_xlabel('Fidelity', fontsize=SIZE_AXIS_LABEL)
+    axd['F'].set_xlabel('1 - Fidelity', fontsize=SIZE_AXIS_LABEL)
     axd['F'].set_ylabel('Steps', fontsize=SIZE_AXIS_LABEL)
     axd['F'].tick_params(axis='both', which='major', labelsize=SIZE_TICK_LABEL) 
     axd['F'].grid(axis='y') # Add gridlines
-    axd['F'].set_xlim(0.5, 1)
-    axd['F'].scatter(fid_array, np.flip(np.arange(nStep + 1)), s=SIZE_SCATTER)
+    axd['F'].set_xlim(0.95 * min_infid, 1.05 * max_infid)
+    axd['F'].scatter(infid_array, np.flip(np.arange(nStep + 1)), s=SIZE_SCATTER)
+    axd['F'].set_xticks(ticks=[min_infid, (max_infid + min_infid) / 2, max_infid])
+    axd['F'].xaxis.set_major_formatter('{x:.2f}') # Set format of x ticks to 2 decimal places
+    # Set the minimum number of ticks for the x-axis
+    #axd['F'].xaxis.set_major_locator(ticker.MaxNLocator(nbins='auto', min_n_ticks=3))
 
     ##########         FILTER PLOTS         ##########
     ##################################################
@@ -818,25 +814,15 @@ if __name__=="__main__":
     eta1 = np.loadtxt(os.path.join(job_dir, 'eta1.txt'))
     freqs_arr = np.loadtxt(os.path.join(job_dir, 'freq.txt'))
     noise_arr = np.loadtxt(os.path.join(job_dir, 'sOmega.txt'))
-    final_state = np.loadtxt(os.path.join(job_dir, 'state.txt'))
-    reward = np.loadtxt(os.path.join(job_dir, 'reward.txt'))
-    bestFilter = np.loadtxt(os.path.join(job_dir, 'bestFilter.txt'))
+    #final_state = np.loadtxt(os.path.join(job_dir, 'state.txt'))
+    #reward = np.loadtxt(os.path.join(job_dir, 'reward.txt'))
+    #bestFilter = np.loadtxt(os.path.join(job_dir, 'bestFilter.txt'))
     weights_arr = np.loadtxt(os.path.join(job_dir, 'weights.txt')) #None
+    pulse_times = np.loadtxt(os.path.join(job_dir, 'initialState.txt'))#ps.PDD(Npulse, max_time)
 
     max_time = 1
     Npulse = 8
-    pulse_times = ps.PDD(Npulse, max_time)
     eta_arr = np.abs(1 / harmonics_arr) * eta1
-
-    final_filter = ps.FilterFunc(freqs_arr, final_state, max_time) 
-    chi = ps.chi(freqs_arr, noise_arr, final_filter)
-    final_fid = ps.fidelity(chi)
-    print(final_fid)
-
-
-    print('fid from rew')
-    print(ps.fid_from_reward(reward))
-
 
     #action_sequence_plot(pulse_times, action_sequence, harmonics_arr, eta_arr, max_time, freqs_arr, noise_arr, save=save_dir, show=False, weights=weights_arr)
     action_sequence_plot(pulse_times, action_sequence, harmonics_arr, eta_arr, max_time, freqs_arr, noise_arr, weights=weights_arr)
