@@ -6,8 +6,8 @@
 #include "Greedy.hpp"
 #include "Param.hpp"
 
-constexpr int numTrial = 100;//250;//400;
-constexpr int numEpisode = 100;
+constexpr int numTrial = 200;//100;
+constexpr int numEpisode = 25;
 
 int main()
 { 
@@ -15,12 +15,15 @@ int main()
   std::string paramFile = "/home/charlie/Documents/ml/CollectiveAction/param.txt";
   Param param;
   param = getParam(paramFile);
+
+  std::cout << "numAction: " << numAction << std::endl;
   
   Environment environment(param);
   //Environment environment;
   Agent<Feature, numAction> agent;
   
   //agent.load("/home/charlie/Documents/ml/CollectiveAction/data/model");
+  //agent.load("/home/charlie/Documents/ml/CollectiveAction/bootstrap_testing/Npulse_8/seed_N_8_j_1_2_7_8/data_N_8_j_1_2_7_8/model");
   
   std::vector<int> actionRecord;
   std::vector<double> rewardHistory;
@@ -34,29 +37,41 @@ int main()
     double maxRewardTrial = 0;
     double maxFidTrial = 0;
     int lossCtr = 0;
+    double reward = 0;
+    //std::cout << "Trial: " << trial << std::endl;
     for (int episode = 0; episode < numEpisode; episode++) {
       environment.reset();
       Feature state = environment.state();
       bool done = environment.done();
+      //std::cout << "Episode: " << episode << std::endl;
       while (!done) {
         int action = agent.proposeAction(state, epsilon);
+	//std::cout << "Proposed action" << std::endl;
         environment.applyAction(action);
-        double reward = environment.reward();
-        Feature next_state = environment.state();
+	//std::cout << "Applied action" << std::endl;
+        reward = environment.reward();
+	//std::cout << "Calculated reward" << std::endl;
+
+        //double reward = environment.reward();
+        
+	Feature next_state = environment.state();
+	//std::cout << "Got new state" << std::endl;
         done = environment.done();
         agent.push(state, action, next_state, reward, done);
-        avgLoss += agent.learn();
+	//std::cout << "Pushed state transition" << std::endl;
+        avgLoss += agent.learn(); // This where code fails
+	//std::cout << "Learned" << std::endl;
         lossCtr++;
         state = next_state;
       }
-      maxRewardTrial = std::max(maxRewardTrial, environment.reward());
+      //maxRewardTrial = std::max(maxRewardTrial, environment.reward());
+      maxRewardTrial = std::max(maxRewardTrial, reward);
       maxFidTrial = maxRewardTrial * (1 + 1e-8) / (1 + maxRewardTrial); // Don't need this but helpful
-      if (maxReward < environment.reward()) {
+      //if (maxReward < environment.reward()) {
+      if (maxReward < reward) {
         maxReward = environment.reward();
         maxFid = maxReward * (1 + 1e-8) / (1 + maxReward); // Don't need this but helpful
         actionRecord = environment.actionRecord();
-      std::cout << "Chi: " << environment.getChi() << std::endl;
-      std::cout << "Sum: " << environment.getSum() << std::endl;
       }
     }
 
@@ -82,6 +97,10 @@ int main()
 
   // Print number of times we need to calculate average infidelity.
   std::cout << "Number of times we needed to calculate average fidelity: " << environment.getRewardCalls() << std::endl;
+
+
+  // Set new precision for writing to files.
+  std::cout << std::setprecision(5);
   
   // Apply optimal action sequence and write it to file. Print if verbose.
   std::ofstream out_action(param.oDir + "/action.txt");

@@ -5,11 +5,10 @@
 
 using namespace Eigen;
 
-const int nPulse = 8;
+const int nPulse = 64;
 const double maxTime = 1;
 const int nTimeStep = 2000; // Number of time steps in mesh.
 const int nZero = 65536 - (nTimeStep + 1); // Number of zeros for padding signal in FFT.
-//typedef Matrix<Pulse, nPulse, 1> Sequence;
 
 class Pulse {
 
@@ -43,6 +42,7 @@ class Pulse {
     }
 };
 
+
 class Sequence {
   
   // Make container for the pulses:
@@ -74,7 +74,6 @@ class Sequence {
      return pulseCenters; 
     }
 };
-
 
 VectorXd PDDCenterTimes()
 {

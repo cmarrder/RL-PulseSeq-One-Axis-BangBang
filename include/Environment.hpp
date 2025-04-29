@@ -81,12 +81,12 @@ public:
 	  return crystal.chi();
   }
 
-  VectorXd getSum() const
+  ArrayXd getSum() const
   {
 	  return crystal.getSum();
   }
 
-  VectorXd getFilter() const
+  ArrayXd getFilter() const
   {
 	  return crystal.getFilter();
   }

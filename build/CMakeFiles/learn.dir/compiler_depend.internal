@@ -515,6 +515,8 @@ CMakeFiles/learn.dir/src/learn.cpp.o
  /usr/include/features.h
  /usr/include/gnu/stubs-64.h
  /usr/include/gnu/stubs.h
+ /usr/include/gsl/gsl_sf_expint.h
+ /usr/include/gsl/gsl_sf_result.h
  /usr/include/inttypes.h
  /usr/include/libintl.h
  /usr/include/limits.h

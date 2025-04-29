@@ -95,6 +95,8 @@ learn: CMakeFiles/learn.dir/build.make
 learn: /usr/local/lib/libtorch/lib/libtorch.so
 learn: /usr/local/lib/libtorch/lib/libc10.so
 learn: /usr/local/lib/libtorch/lib/libkineto.a
+learn: /usr/lib64/libgsl.so
+learn: /usr/lib64/libgslcblas.so
 learn: /usr/local/lib/libtorch/lib/libc10.so
 learn: CMakeFiles/learn.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/charlie/Documents/ml/CollectiveAction/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable learn"

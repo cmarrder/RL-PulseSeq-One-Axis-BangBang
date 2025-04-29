@@ -1,5 +1,6 @@
-oDir /home/charlie/Documents/ml/CollectiveAction/data
+oDir /home/charlie/Documents/ml/CollectiveAction/data/N_064/J_064
 verbose 1
 noiseParam1 0.25
 noiseParam2 1.000000000000000021e-02
-eta1 0.0410722
+eta1 1.026806084463840855e-02
+maxJ 64

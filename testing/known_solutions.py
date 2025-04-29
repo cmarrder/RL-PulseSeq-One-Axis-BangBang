@@ -10,17 +10,19 @@ plotCurves = True
 
 # Load data
 
-oDir = '/home/charlie/Documents/ml/CollectiveAction/eta_scan_data/1_over_f/harmonics_01_02_08/job_00002/run_00001'
+oDir = '/home/charlie/Documents/ml/CollectiveAction/data'
 
 nPulse = 8#int( np.loadtxt(os.path.join(oDir, 'nPulse.txt')) ) # Number of pulse applications
+maxTime = 1
 #nTimeStep = int( np.loadtxt(os.path.join(oDir, 'nTimeStep.txt')) )# Number of pulse chances/locations
-tMax = np.loadtxt(os.path.join(oDir, 'maxTime.txt'))
-param1 = np.loadtxt(os.path.join(oDir, 'noiseParam1.txt'))
-param2 = np.loadtxt(os.path.join(oDir, 'noiseParam2.txt'))
+#maxTime = np.loadtxt(os.path.join(oDir, 'maxTime.txt'))
+#param1 = np.loadtxt(os.path.join(oDir, 'noiseParam1.txt'))
+#param2 = np.loadtxt(os.path.join(oDir, 'noiseParam2.txt'))
 
-freq = np.loadtxt(os.path.join(oDir, 'freq.txt'))
-recip = np.reciprocal(freq, where=freq >= 1e-8)#np.loadtxt(os.path.join(oDir, 'sOmega.txt')) #ps.fermi_dirac(freq, 20/2/np.pi, 0.1) #1 / (1 + freq**2)#np.loadtxt(os.path.join(oDir, 'sOmega.txt'))
-sOmega = np.where(recip < 1e-8, 1e8, recip)
+#freq = np.loadtxt(os.path.join(oDir, 'freq.txt'))
+#recip = np.reciprocal(freq, where=freq >= 1e-8) #ps.fermi_dirac(freq, 20/2/np.pi, 0.1) #1 / (1 + freq**2)#np.loadtxt(os.path.join(oDir, 'sOmega.txt'))
+#sOmega = np.loadtxt(os.path.join(oDir, 'sOmega.txt'))
+#sOmega = np.where(recip < 1e-8, 1e8, recip)
 
 #finalState = np.loadtxt(os.path.join(oDir, 'state.txt'))
 #reward = np.loadtxt(os.path.join(oDir, 'reward.txt'))
@@ -28,16 +30,51 @@ sOmega = np.where(recip < 1e-8, 1e8, recip)
 
 # Choose noise PSD profile
 
-cpmgPeak = nPulse / 2 / tMax
-param1 = cpmgPeak / 8
-param2 = 0.4#0.01
+cpmgPeak = nPulse / 2 / maxTime
+#nLorentzians = 10
+#centers = np.random.rand(nLorentzians - 1) * cpmgPeak * 1.2
+#fwhms = np.random.rand(nLorentzians - 1) * 2 / maxTime
+#S0 = 10
+#heights = S0 * np.reciprocal(centers, where = centers>=1e-8)
+## Add frequency = zero as a center
+#centers = np.append(centers, 0)
+#fwhms = np.append(fwhms, np.random.rand())
+#heights = np.append(heights, S0)
+
+#S0 = 10
+#centers = np.array([0, 4, 13, 37, 48, 61, 64, 69, 71, 78, 84]) / 2 / maxTime
+#nLorentzians = len(centers)
+#fwhms = (0.25 + np.random.rand(nLorentzians)) * 2 / maxTime
+#heights = np.zeros_like(centers)
+#heights[0] = S0
+#heights[1:] = S0 / np.sqrt(centers[1:])
+
+
+maxTime = 1
+IR_cutoff = 1 / maxTime
+S0 = 0.25
+noise_func = lambda x: S0 / np.where(x <= IR_cutoff, 1, x)
+
+
+#centers = np.array([0.0, 2.0, 6.5, 18.5, 24.0, 30.5, 32.0, 34.5, 35.5, 39.0, 42.0])
+#fwhms = np.array([0.97791257, 0.69318029, 1.33978924, 1.22886943, 1.04032235, 0.57028931, 1.85807798, 2.40010327, 0.71804862, 1.9982775, 0.76180626])
+#heights = np.array([10.0, 7.07106781, 3.9223227, 2.32495277, 2.04124145, 1.81071492,
+#        1.76776695, 1.70251306, 1.67836272, 1.60128154, 1.5430335])
+#
+#noise_func = lambda v: ps.lorentzians(v, centers, fwhms, heights=heights)
+#cutoffFreq = ps.findCutoffFreq(centers[-1], cpmgPeak / 100, noise_func)
+
+#param1 = cpmgPeak / 8
+#param2 = 0.4#0.01
 # Fermi-Dirac distribution for studying hard to smooth cutoff (low temp to high temp)
 #S = ps.fermi_dirac(freq, param1, param2)
 
-noise = sOmega
+cutoffFreq = ps.findCutoffFreq(IR_cutoff, IR_cutoff / 100, noise_func)
+freq = np.linspace(0, cutoffFreq, 100000)
+noise = noise_func(freq)
 
 # Sum of Lorentzians peaked at the CPMG filter function peaks so we make it hard for CPMG to perform well
-#tau = tMax / (2 * nPulse)
+#tau = maxTime / (2 * nPulse)
 #centers = (np.arange(nPulse) + 0.5) / (2 * tau)
 #fwhms = np.ones_like(centers) / 2
 #S = ps.lorentzians(freq, centers, fwhms)
@@ -45,9 +82,9 @@ noise = sOmega
 #S /= len(centers)
 
 # Crunch numbers
-UDDTime = ps.UDD(nPulse, tMax)
-PDDTime = ps.PDD(nPulse, tMax)
-CPMGTime = ps.CPMG(nPulse, tMax)
+UDDTime = ps.UDD(nPulse, maxTime)
+PDDTime = ps.PDD(nPulse, maxTime)
+CPMGTime = ps.CPMG(nPulse, maxTime)
 print("\nPULSE TIMES")
 print("\nUDD")
 print(UDDTime)
@@ -84,9 +121,9 @@ if plotCurves == True:
     mpl.rcParams['ytick.minor.width'] = 1
 #    mpl.rcParams['axes.titlepad'] = PAD_AXH
 
-    UDDFilter = ps.FilterFunc(freq, UDDTime, tMax)
-    PDDFilter = ps.FilterFunc(freq, PDDTime, tMax)
-    CPMGFilter = ps.FilterFunc(freq, CPMGTime, tMax)
+    UDDFilter = ps.FilterFunc(freq, UDDTime, maxTime)
+    PDDFilter = ps.FilterFunc(freq, PDDTime, maxTime)
+    CPMGFilter = ps.FilterFunc(freq, CPMGTime, maxTime)
     
     UDDOverlap = ps.chi(freq, noise, UDDFilter)
     PDDOverlap = ps.chi(freq, noise, PDDFilter)
@@ -96,6 +133,13 @@ if plotCurves == True:
     PDDFid = ps.fidelity(PDDOverlap)
     CPMGFid = ps.fidelity(CPMGOverlap)
 
+    print('\nChis')
+    print('\nUDD Chi')
+    print(UDDOverlap)
+    print('PDD Chi')
+    print(PDDOverlap)
+    print('CPMG Chi')
+    print(CPMGOverlap)
     print('\nFIDELITIES')
     print('\nUDD Fidelity')
     print(UDDFid)
@@ -119,16 +163,24 @@ if plotCurves == True:
     CPMGLabel = 'CPMG ($N = {0}$), $p = {1:.3f}$'.format(nPulse, CPMGFid)
     
     string_Na = '$N_{{pulse}} = {}$, '.format(nPulse)
-    string_mu = '$\mu$ = {:.3e}, '.format(param1)
-    string_temp = '$T$ = {:.3e}'.format(param2)
+    #string_mu = '$\mu$ = {:.3e}, '.format(param1)
+    #string_temp = '$T$ = {:.3e}'.format(param2)
     #title = string_Na + string_mu + string_temp
     title = 'Performance of UDD, PDD, and CPMG on $1/f$ Noise'
     
+    ## Find max index for plotting
+    #cutoffIdx = len(noise)-1 # Initialize
+    #for i in range(len(noise)-1, -1, -1):
+    #    #if (noise[i] / freq[i] > 1e-5):
+    #    if (noise[i] / freq[i] > 1e-3):
+    #        cutoffIdx = i
+    #        break
     # Find max index for plotting
     cutoffIdx = len(noise)-1 # Initialize
+    maxNoise = np.max(noise)
     for i in range(len(noise)-1, -1, -1):
-        #if (noise[i] / freq[i] > 1e-5):
-        if (noise[i] / freq[i] > 1e-3):
+        #if ( noise[i] / maxNoise > 2e-3):
+        if ( noise[i] / maxNoise > 2e-2):
             cutoffIdx = i
             break
     
@@ -195,7 +247,7 @@ if plotCurves == True:
 #    #axd['C'].set_title('CPMG ($N_{{pulse}} = {}$)'.format(int(nPulse)))
 #    axd['C'].set_title('CPMG ($N = {}$)'.format(int(nPulse)))
 #    axd['C'].set_xlabel('Time')
-#    axd['C'].set_xlim(0, tMax)
+#    axd['C'].set_xlim(0, maxTime)
 #    axd['C'].vlines(CPMGTime, 0, 1, color=CPMGColor, linestyle=CPMGLinestyle, linewidth=LW_SEQUENCE)
 #    axd['C'].yaxis.set_major_locator(ticker.NullLocator()) # Remove y axis labels/ticks
 #    axd['C'].grid(axis = 'x')
@@ -330,7 +382,7 @@ if plotCurves == True:
 #
 #    axd['F'].set_xlabel(r'$\omega$', fontsize=SIZE_AXIS_LABEL)
 #    axd['C'].set_xlabel('Time', fontsize=SIZE_AXIS_LABEL)
-#    axd['C'].set_xlim(0, tMax)
+#    axd['C'].set_xlim(0, maxTime)
 #
 ##    plt.savefig('../paper_plots/Figure1.svg', dpi=300)
 #    plt.show()
@@ -362,9 +414,23 @@ if plotCurves == True:
     LW_SEQUENCE = 2.5
     LW_CURVES = 1.75
 
-    angfreq = 2 * np.pi * freq[:cutoffIdx]
+    #angfreq = 2 * np.pi * freq[:cutoffIdx]
     filters = np.stack((UDDFilter[:cutoffIdx], PDDFilter[:cutoffIdx], CPMGFilter[:cutoffIdx]))
     sequences = np.stack((UDDTime, PDDTime, CPMGTime))
+
+    # Get T2star, the fundamental timescale of our system
+    max_times = np.linspace(maxTime, 10*maxTime, 100)
+    T2star = ps.calculateT2star(freq[-1], noise_func, max_times, verbose=True)
+
+    # Put sOmega in units of 1 / time since it has units rad^2 / time
+    noise /= (2 * np.pi)**2
+    # Scale sOmega and freq in terms of frequency of 1 / T2star
+    noise /= (1 / T2star)
+    freq /= (1 / T2star)
+    noise = noise[:cutoffIdx]
+    freq = freq[:cutoffIdx]
+    # Put filter functions in units of T2star since it has units of time already
+    filters /= T2star
 
     time_tick_labels = ['0', '0.2T', '0.4T', '0.6T', '0.8T', 'T']
     time_tick_locs = [0, 0.2, 0.4, 0.6, 0.8, 1]
@@ -374,6 +440,12 @@ if plotCurves == True:
     filter_keys = ['D', 'E', 'F']
     ins_axlist = []
 
+    inset_x = 0.3#0.55
+    inset_y = 0.80#0.55
+    inset_w = 0.4
+    inset_h = 0.15
+    #legend_loc = 'lower right'
+    legend_bbox_to_anchor=(0.54, 0.56)
     for i in range(3):
         inset_x = 0.3#0.55
         inset_y = 0.80#0.55
@@ -394,17 +466,20 @@ if plotCurves == True:
         ins_axlist[i].set_xlabel('Time', fontsize=0.7*SIZE_AXIS_LABEL)
         #ins_axlist[i].grid(axis = 'x')
         # Plot filters and noise PSD
-        axd[filter_keys[i]].plot(angfreq, filters[i], color=filter_colors[i], linestyle=filter_linestyles[i], label = r'$F(\omega)$', linewidth=LW_CURVES)
-        axd[filter_keys[i]].plot(angfreq, noise[:cutoffIdx], color=noiseColor, linestyle=noiseLinestyle, label = r'$S(\omega)$', linewidth=LW_CURVES)
+        #axd[filter_keys[i]].plot(angfreq, filters[i], color=filter_colors[i], linestyle=filter_linestyles[i], label = r'$F(\omega)$', linewidth=LW_CURVES)
+        #axd[filter_keys[i]].plot(angfreq, noise[:cutoffIdx], color=noiseColor, linestyle=noiseLinestyle, label = r'$S(\omega)$', linewidth=LW_CURVES)
+        axd[filter_keys[i]].plot(freq, filters[i], color=filter_colors[i], linestyle=filter_linestyles[i], label = r'$F(\omega) \left[T_2^*\right]$', linewidth=LW_CURVES)
+        axd[filter_keys[i]].plot(freq, noise, color=noiseColor, linestyle=noiseLinestyle, label = r'$\mathrm{Re}[S(\omega)]/(2\pi)^2 \left[1/T_2^*\right]$', linewidth=LW_CURVES)
         axd[filter_keys[i]].tick_params(axis='both', which='major', labelsize=SIZE_TICK_LABEL) 
-        axd[filter_keys[i]].set_yscale('log')
+        #axd[filter_keys[i]].set_yscale('log')
         axd[filter_keys[i]].set_title(filter_labels[i], fontsize=SIZE_AXIS_LABEL)
-        axd[filter_keys[i]].legend(prop={'size': SIZE_TICK_LABEL})
+        #axd[filter_keys[i]].legend(prop={'size': SIZE_TICK_LABEL}, loc=legend_loc, bbox_to_anchor=legend_bbox_to_anchor)
+        axd[filter_keys[i]].legend(prop={'size': SIZE_TICK_LABEL}, bbox_to_anchor=legend_bbox_to_anchor)
 
-    axd['F'].set_xlabel(r'$\omega$', fontsize=SIZE_AXIS_LABEL)
-    axd['D'].set_ylim(bottom=1e-12, top=1e9)
-    ins_axlist[2].set_xlim(0, tMax)
+    axd['F'].set_xlabel(r'$\frac{\omega}{2\pi} \left[\frac{1}{T_2^*}\right]$', fontsize=SIZE_AXIS_LABEL)
+    #axd['D'].set_ylim(bottom=1e-12, top=1e9)
+    ins_axlist[2].set_xlim(0, maxTime)
     ins_axlist[2].set_ylim(0, 1)
 
-#    plt.savefig('../paper_plots/Figure1.svg', dpi=300)
+    plt.savefig('../paper_plots/Figure1.svg', dpi=300)
     plt.show()

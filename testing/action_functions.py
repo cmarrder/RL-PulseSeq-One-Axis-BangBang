@@ -206,9 +206,10 @@ if __name__=="__main__":
     Nsample = 4
     xsample = ps.PDD(Nsample, max_time) 
 
-    plot_3_kappas_paper(x, xsample, c, save='paper_plots/Figure2b.svg')
+    #plot_3_kappas_paper(x, xsample, c, save='paper_plots/Figure2b.svg')
     #plot_3_kappas_paper(x, xsample, c)
     #plot_4_kappas_paper(x, xsample, c, save='paper_plots/Figure2b.svg')
+    plot_4_kappas_paper(x, xsample, c, save='paper_plots/posterfest_action_funcs.png')
      
     #for j in harmonic_list:
     #    title = '$\kappa_{{{}}}$'.format(j)

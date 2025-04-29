@@ -1,0 +1,666 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ns/call  ns/call  name    
+ 50.00      0.01     0.01 205834541     0.05     0.05  c10::intrusive_ptr<c10::TensorImpl, c10::UndefinedTensorImpl>::reset_()
+ 50.00      0.02     0.01   199981    50.00    50.00  ReplayBuffer<Eigen::Matrix<double, 8, 1, 0, 8, 1> >::sample(std::linear_congruential_engine<unsigned long, 48271ul, 0ul, 2147483647ul>*) const
+  0.00      0.02     0.00 26722526     0.00     0.10  torch::autograd::make_variable(at::Tensor, bool, bool)
+  0.00      0.02     0.00 25722621     0.00     0.24  at::Tensor toTensor<8>(Eigen::Matrix<double, 8, 1, ((Eigen::StorageOptions)0)|((((8)==(1))&&((1)!=(1)))?((Eigen::StorageOptions)1) : ((((1)==(1))&&((8)!=(1)))?((Eigen::StorageOptions)0) : ((Eigen::StorageOptions)0))), 8, 1> const&)
+  0.00      0.02     0.00  2799708     0.00     0.00  void std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >::_M_realloc_insert<Eigen::Matrix<double, 8, 1, 0, 8, 1> const&>(__gnu_cxx::__normal_iterator<Eigen::Matrix<double, 8, 1, 0, 8, 1>*, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > > >, Eigen::Matrix<double, 8, 1, 0, 8, 1> const&)
+  0.00      0.02     0.00  1399886     0.00     0.00  std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::clear()
+  0.00      0.02     0.00  1399884     0.00     0.00  torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, at::Tensor>::~OrderedDict()
+  0.00      0.02     0.00  1399862     0.00     0.00  void std::vector<double, std::allocator<double> >::_M_realloc_insert<double const&>(__gnu_cxx::__normal_iterator<double*, std::vector<double, std::allocator<double> > >, double const&)
+  0.00      0.02     0.00  1399860     0.00     0.00  void std::vector<int, std::allocator<int> >::_M_realloc_insert<int const&>(__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > >, int const&)
+  0.00      0.02     0.00  1199898     0.00     0.00  torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, at::Tensor>::operator[](std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+  0.00      0.02     0.00  1199898     0.00     0.00  std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::find(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+  0.00      0.02     0.00   726976     0.00     0.58  NetworkImpl::forward(at::Tensor)
+  0.00      0.02     0.00   399962     0.00    21.91  at::Tensor toTensor<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > > const&)
+  0.00      0.02     0.00   200020     0.00     0.00  kappa(Eigen::Matrix<double, -1, 1, 0, -1, 1> const&, double, double)
+  0.00      0.02     0.00   200000     0.00     0.65  Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::proposeAction(Eigen::Matrix<double, 8, 1, 0, 8, 1> const&, double)
+  0.00      0.02     0.00   200000     0.00    99.35  Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::learn()
+  0.00      0.02     0.00   199981     0.00    44.79  std::tuple<at::Tensor, at::Tensor, at::Tensor, at::Tensor, at::Tensor> toTensor<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::tuple<std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<int, std::allocator<int> >, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<double, std::allocator<double> >, std::vector<bool, std::allocator<bool> > > const&)
+  0.00      0.02     0.00   199981     0.00     0.24  toTensor(std::vector<bool, std::allocator<bool> > const&)
+  0.00      0.02     0.00   199981     0.00     0.24  toTensor(std::vector<double, std::allocator<double> > const&)
+  0.00      0.02     0.00   199981     0.00     0.29  toTensor(std::vector<int, std::allocator<int> > const&)
+  0.00      0.02     0.00   199981     0.00    48.34  Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::tdLoss(std::tuple<std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<int, std::allocator<int> >, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<double, std::allocator<double> >, std::vector<bool, std::allocator<bool> > > const&)
+  0.00      0.02     0.00   199981     0.00     0.00  std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_weak_release()
+  0.00      0.02     0.00   127033     0.00     0.05  toVector(at::Tensor const&)
+  0.00      0.02     0.00    50729     0.00     0.00  frame_dummy
+  0.00      0.02     0.00    20099     0.00     0.00  Crystal::chi_1_over_f_low_cutoff(double, double) const
+  0.00      0.02     0.00    10003     0.00     0.00  PDDCenterTimes()
+  0.00      0.02     0.00     3948     0.00     0.00  c10::bad_optional_access::~bad_optional_access()
+  0.00      0.02     0.00      108     0.00     0.00  void std::shuffle<int*, std::linear_congruential_engine<unsigned long, 48271ul, 0ul, 2147483647ul>&>(int*, int*, std::linear_congruential_engine<unsigned long, 48271ul, 0ul, 2147483647ul>&)
+  0.00      0.02     0.00       84     0.00     0.00  Crystal::chi() const
+  0.00      0.02     0.00       32     0.00     0.00  Eigen::IOFormat::IOFormat(int, int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char)
+  0.00      0.02     0.00       21     0.00     0.00  std::ostream& Eigen::internal::print_matrix<Eigen::Matrix<double, 1, 8, 1, 1, 8> >(std::ostream&, Eigen::Matrix<double, 1, 8, 1, 1, 8> const&, Eigen::IOFormat const&)
+  0.00      0.02     0.00       21     0.00     0.00  std::ostream& Eigen::operator<< <Eigen::Transpose<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >(std::ostream&, Eigen::DenseBase<Eigen::Transpose<Eigen::Matrix<double, 8, 1, 0, 8, 1> > > const&)
+  0.00      0.02     0.00       20     0.00     0.00  Crystal::step(int)
+  0.00      0.02     0.00       20     0.00     0.00  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*)
+  0.00      0.02     0.00       18     0.00     0.00  myReciprocal(Eigen::Matrix<double, -1, 1, 0, -1, 1> const&, double)
+  0.00      0.02     0.00       18     0.00     0.00  sinc(Eigen::Matrix<double, -1, 1, 0, -1, 1> const&)
+  0.00      0.02     0.00       18     0.00     0.00  void std::vector<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool>, std::allocator<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool> > >::_M_realloc_insert<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool> const&>(__gnu_cxx::__normal_iterator<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool>*, std::vector<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool>, std::allocator<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool> > > >, std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool> const&)
+  0.00      0.02     0.00        8     0.00     0.00  std::ostream& Eigen::internal::print_matrix<Eigen::Matrix<double, -1, 1, 0, -1, 1> >(std::ostream&, Eigen::Matrix<double, -1, 1, 0, -1, 1> const&, Eigen::IOFormat const&)
+  0.00      0.02     0.00        8     0.00     0.00  std::ostream& Eigen::operator<< <Eigen::Matrix<double, -1, 1, 0, -1, 1> >(std::ostream&, Eigen::DenseBase<Eigen::Matrix<double, -1, 1, 0, -1, 1> > const&)
+  0.00      0.02     0.00        8     0.00     0.00  std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release()
+  0.00      0.02     0.00        8     0.00     0.00  void std::vector<double, std::allocator<double> >::_M_realloc_insert<double>(__gnu_cxx::__normal_iterator<double*, std::vector<double, std::allocator<double> > >, double&&)
+  0.00      0.02     0.00        6     0.00     0.00  Eigen::PlainObjectBase<Eigen::Matrix<double, -1, 1, 0, -1, 1> >::PlainObjectBase<Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, Eigen::Matrix<double, -1, 1, 0, -1, 1> > >(Eigen::DenseBase<Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, Eigen::Matrix<double, -1, 1, 0, -1, 1> > > const&)
+  0.00      0.02     0.00        6     0.00     0.00  std::shared_ptr<torch::nn::Module>& torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::insert<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::LinearImpl> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&, std::shared_ptr<torch::nn::LinearImpl>&&)
+  0.00      0.02     0.00        6     0.00     0.00  std::shared_ptr<torch::nn::LinearImpl> torch::nn::Module::register_module<torch::nn::LinearImpl>(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, torch::nn::ModuleHolder<torch::nn::LinearImpl>)
+  0.00      0.02     0.00        6     0.00     0.00  std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::find(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const
+  0.00      0.02     0.00        6     0.00     0.00  void std::vector<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item, std::allocator<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item> >::_M_realloc_insert<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, std::shared_ptr<torch::nn::LinearImpl> >(__gnu_cxx::__normal_iterator<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item*, std::vector<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item, std::allocator<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item> > >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, std::shared_ptr<torch::nn::LinearImpl>&&)
+  0.00      0.02     0.00        2     0.00     0.00  NetworkImpl::NetworkImpl(int, int, int)
+  0.00      0.02     0.00        2     0.00     0.00  NetworkImpl::~NetworkImpl()
+  0.00      0.02     0.00        2     0.00     0.00  std::ostream& Eigen::internal::print_matrix<Eigen::Matrix<double, 1, -1, 1, 1, -1> >(std::ostream&, Eigen::Matrix<double, 1, -1, 1, 1, -1> const&, Eigen::IOFormat const&)
+  0.00      0.02     0.00        2     0.00     0.00  std::ostream& Eigen::operator<< <Eigen::Transpose<Eigen::Matrix<double, -1, 1, 0, -1, 1> > >(std::ostream&, Eigen::DenseBase<Eigen::Transpose<Eigen::Matrix<double, -1, 1, 0, -1, 1> > > const&)
+  0.00      0.02     0.00        2     0.00     0.00  torch::nn::Module::~Module()
+  0.00      0.02     0.00        2     0.00     0.00  Crystal::computeSOmega(Eigen::Matrix<double, -1, 1, 0, -1, 1>)
+  0.00      0.02     0.00        2     0.00     0.00  Crystal::computeFOmega() const
+  0.00      0.02     0.00        2     0.00     0.00  Crystal::feature() const
+  0.00      0.02     0.00        2     0.00     0.00  std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::_M_rehash(unsigned long, unsigned long const&)
+  0.00      0.02     0.00        2     0.00     0.00  std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release_last_use_cold()
+  0.00      0.02     0.00        2     0.00     0.00  std::_Sp_counted_ptr_inplace<NetworkImpl, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::_M_destroy()
+  0.00      0.02     0.00        2     0.00     0.00  std::_Sp_counted_ptr_inplace<NetworkImpl, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::_M_dispose()
+  0.00      0.02     0.00        2     0.00     0.00  std::vector<at::Tensor, std::allocator<at::Tensor> >::~vector()
+  0.00      0.02     0.00        1     0.00     0.00  gaussQuad5()
+  0.00      0.02     0.00        1     0.00     0.00  shiftedGaussQuad5(double, double, int)
+  0.00      0.02     0.00        1     0.00     0.00  getParam(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&)
+  0.00      0.02     0.00        1     0.00     0.58  NetworkImpl::initializeParameters()
+  0.00      0.02     0.00        1     0.00     0.58  Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::Agent()
+  0.00      0.02     0.00        1     0.00     0.00  std::ostream& Eigen::internal::print_matrix<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::ostream&, Eigen::Matrix<double, 8, 1, 0, 8, 1> const&, Eigen::IOFormat const&)
+  0.00      0.02     0.00        1     0.00     0.00  std::ostream& Eigen::operator<< <Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::ostream&, Eigen::DenseBase<Eigen::Matrix<double, 8, 1, 0, 8, 1> > const&)
+  0.00      0.02     0.00        1     0.00     0.00  torch::optim::Adam::Adam(std::vector<torch::optim::OptimizerParamGroup, std::allocator<torch::optim::OptimizerParamGroup> >, torch::optim::AdamOptions)
+  0.00      0.02     0.00        1     0.00     0.00  Crystal::writeInitial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&)
+  0.00      0.02     0.00        1     0.00     0.00  Crystal::initializeTimeFreqData()
+  0.00      0.02     0.00        1     0.00     0.00  Crystal::reset()
+  0.00      0.02     0.00        1     0.00     0.00  Crystal::Crystal(Param&)
+  0.00      0.02     0.00        1     0.00     0.00  Crystal::computeCtrlSig() const
+  0.00      0.02     0.00        1     0.00     0.00  Crystal::computeFOmegaAbs2() const
+  0.00      0.02     0.00        1     0.00     0.00  Crystal::avgFid() const
+  0.00      0.02     0.00        1     0.00     0.00  std::vector<torch::optim::OptimizerParamGroup, std::allocator<torch::optim::OptimizerParamGroup> >::~vector()
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+Copyright (C) 2012-2022 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 4 byte(s) for 50.00% of 0.02 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]    100.0    0.00    0.02                 main [1]
+                0.00    0.02  200000/200000      Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::learn() [2]
+                0.00    0.00  200000/200000      Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::proposeAction(Eigen::Matrix<double, 8, 1, 0, 8, 1> const&, double) [11]
+                0.00    0.00       1/1           Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::Agent() [17]
+                0.00    0.00  200000/200020      kappa(Eigen::Matrix<double, -1, 1, 0, -1, 1> const&, double, double) [30]
+                0.00    0.00   20098/20099       Crystal::chi_1_over_f_low_cutoff(double, double) const [32]
+                0.00    0.00   10000/10003       PDDCenterTimes() [33]
+                0.00    0.00     122/50729       frame_dummy [18]
+                0.00    0.00      83/84          Crystal::chi() const [36]
+                0.00    0.00      21/21          std::ostream& Eigen::operator<< <Eigen::Transpose<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >(std::ostream&, Eigen::DenseBase<Eigen::Transpose<Eigen::Matrix<double, 8, 1, 0, 8, 1> > > const&) [39]
+                0.00    0.00      20/20          Crystal::step(int) [40]
+                0.00    0.00      18/18          void std::vector<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool>, std::allocator<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool> > >::_M_realloc_insert<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool> const&>(__gnu_cxx::__normal_iterator<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool>*, std::vector<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool>, std::allocator<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool> > > >, std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool> const&) [44]
+                0.00    0.00       8/8           void std::vector<double, std::allocator<double> >::_M_realloc_insert<double>(__gnu_cxx::__normal_iterator<double*, std::vector<double, std::allocator<double> > >, double&&) [48]
+                0.00    0.00       8/1399862     void std::vector<double, std::allocator<double> >::_M_realloc_insert<double const&>(__gnu_cxx::__normal_iterator<double*, std::vector<double, std::allocator<double> > >, double const&) [26]
+                0.00    0.00       7/20          std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*) [41]
+                0.00    0.00       6/1399860     void std::vector<int, std::allocator<int> >::_M_realloc_insert<int const&>(__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > >, int const&) [27]
+                0.00    0.00       2/2           Crystal::feature() const [61]
+                0.00    0.00       1/1           getParam(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&) [69]
+                0.00    0.00       1/1           Crystal::Crystal(Param&) [76]
+                0.00    0.00       1/1           Crystal::reset() [75]
+                0.00    0.00       1/1           Crystal::avgFid() const [79]
+                0.00    0.00       1/1           std::ostream& Eigen::operator<< <Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::ostream&, Eigen::DenseBase<Eigen::Matrix<double, 8, 1, 0, 8, 1> > const&) [71]
+                0.00    0.00       1/1           Crystal::computeFOmegaAbs2() const [78]
+                0.00    0.00       1/8           std::ostream& Eigen::operator<< <Eigen::Matrix<double, -1, 1, 0, -1, 1> >(std::ostream&, Eigen::DenseBase<Eigen::Matrix<double, -1, 1, 0, -1, 1> > const&) [46]
+-----------------------------------------------
+                0.00    0.02  200000/200000      main [1]
+[2]     99.4    0.00    0.02  200000         Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::learn() [2]
+                0.01    0.00  199981/199981      ReplayBuffer<Eigen::Matrix<double, 8, 1, 0, 8, 1> >::sample(std::linear_congruential_engine<unsigned long, 48271ul, 0ul, 2147483647ul>*) const [4]
+                0.00    0.01  199981/199981      Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::tdLoss(std::tuple<std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<int, std::allocator<int> >, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<double, std::allocator<double> >, std::vector<bool, std::allocator<bool> > > const&) [5]
+                0.00    0.00 4199601/205834541     c10::intrusive_ptr<c10::TensorImpl, c10::UndefinedTensorImpl>::reset_() [3]
+                0.00    0.00 1399867/1399884     torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, at::Tensor>::~OrderedDict() [25]
+                0.00    0.00 1199886/1199898     torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, at::Tensor>::operator[](std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [28]
+-----------------------------------------------
+                0.00    0.00      12/205834541     NetworkImpl::initializeParameters() [16]
+                0.00    0.00  127033/205834541     toVector(at::Tensor const&) [15]
+                0.00    0.00  381099/205834541     Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::proposeAction(Eigen::Matrix<double, 8, 1, 0, 8, 1> const&, double) [11]
+                0.00    0.00  599943/205834541     toTensor(std::vector<bool, std::allocator<bool> > const&) [13]
+                0.00    0.00  599943/205834541     toTensor(std::vector<double, std::allocator<double> > const&) [14]
+                0.00    0.00  799924/205834541     toTensor(std::vector<int, std::allocator<int> > const&) [12]
+                0.00    0.00  799924/205834541     std::tuple<at::Tensor, at::Tensor, at::Tensor, at::Tensor, at::Tensor> toTensor<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::tuple<std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<int, std::allocator<int> >, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<double, std::allocator<double> >, std::vector<bool, std::allocator<bool> > > const&) [6]
+                0.00    0.00 4199601/205834541     Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::learn() [2]
+                0.00    0.00 7399297/205834541     Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::tdLoss(std::tuple<std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<int, std::allocator<int> >, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<double, std::allocator<double> >, std::vector<bool, std::allocator<bool> > > const&) [5]
+                0.00    0.00 8723712/205834541     NetworkImpl::forward(at::Tensor) [10]
+                0.00    0.00 51591138/205834541     at::Tensor toTensor<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > > const&) [7]
+                0.00    0.00 53445052/205834541     torch::autograd::make_variable(at::Tensor, bool, bool) [9]
+                0.00    0.00 77167863/205834541     at::Tensor toTensor<8>(Eigen::Matrix<double, 8, 1, ((Eigen::StorageOptions)0)|((((8)==(1))&&((1)!=(1)))?((Eigen::StorageOptions)1) : ((((1)==(1))&&((8)!=(1)))?((Eigen::StorageOptions)0) : ((Eigen::StorageOptions)0))), 8, 1> const&) [8]
+[3]     50.0    0.01    0.00 205834541         c10::intrusive_ptr<c10::TensorImpl, c10::UndefinedTensorImpl>::reset_() [3]
+-----------------------------------------------
+                0.01    0.00  199981/199981      Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::learn() [2]
+[4]     50.0    0.01    0.00  199981         ReplayBuffer<Eigen::Matrix<double, 8, 1, 0, 8, 1> >::sample(std::linear_congruential_engine<unsigned long, 48271ul, 0ul, 2147483647ul>*) const [4]
+                0.00    0.00 2799708/2799708     void std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >::_M_realloc_insert<Eigen::Matrix<double, 8, 1, 0, 8, 1> const&>(__gnu_cxx::__normal_iterator<Eigen::Matrix<double, 8, 1, 0, 8, 1>*, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > > >, Eigen::Matrix<double, 8, 1, 0, 8, 1> const&) [23]
+                0.00    0.00 1399854/1399862     void std::vector<double, std::allocator<double> >::_M_realloc_insert<double const&>(__gnu_cxx::__normal_iterator<double*, std::vector<double, std::allocator<double> > >, double const&) [26]
+                0.00    0.00 1399854/1399860     void std::vector<int, std::allocator<int> >::_M_realloc_insert<int const&>(__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > >, int const&) [27]
+                0.00    0.00     108/108         void std::shuffle<int*, std::linear_congruential_engine<unsigned long, 48271ul, 0ul, 2147483647ul>&>(int*, int*, std::linear_congruential_engine<unsigned long, 48271ul, 0ul, 2147483647ul>&) [35]
+-----------------------------------------------
+                0.00    0.01  199981/199981      Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::learn() [2]
+[5]     48.3    0.00    0.01  199981         Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::tdLoss(std::tuple<std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<int, std::allocator<int> >, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<double, std::allocator<double> >, std::vector<bool, std::allocator<bool> > > const&) [5]
+                0.00    0.01  199981/199981      std::tuple<at::Tensor, at::Tensor, at::Tensor, at::Tensor, at::Tensor> toTensor<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::tuple<std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<int, std::allocator<int> >, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<double, std::allocator<double> >, std::vector<bool, std::allocator<bool> > > const&) [6]
+                0.00    0.00 7399297/205834541     c10::intrusive_ptr<c10::TensorImpl, c10::UndefinedTensorImpl>::reset_() [3]
+                0.00    0.00  599943/726976      NetworkImpl::forward(at::Tensor) [10]
+-----------------------------------------------
+                0.00    0.01  199981/199981      Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::tdLoss(std::tuple<std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<int, std::allocator<int> >, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<double, std::allocator<double> >, std::vector<bool, std::allocator<bool> > > const&) [5]
+[6]     44.8    0.00    0.01  199981         std::tuple<at::Tensor, at::Tensor, at::Tensor, at::Tensor, at::Tensor> toTensor<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::tuple<std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<int, std::allocator<int> >, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<double, std::allocator<double> >, std::vector<bool, std::allocator<bool> > > const&) [6]
+                0.00    0.01  399962/399962      at::Tensor toTensor<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > > const&) [7]
+                0.00    0.00  199981/199981      toTensor(std::vector<int, std::allocator<int> > const&) [12]
+                0.00    0.00  199981/199981      toTensor(std::vector<bool, std::allocator<bool> > const&) [13]
+                0.00    0.00  199981/199981      toTensor(std::vector<double, std::allocator<double> > const&) [14]
+                0.00    0.00  799924/205834541     c10::intrusive_ptr<c10::TensorImpl, c10::UndefinedTensorImpl>::reset_() [3]
+-----------------------------------------------
+                0.00    0.01  399962/399962      std::tuple<at::Tensor, at::Tensor, at::Tensor, at::Tensor, at::Tensor> toTensor<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::tuple<std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<int, std::allocator<int> >, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<double, std::allocator<double> >, std::vector<bool, std::allocator<bool> > > const&) [6]
+[7]     43.8    0.00    0.01  399962         at::Tensor toTensor<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > > const&) [7]
+                0.00    0.01 25595588/25722621     at::Tensor toTensor<8>(Eigen::Matrix<double, 8, 1, ((Eigen::StorageOptions)0)|((((8)==(1))&&((1)!=(1)))?((Eigen::StorageOptions)1) : ((((1)==(1))&&((8)!=(1)))?((Eigen::StorageOptions)0) : ((Eigen::StorageOptions)0))), 8, 1> const&) [8]
+                0.00    0.00 51591138/205834541     c10::intrusive_ptr<c10::TensorImpl, c10::UndefinedTensorImpl>::reset_() [3]
+                0.00    0.00  399962/26722526     torch::autograd::make_variable(at::Tensor, bool, bool) [9]
+-----------------------------------------------
+                0.00    0.00  127033/25722621     Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::proposeAction(Eigen::Matrix<double, 8, 1, 0, 8, 1> const&, double) [11]
+                0.00    0.01 25595588/25722621     at::Tensor toTensor<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > > const&) [7]
+[8]     31.2    0.00    0.01 25722621         at::Tensor toTensor<8>(Eigen::Matrix<double, 8, 1, ((Eigen::StorageOptions)0)|((((8)==(1))&&((1)!=(1)))?((Eigen::StorageOptions)1) : ((((1)==(1))&&((8)!=(1)))?((Eigen::StorageOptions)0) : ((Eigen::StorageOptions)0))), 8, 1> const&) [8]
+                0.00    0.00 77167863/205834541     c10::intrusive_ptr<c10::TensorImpl, c10::UndefinedTensorImpl>::reset_() [3]
+                0.00    0.00 25722621/26722526     torch::autograd::make_variable(at::Tensor, bool, bool) [9]
+-----------------------------------------------
+                0.00    0.00  199981/26722526     toTensor(std::vector<bool, std::allocator<bool> > const&) [13]
+                0.00    0.00  199981/26722526     toTensor(std::vector<double, std::allocator<double> > const&) [14]
+                0.00    0.00  199981/26722526     toTensor(std::vector<int, std::allocator<int> > const&) [12]
+                0.00    0.00  399962/26722526     at::Tensor toTensor<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > > const&) [7]
+                0.00    0.00 25722621/26722526     at::Tensor toTensor<8>(Eigen::Matrix<double, 8, 1, ((Eigen::StorageOptions)0)|((((8)==(1))&&((1)!=(1)))?((Eigen::StorageOptions)1) : ((((1)==(1))&&((8)!=(1)))?((Eigen::StorageOptions)0) : ((Eigen::StorageOptions)0))), 8, 1> const&) [8]
+[9]     13.0    0.00    0.00 26722526         torch::autograd::make_variable(at::Tensor, bool, bool) [9]
+                0.00    0.00 53445052/205834541     c10::intrusive_ptr<c10::TensorImpl, c10::UndefinedTensorImpl>::reset_() [3]
+-----------------------------------------------
+                0.00    0.00  127033/726976      Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::proposeAction(Eigen::Matrix<double, 8, 1, 0, 8, 1> const&, double) [11]
+                0.00    0.00  599943/726976      Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::tdLoss(std::tuple<std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<int, std::allocator<int> >, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<double, std::allocator<double> >, std::vector<bool, std::allocator<bool> > > const&) [5]
+[10]     2.1    0.00    0.00  726976         NetworkImpl::forward(at::Tensor) [10]
+                0.00    0.00 8723712/205834541     c10::intrusive_ptr<c10::TensorImpl, c10::UndefinedTensorImpl>::reset_() [3]
+-----------------------------------------------
+                0.00    0.00  200000/200000      main [1]
+[11]     0.6    0.00    0.00  200000         Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::proposeAction(Eigen::Matrix<double, 8, 1, 0, 8, 1> const&, double) [11]
+                0.00    0.00  127033/726976      NetworkImpl::forward(at::Tensor) [10]
+                0.00    0.00  127033/25722621     at::Tensor toTensor<8>(Eigen::Matrix<double, 8, 1, ((Eigen::StorageOptions)0)|((((8)==(1))&&((1)!=(1)))?((Eigen::StorageOptions)1) : ((((1)==(1))&&((8)!=(1)))?((Eigen::StorageOptions)0) : ((Eigen::StorageOptions)0))), 8, 1> const&) [8]
+                0.00    0.00  381099/205834541     c10::intrusive_ptr<c10::TensorImpl, c10::UndefinedTensorImpl>::reset_() [3]
+                0.00    0.00  127033/127033      toVector(at::Tensor const&) [15]
+-----------------------------------------------
+                0.00    0.00  199981/199981      std::tuple<at::Tensor, at::Tensor, at::Tensor, at::Tensor, at::Tensor> toTensor<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::tuple<std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<int, std::allocator<int> >, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<double, std::allocator<double> >, std::vector<bool, std::allocator<bool> > > const&) [6]
+[12]     0.3    0.00    0.00  199981         toTensor(std::vector<int, std::allocator<int> > const&) [12]
+                0.00    0.00  799924/205834541     c10::intrusive_ptr<c10::TensorImpl, c10::UndefinedTensorImpl>::reset_() [3]
+                0.00    0.00  199981/26722526     torch::autograd::make_variable(at::Tensor, bool, bool) [9]
+-----------------------------------------------
+                0.00    0.00  199981/199981      std::tuple<at::Tensor, at::Tensor, at::Tensor, at::Tensor, at::Tensor> toTensor<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::tuple<std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<int, std::allocator<int> >, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<double, std::allocator<double> >, std::vector<bool, std::allocator<bool> > > const&) [6]
+[13]     0.2    0.00    0.00  199981         toTensor(std::vector<bool, std::allocator<bool> > const&) [13]
+                0.00    0.00  599943/205834541     c10::intrusive_ptr<c10::TensorImpl, c10::UndefinedTensorImpl>::reset_() [3]
+                0.00    0.00  199981/26722526     torch::autograd::make_variable(at::Tensor, bool, bool) [9]
+-----------------------------------------------
+                0.00    0.00  199981/199981      std::tuple<at::Tensor, at::Tensor, at::Tensor, at::Tensor, at::Tensor> toTensor<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::tuple<std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<int, std::allocator<int> >, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<double, std::allocator<double> >, std::vector<bool, std::allocator<bool> > > const&) [6]
+[14]     0.2    0.00    0.00  199981         toTensor(std::vector<double, std::allocator<double> > const&) [14]
+                0.00    0.00  599943/205834541     c10::intrusive_ptr<c10::TensorImpl, c10::UndefinedTensorImpl>::reset_() [3]
+                0.00    0.00  199981/26722526     torch::autograd::make_variable(at::Tensor, bool, bool) [9]
+-----------------------------------------------
+                0.00    0.00  127033/127033      Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::proposeAction(Eigen::Matrix<double, 8, 1, 0, 8, 1> const&, double) [11]
+[15]     0.0    0.00    0.00  127033         toVector(at::Tensor const&) [15]
+                0.00    0.00  127033/205834541     c10::intrusive_ptr<c10::TensorImpl, c10::UndefinedTensorImpl>::reset_() [3]
+-----------------------------------------------
+                0.00    0.00       1/1           Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::Agent() [17]
+[16]     0.0    0.00    0.00       1         NetworkImpl::initializeParameters() [16]
+                0.00    0.00      12/205834541     c10::intrusive_ptr<c10::TensorImpl, c10::UndefinedTensorImpl>::reset_() [3]
+                0.00    0.00       6/50729       frame_dummy [18]
+                0.00    0.00       6/1199898     torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, at::Tensor>::operator[](std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [28]
+                0.00    0.00       6/1399884     torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, at::Tensor>::~OrderedDict() [25]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[17]     0.0    0.00    0.00       1         Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::Agent() [17]
+                0.00    0.00       1/1           NetworkImpl::initializeParameters() [16]
+                0.00    0.00       7/1399884     torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, at::Tensor>::~OrderedDict() [25]
+                0.00    0.00       6/1199898     torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, at::Tensor>::operator[](std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [28]
+                0.00    0.00       4/8           std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release() [47]
+                0.00    0.00       2/2           NetworkImpl::NetworkImpl(int, int, int) [54]
+                0.00    0.00       2/2           std::_Sp_counted_ptr_inplace<NetworkImpl, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::_M_destroy() [64]
+                0.00    0.00       2/2           std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release_last_use_cold() [63]
+                0.00    0.00       2/2           std::vector<at::Tensor, std::allocator<at::Tensor> >::~vector() [66]
+                0.00    0.00       1/50729       frame_dummy [18]
+                0.00    0.00       1/1           torch::optim::Adam::Adam(std::vector<torch::optim::OptimizerParamGroup, std::allocator<torch::optim::OptimizerParamGroup> >, torch::optim::AdamOptions) [72]
+                0.00    0.00       1/1           std::vector<torch::optim::OptimizerParamGroup, std::allocator<torch::optim::OptimizerParamGroup> >::~vector() [80]
+-----------------------------------------------
+                0.00    0.00       1/50729       _GLOBAL__sub_I__Z8toTensorRKSt6vectorIiSaIiEE [81]
+                0.00    0.00       1/50729       Crystal::writeInitial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&) [73]
+                0.00    0.00       1/50729       Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::Agent() [17]
+                0.00    0.00       2/50729       gaussQuad5() [67]
+                0.00    0.00       2/50729       Crystal::computeCtrlSig() const [77]
+                0.00    0.00       2/50729       Crystal::computeSOmega(Eigen::Matrix<double, -1, 1, 0, -1, 1>) [59]
+                0.00    0.00       3/50729       Crystal::initializeTimeFreqData() [74]
+                0.00    0.00       3/50729       Crystal::Crystal(Param&) [76]
+                0.00    0.00       4/50729       shiftedGaussQuad5(double, double, int) [68]
+                0.00    0.00       6/50729       Crystal::computeFOmega() const [60]
+                0.00    0.00       6/50729       std::ostream& Eigen::operator<< <Eigen::Transpose<Eigen::Matrix<double, -1, 1, 0, -1, 1> > >(std::ostream&, Eigen::DenseBase<Eigen::Transpose<Eigen::Matrix<double, -1, 1, 0, -1, 1> > > const&) [57]
+                0.00    0.00       6/50729       NetworkImpl::initializeParameters() [16]
+                0.00    0.00       6/50729       void std::vector<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item, std::allocator<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item> >::_M_realloc_insert<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, std::shared_ptr<torch::nn::LinearImpl> >(__gnu_cxx::__normal_iterator<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item*, std::vector<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item, std::allocator<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item> > >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, std::shared_ptr<torch::nn::LinearImpl>&&) [53]
+                0.00    0.00       6/50729       NetworkImpl::NetworkImpl(int, int, int) [54]
+                0.00    0.00      21/50729       std::ostream& Eigen::operator<< <Eigen::Transpose<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >(std::ostream&, Eigen::DenseBase<Eigen::Transpose<Eigen::Matrix<double, 8, 1, 0, 8, 1> > > const&) [39]
+                0.00    0.00      36/50729       myReciprocal(Eigen::Matrix<double, -1, 1, 0, -1, 1> const&, double) [42]
+                0.00    0.00      36/50729       sinc(Eigen::Matrix<double, -1, 1, 0, -1, 1> const&) [43]
+                0.00    0.00      72/50729       std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*) [41]
+                0.00    0.00     122/50729       main [1]
+                0.00    0.00     192/50729       Eigen::IOFormat::IOFormat(int, int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char) [37]
+                0.00    0.00   10003/50729       PDDCenterTimes() [33]
+                0.00    0.00   40198/50729       Crystal::chi_1_over_f_low_cutoff(double, double) const [32]
+[18]     0.0    0.00    0.00   50729         frame_dummy [18]
+-----------------------------------------------
+                0.00    0.00 2799708/2799708     ReplayBuffer<Eigen::Matrix<double, 8, 1, 0, 8, 1> >::sample(std::linear_congruential_engine<unsigned long, 48271ul, 0ul, 2147483647ul>*) const [4]
+[23]     0.0    0.00    0.00 2799708         void std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >::_M_realloc_insert<Eigen::Matrix<double, 8, 1, 0, 8, 1> const&>(__gnu_cxx::__normal_iterator<Eigen::Matrix<double, 8, 1, 0, 8, 1>*, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > > >, Eigen::Matrix<double, 8, 1, 0, 8, 1> const&) [23]
+-----------------------------------------------
+                0.00    0.00       2/1399886     torch::nn::Module::~Module() [58]
+                0.00    0.00 1399884/1399886     torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, at::Tensor>::~OrderedDict() [25]
+[24]     0.0    0.00    0.00 1399886         std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::clear() [24]
+-----------------------------------------------
+                0.00    0.00       4/1399884     torch::nn::Module::~Module() [58]
+                0.00    0.00       6/1399884     NetworkImpl::initializeParameters() [16]
+                0.00    0.00       7/1399884     Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::Agent() [17]
+                0.00    0.00 1399867/1399884     Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::learn() [2]
+[25]     0.0    0.00    0.00 1399884         torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, at::Tensor>::~OrderedDict() [25]
+                0.00    0.00 1399884/1399886     std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::clear() [24]
+-----------------------------------------------
+                0.00    0.00       8/1399862     main [1]
+                0.00    0.00 1399854/1399862     ReplayBuffer<Eigen::Matrix<double, 8, 1, 0, 8, 1> >::sample(std::linear_congruential_engine<unsigned long, 48271ul, 0ul, 2147483647ul>*) const [4]
+[26]     0.0    0.00    0.00 1399862         void std::vector<double, std::allocator<double> >::_M_realloc_insert<double const&>(__gnu_cxx::__normal_iterator<double*, std::vector<double, std::allocator<double> > >, double const&) [26]
+-----------------------------------------------
+                0.00    0.00       6/1399860     main [1]
+                0.00    0.00 1399854/1399860     ReplayBuffer<Eigen::Matrix<double, 8, 1, 0, 8, 1> >::sample(std::linear_congruential_engine<unsigned long, 48271ul, 0ul, 2147483647ul>*) const [4]
+[27]     0.0    0.00    0.00 1399860         void std::vector<int, std::allocator<int> >::_M_realloc_insert<int const&>(__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > >, int const&) [27]
+-----------------------------------------------
+                0.00    0.00       6/1199898     NetworkImpl::initializeParameters() [16]
+                0.00    0.00       6/1199898     Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::Agent() [17]
+                0.00    0.00 1199886/1199898     Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::learn() [2]
+[28]     0.0    0.00    0.00 1199898         torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, at::Tensor>::operator[](std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [28]
+                0.00    0.00 1199898/1199898     std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::find(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [29]
+-----------------------------------------------
+                0.00    0.00 1199898/1199898     torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, at::Tensor>::operator[](std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [28]
+[29]     0.0    0.00    0.00 1199898         std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::find(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [29]
+-----------------------------------------------
+                0.00    0.00      20/200020      Crystal::step(int) [40]
+                0.00    0.00  200000/200020      main [1]
+[30]     0.0    0.00    0.00  200020         kappa(Eigen::Matrix<double, -1, 1, 0, -1, 1> const&, double, double) [30]
+-----------------------------------------------
+                0.00    0.00  199981/199981      std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release_last_use_cold() [63]
+[31]     0.0    0.00    0.00  199981         std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_weak_release() [31]
+-----------------------------------------------
+                0.00    0.00       1/20099       Crystal::avgFid() const [79]
+                0.00    0.00   20098/20099       main [1]
+[32]     0.0    0.00    0.00   20099         Crystal::chi_1_over_f_low_cutoff(double, double) const [32]
+                0.00    0.00   40198/50729       frame_dummy [18]
+-----------------------------------------------
+                0.00    0.00       1/10003       Crystal::reset() [75]
+                0.00    0.00       1/10003       Crystal::writeInitial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&) [73]
+                0.00    0.00       1/10003       Crystal::Crystal(Param&) [76]
+                0.00    0.00   10000/10003       main [1]
+[33]     0.0    0.00    0.00   10003         PDDCenterTimes() [33]
+                0.00    0.00   10003/50729       frame_dummy [18]
+-----------------------------------------------
+                0.00    0.00       6/3948        NetworkImpl::NetworkImpl(int, int, int) [54]
+                0.00    0.00    3942/3948        void std::shuffle<int*, std::linear_congruential_engine<unsigned long, 48271ul, 0ul, 2147483647ul>&>(int*, int*, std::linear_congruential_engine<unsigned long, 48271ul, 0ul, 2147483647ul>&) [35]
+[34]     0.0    0.00    0.00    3948         c10::bad_optional_access::~bad_optional_access() [34]
+-----------------------------------------------
+                0.00    0.00     108/108         ReplayBuffer<Eigen::Matrix<double, 8, 1, 0, 8, 1> >::sample(std::linear_congruential_engine<unsigned long, 48271ul, 0ul, 2147483647ul>*) const [4]
+[35]     0.0    0.00    0.00     108         void std::shuffle<int*, std::linear_congruential_engine<unsigned long, 48271ul, 0ul, 2147483647ul>&>(int*, int*, std::linear_congruential_engine<unsigned long, 48271ul, 0ul, 2147483647ul>&) [35]
+                0.00    0.00    3942/3948        c10::bad_optional_access::~bad_optional_access() [34]
+-----------------------------------------------
+                0.00    0.00       1/84          Crystal::avgFid() const [79]
+                0.00    0.00      83/84          main [1]
+[36]     0.0    0.00    0.00      84         Crystal::chi() const [36]
+-----------------------------------------------
+                0.00    0.00       1/32          std::ostream& Eigen::operator<< <Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::ostream&, Eigen::DenseBase<Eigen::Matrix<double, 8, 1, 0, 8, 1> > const&) [71]
+                0.00    0.00       2/32          std::ostream& Eigen::operator<< <Eigen::Transpose<Eigen::Matrix<double, -1, 1, 0, -1, 1> > >(std::ostream&, Eigen::DenseBase<Eigen::Transpose<Eigen::Matrix<double, -1, 1, 0, -1, 1> > > const&) [57]
+                0.00    0.00       8/32          std::ostream& Eigen::operator<< <Eigen::Matrix<double, -1, 1, 0, -1, 1> >(std::ostream&, Eigen::DenseBase<Eigen::Matrix<double, -1, 1, 0, -1, 1> > const&) [46]
+                0.00    0.00      21/32          std::ostream& Eigen::operator<< <Eigen::Transpose<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >(std::ostream&, Eigen::DenseBase<Eigen::Transpose<Eigen::Matrix<double, 8, 1, 0, 8, 1> > > const&) [39]
+[37]     0.0    0.00    0.00      32         Eigen::IOFormat::IOFormat(int, int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char) [37]
+                0.00    0.00     192/50729       frame_dummy [18]
+-----------------------------------------------
+                0.00    0.00      21/21          std::ostream& Eigen::operator<< <Eigen::Transpose<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >(std::ostream&, Eigen::DenseBase<Eigen::Transpose<Eigen::Matrix<double, 8, 1, 0, 8, 1> > > const&) [39]
+[38]     0.0    0.00    0.00      21         std::ostream& Eigen::internal::print_matrix<Eigen::Matrix<double, 1, 8, 1, 1, 8> >(std::ostream&, Eigen::Matrix<double, 1, 8, 1, 1, 8> const&, Eigen::IOFormat const&) [38]
+-----------------------------------------------
+                0.00    0.00      21/21          main [1]
+[39]     0.0    0.00    0.00      21         std::ostream& Eigen::operator<< <Eigen::Transpose<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >(std::ostream&, Eigen::DenseBase<Eigen::Transpose<Eigen::Matrix<double, 8, 1, 0, 8, 1> > > const&) [39]
+                0.00    0.00      21/50729       frame_dummy [18]
+                0.00    0.00      21/32          Eigen::IOFormat::IOFormat(int, int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char) [37]
+                0.00    0.00      21/21          std::ostream& Eigen::internal::print_matrix<Eigen::Matrix<double, 1, 8, 1, 1, 8> >(std::ostream&, Eigen::Matrix<double, 1, 8, 1, 1, 8> const&, Eigen::IOFormat const&) [38]
+-----------------------------------------------
+                0.00    0.00      20/20          main [1]
+[40]     0.0    0.00    0.00      20         Crystal::step(int) [40]
+                0.00    0.00      20/200020      kappa(Eigen::Matrix<double, -1, 1, 0, -1, 1> const&, double, double) [30]
+-----------------------------------------------
+                0.00    0.00       7/20          main [1]
+                0.00    0.00      13/20          Crystal::writeInitial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&) [73]
+[41]     0.0    0.00    0.00      20         std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*) [41]
+                0.00    0.00      72/50729       frame_dummy [18]
+-----------------------------------------------
+                0.00    0.00      18/18          sinc(Eigen::Matrix<double, -1, 1, 0, -1, 1> const&) [43]
+[42]     0.0    0.00    0.00      18         myReciprocal(Eigen::Matrix<double, -1, 1, 0, -1, 1> const&, double) [42]
+                0.00    0.00      36/50729       frame_dummy [18]
+-----------------------------------------------
+                0.00    0.00      18/18          Crystal::computeFOmega() const [60]
+[43]     0.0    0.00    0.00      18         sinc(Eigen::Matrix<double, -1, 1, 0, -1, 1> const&) [43]
+                0.00    0.00      36/50729       frame_dummy [18]
+                0.00    0.00      18/18          myReciprocal(Eigen::Matrix<double, -1, 1, 0, -1, 1> const&, double) [42]
+-----------------------------------------------
+                0.00    0.00      18/18          main [1]
+[44]     0.0    0.00    0.00      18         void std::vector<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool>, std::allocator<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool> > >::_M_realloc_insert<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool> const&>(__gnu_cxx::__normal_iterator<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool>*, std::vector<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool>, std::allocator<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool> > > >, std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool> const&) [44]
+-----------------------------------------------
+                0.00    0.00       8/8           std::ostream& Eigen::operator<< <Eigen::Matrix<double, -1, 1, 0, -1, 1> >(std::ostream&, Eigen::DenseBase<Eigen::Matrix<double, -1, 1, 0, -1, 1> > const&) [46]
+[45]     0.0    0.00    0.00       8         std::ostream& Eigen::internal::print_matrix<Eigen::Matrix<double, -1, 1, 0, -1, 1> >(std::ostream&, Eigen::Matrix<double, -1, 1, 0, -1, 1> const&, Eigen::IOFormat const&) [45]
+-----------------------------------------------
+                0.00    0.00       1/8           main [1]
+                0.00    0.00       7/8           Crystal::writeInitial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&) [73]
+[46]     0.0    0.00    0.00       8         std::ostream& Eigen::operator<< <Eigen::Matrix<double, -1, 1, 0, -1, 1> >(std::ostream&, Eigen::DenseBase<Eigen::Matrix<double, -1, 1, 0, -1, 1> > const&) [46]
+                0.00    0.00       8/32          Eigen::IOFormat::IOFormat(int, int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char) [37]
+                0.00    0.00       8/8           std::ostream& Eigen::internal::print_matrix<Eigen::Matrix<double, -1, 1, 0, -1, 1> >(std::ostream&, Eigen::Matrix<double, -1, 1, 0, -1, 1> const&, Eigen::IOFormat const&) [45]
+-----------------------------------------------
+                0.00    0.00       4/8           NetworkImpl::NetworkImpl(int, int, int) [54]
+                0.00    0.00       4/8           Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::Agent() [17]
+[47]     0.0    0.00    0.00       8         std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release() [47]
+-----------------------------------------------
+                0.00    0.00       8/8           main [1]
+[48]     0.0    0.00    0.00       8         void std::vector<double, std::allocator<double> >::_M_realloc_insert<double>(__gnu_cxx::__normal_iterator<double*, std::vector<double, std::allocator<double> > >, double&&) [48]
+-----------------------------------------------
+                0.00    0.00       2/6           shiftedGaussQuad5(double, double, int) [68]
+                0.00    0.00       2/6           Crystal::computeSOmega(Eigen::Matrix<double, -1, 1, 0, -1, 1>) [59]
+                0.00    0.00       2/6           Crystal::computeFOmega() const [60]
+[49]     0.0    0.00    0.00       6         Eigen::PlainObjectBase<Eigen::Matrix<double, -1, 1, 0, -1, 1> >::PlainObjectBase<Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, Eigen::Matrix<double, -1, 1, 0, -1, 1> > >(Eigen::DenseBase<Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, Eigen::Matrix<double, -1, 1, 0, -1, 1> > > const&) [49]
+-----------------------------------------------
+                0.00    0.00       6/6           std::shared_ptr<torch::nn::LinearImpl> torch::nn::Module::register_module<torch::nn::LinearImpl>(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, torch::nn::ModuleHolder<torch::nn::LinearImpl>) [51]
+[50]     0.0    0.00    0.00       6         std::shared_ptr<torch::nn::Module>& torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::insert<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::LinearImpl> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&, std::shared_ptr<torch::nn::LinearImpl>&&) [50]
+                0.00    0.00       6/6           std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::find(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const [52]
+                0.00    0.00       6/6           void std::vector<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item, std::allocator<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item> >::_M_realloc_insert<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, std::shared_ptr<torch::nn::LinearImpl> >(__gnu_cxx::__normal_iterator<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item*, std::vector<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item, std::allocator<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item> > >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, std::shared_ptr<torch::nn::LinearImpl>&&) [53]
+                0.00    0.00       2/2           std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::_M_rehash(unsigned long, unsigned long const&) [62]
+-----------------------------------------------
+                0.00    0.00       6/6           NetworkImpl::NetworkImpl(int, int, int) [54]
+[51]     0.0    0.00    0.00       6         std::shared_ptr<torch::nn::LinearImpl> torch::nn::Module::register_module<torch::nn::LinearImpl>(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, torch::nn::ModuleHolder<torch::nn::LinearImpl>) [51]
+                0.00    0.00       6/6           std::shared_ptr<torch::nn::Module>& torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::insert<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::LinearImpl> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&, std::shared_ptr<torch::nn::LinearImpl>&&) [50]
+-----------------------------------------------
+                0.00    0.00       6/6           std::shared_ptr<torch::nn::Module>& torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::insert<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::LinearImpl> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&, std::shared_ptr<torch::nn::LinearImpl>&&) [50]
+[52]     0.0    0.00    0.00       6         std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::find(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const [52]
+-----------------------------------------------
+                0.00    0.00       6/6           std::shared_ptr<torch::nn::Module>& torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::insert<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::LinearImpl> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&, std::shared_ptr<torch::nn::LinearImpl>&&) [50]
+[53]     0.0    0.00    0.00       6         void std::vector<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item, std::allocator<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item> >::_M_realloc_insert<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, std::shared_ptr<torch::nn::LinearImpl> >(__gnu_cxx::__normal_iterator<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item*, std::vector<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item, std::allocator<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item> > >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, std::shared_ptr<torch::nn::LinearImpl>&&) [53]
+                0.00    0.00       6/50729       frame_dummy [18]
+-----------------------------------------------
+                0.00    0.00       2/2           Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::Agent() [17]
+[54]     0.0    0.00    0.00       2         NetworkImpl::NetworkImpl(int, int, int) [54]
+                0.00    0.00       6/3948        c10::bad_optional_access::~bad_optional_access() [34]
+                0.00    0.00       6/50729       frame_dummy [18]
+                0.00    0.00       6/6           std::shared_ptr<torch::nn::LinearImpl> torch::nn::Module::register_module<torch::nn::LinearImpl>(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, torch::nn::ModuleHolder<torch::nn::LinearImpl>) [51]
+                0.00    0.00       4/8           std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release() [47]
+-----------------------------------------------
+                0.00    0.00       2/2           std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release_last_use_cold() [63]
+[55]     0.0    0.00    0.00       2         NetworkImpl::~NetworkImpl() [55]
+-----------------------------------------------
+                0.00    0.00       2/2           std::ostream& Eigen::operator<< <Eigen::Transpose<Eigen::Matrix<double, -1, 1, 0, -1, 1> > >(std::ostream&, Eigen::DenseBase<Eigen::Transpose<Eigen::Matrix<double, -1, 1, 0, -1, 1> > > const&) [57]
+[56]     0.0    0.00    0.00       2         std::ostream& Eigen::internal::print_matrix<Eigen::Matrix<double, 1, -1, 1, 1, -1> >(std::ostream&, Eigen::Matrix<double, 1, -1, 1, 1, -1> const&, Eigen::IOFormat const&) [56]
+-----------------------------------------------
+                0.00    0.00       2/2           Crystal::Crystal(Param&) [76]
+[57]     0.0    0.00    0.00       2         std::ostream& Eigen::operator<< <Eigen::Transpose<Eigen::Matrix<double, -1, 1, 0, -1, 1> > >(std::ostream&, Eigen::DenseBase<Eigen::Transpose<Eigen::Matrix<double, -1, 1, 0, -1, 1> > > const&) [57]
+                0.00    0.00       6/50729       frame_dummy [18]
+                0.00    0.00       2/32          Eigen::IOFormat::IOFormat(int, int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char) [37]
+                0.00    0.00       2/2           std::ostream& Eigen::internal::print_matrix<Eigen::Matrix<double, 1, -1, 1, 1, -1> >(std::ostream&, Eigen::Matrix<double, 1, -1, 1, 1, -1> const&, Eigen::IOFormat const&) [56]
+-----------------------------------------------
+                0.00    0.00       2/2           std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release_last_use_cold() [63]
+[58]     0.0    0.00    0.00       2         torch::nn::Module::~Module() [58]
+                0.00    0.00       4/1399884     torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, at::Tensor>::~OrderedDict() [25]
+                0.00    0.00       2/1399886     std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::clear() [24]
+-----------------------------------------------
+                0.00    0.00       1/2           Crystal::initializeTimeFreqData() [74]
+                0.00    0.00       1/2           Crystal::Crystal(Param&) [76]
+[59]     0.0    0.00    0.00       2         Crystal::computeSOmega(Eigen::Matrix<double, -1, 1, 0, -1, 1>) [59]
+                0.00    0.00       2/6           Eigen::PlainObjectBase<Eigen::Matrix<double, -1, 1, 0, -1, 1> >::PlainObjectBase<Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, Eigen::Matrix<double, -1, 1, 0, -1, 1> > >(Eigen::DenseBase<Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, Eigen::Matrix<double, -1, 1, 0, -1, 1> > > const&) [49]
+                0.00    0.00       2/50729       frame_dummy [18]
+-----------------------------------------------
+                0.00    0.00       1/2           Crystal::computeFOmegaAbs2() const [78]
+                0.00    0.00       1/2           Crystal::writeInitial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&) [73]
+[60]     0.0    0.00    0.00       2         Crystal::computeFOmega() const [60]
+                0.00    0.00      18/18          sinc(Eigen::Matrix<double, -1, 1, 0, -1, 1> const&) [43]
+                0.00    0.00       6/50729       frame_dummy [18]
+                0.00    0.00       2/6           Eigen::PlainObjectBase<Eigen::Matrix<double, -1, 1, 0, -1, 1> >::PlainObjectBase<Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, Eigen::Matrix<double, -1, 1, 0, -1, 1> > >(Eigen::DenseBase<Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, Eigen::Matrix<double, -1, 1, 0, -1, 1> > > const&) [49]
+-----------------------------------------------
+                0.00    0.00       2/2           main [1]
+[61]     0.0    0.00    0.00       2         Crystal::feature() const [61]
+-----------------------------------------------
+                0.00    0.00       2/2           std::shared_ptr<torch::nn::Module>& torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::insert<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::LinearImpl> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&, std::shared_ptr<torch::nn::LinearImpl>&&) [50]
+[62]     0.0    0.00    0.00       2         std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::_M_rehash(unsigned long, unsigned long const&) [62]
+-----------------------------------------------
+                0.00    0.00       2/2           Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::Agent() [17]
+[63]     0.0    0.00    0.00       2         std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release_last_use_cold() [63]
+                0.00    0.00  199981/199981      std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_weak_release() [31]
+                0.00    0.00       2/2           torch::nn::Module::~Module() [58]
+                0.00    0.00       2/2           NetworkImpl::~NetworkImpl() [55]
+                0.00    0.00       2/2           std::_Sp_counted_ptr_inplace<NetworkImpl, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::_M_dispose() [65]
+-----------------------------------------------
+                0.00    0.00       2/2           Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::Agent() [17]
+[64]     0.0    0.00    0.00       2         std::_Sp_counted_ptr_inplace<NetworkImpl, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::_M_destroy() [64]
+-----------------------------------------------
+                0.00    0.00       2/2           std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release_last_use_cold() [63]
+[65]     0.0    0.00    0.00       2         std::_Sp_counted_ptr_inplace<NetworkImpl, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::_M_dispose() [65]
+-----------------------------------------------
+                0.00    0.00       2/2           Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::Agent() [17]
+[66]     0.0    0.00    0.00       2         std::vector<at::Tensor, std::allocator<at::Tensor> >::~vector() [66]
+-----------------------------------------------
+                0.00    0.00       1/1           shiftedGaussQuad5(double, double, int) [68]
+[67]     0.0    0.00    0.00       1         gaussQuad5() [67]
+                0.00    0.00       2/50729       frame_dummy [18]
+-----------------------------------------------
+                0.00    0.00       1/1           Crystal::initializeTimeFreqData() [74]
+[68]     0.0    0.00    0.00       1         shiftedGaussQuad5(double, double, int) [68]
+                0.00    0.00       4/50729       frame_dummy [18]
+                0.00    0.00       2/6           Eigen::PlainObjectBase<Eigen::Matrix<double, -1, 1, 0, -1, 1> >::PlainObjectBase<Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, Eigen::Matrix<double, -1, 1, 0, -1, 1> > >(Eigen::DenseBase<Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, Eigen::Matrix<double, -1, 1, 0, -1, 1> > > const&) [49]
+                0.00    0.00       1/1           gaussQuad5() [67]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[69]     0.0    0.00    0.00       1         getParam(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&) [69]
+-----------------------------------------------
+                0.00    0.00       1/1           std::ostream& Eigen::operator<< <Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::ostream&, Eigen::DenseBase<Eigen::Matrix<double, 8, 1, 0, 8, 1> > const&) [71]
+[70]     0.0    0.00    0.00       1         std::ostream& Eigen::internal::print_matrix<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::ostream&, Eigen::Matrix<double, 8, 1, 0, 8, 1> const&, Eigen::IOFormat const&) [70]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[71]     0.0    0.00    0.00       1         std::ostream& Eigen::operator<< <Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::ostream&, Eigen::DenseBase<Eigen::Matrix<double, 8, 1, 0, 8, 1> > const&) [71]
+                0.00    0.00       1/32          Eigen::IOFormat::IOFormat(int, int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char) [37]
+                0.00    0.00       1/1           std::ostream& Eigen::internal::print_matrix<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::ostream&, Eigen::Matrix<double, 8, 1, 0, 8, 1> const&, Eigen::IOFormat const&) [70]
+-----------------------------------------------
+                0.00    0.00       1/1           Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::Agent() [17]
+[72]     0.0    0.00    0.00       1         torch::optim::Adam::Adam(std::vector<torch::optim::OptimizerParamGroup, std::allocator<torch::optim::OptimizerParamGroup> >, torch::optim::AdamOptions) [72]
+-----------------------------------------------
+                0.00    0.00       1/1           Crystal::Crystal(Param&) [76]
+[73]     0.0    0.00    0.00       1         Crystal::writeInitial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&) [73]
+                0.00    0.00      13/20          std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*) [41]
+                0.00    0.00       7/8           std::ostream& Eigen::operator<< <Eigen::Matrix<double, -1, 1, 0, -1, 1> >(std::ostream&, Eigen::DenseBase<Eigen::Matrix<double, -1, 1, 0, -1, 1> > const&) [46]
+                0.00    0.00       1/10003       PDDCenterTimes() [33]
+                0.00    0.00       1/2           Crystal::computeFOmega() const [60]
+                0.00    0.00       1/50729       frame_dummy [18]
+                0.00    0.00       1/1           Crystal::computeCtrlSig() const [77]
+-----------------------------------------------
+                0.00    0.00       1/1           Crystal::Crystal(Param&) [76]
+[74]     0.0    0.00    0.00       1         Crystal::initializeTimeFreqData() [74]
+                0.00    0.00       3/50729       frame_dummy [18]
+                0.00    0.00       1/2           Crystal::computeSOmega(Eigen::Matrix<double, -1, 1, 0, -1, 1>) [59]
+                0.00    0.00       1/1           shiftedGaussQuad5(double, double, int) [68]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[75]     0.0    0.00    0.00       1         Crystal::reset() [75]
+                0.00    0.00       1/10003       PDDCenterTimes() [33]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[76]     0.0    0.00    0.00       1         Crystal::Crystal(Param&) [76]
+                0.00    0.00       3/50729       frame_dummy [18]
+                0.00    0.00       2/2           std::ostream& Eigen::operator<< <Eigen::Transpose<Eigen::Matrix<double, -1, 1, 0, -1, 1> > >(std::ostream&, Eigen::DenseBase<Eigen::Transpose<Eigen::Matrix<double, -1, 1, 0, -1, 1> > > const&) [57]
+                0.00    0.00       1/1           Crystal::initializeTimeFreqData() [74]
+                0.00    0.00       1/2           Crystal::computeSOmega(Eigen::Matrix<double, -1, 1, 0, -1, 1>) [59]
+                0.00    0.00       1/10003       PDDCenterTimes() [33]
+                0.00    0.00       1/1           Crystal::writeInitial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&) [73]
+-----------------------------------------------
+                0.00    0.00       1/1           Crystal::writeInitial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&) [73]
+[77]     0.0    0.00    0.00       1         Crystal::computeCtrlSig() const [77]
+                0.00    0.00       2/50729       frame_dummy [18]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[78]     0.0    0.00    0.00       1         Crystal::computeFOmegaAbs2() const [78]
+                0.00    0.00       1/2           Crystal::computeFOmega() const [60]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[79]     0.0    0.00    0.00       1         Crystal::avgFid() const [79]
+                0.00    0.00       1/20099       Crystal::chi_1_over_f_low_cutoff(double, double) const [32]
+                0.00    0.00       1/84          Crystal::chi() const [36]
+-----------------------------------------------
+                0.00    0.00       1/1           Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::Agent() [17]
+[80]     0.0    0.00    0.00       1         std::vector<torch::optim::OptimizerParamGroup, std::allocator<torch::optim::OptimizerParamGroup> >::~vector() [80]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function is in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+Copyright (C) 2012-2022 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Index by function name
+
+  [67] gaussQuad5()           [37] Eigen::IOFormat::IOFormat(int, int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char) [78] Crystal::computeFOmegaAbs2() const
+  [42] myReciprocal(Eigen::Matrix<double, -1, 1, 0, -1, 1> const&, double) [38] std::ostream& Eigen::internal::print_matrix<Eigen::Matrix<double, 1, 8, 1, 1, 8> >(std::ostream&, Eigen::Matrix<double, 1, 8, 1, 1, 8> const&, Eigen::IOFormat const&) [32] Crystal::chi_1_over_f_low_cutoff(double, double) const
+  [33] PDDCenterTimes()       [56] std::ostream& Eigen::internal::print_matrix<Eigen::Matrix<double, 1, -1, 1, 1, -1> >(std::ostream&, Eigen::Matrix<double, 1, -1, 1, 1, -1> const&, Eigen::IOFormat const&) [36] Crystal::chi() const
+  [68] shiftedGaussQuad5(double, double, int) [70] std::ostream& Eigen::internal::print_matrix<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::ostream&, Eigen::Matrix<double, 8, 1, 0, 8, 1> const&, Eigen::IOFormat const&) [79] Crystal::avgFid() const
+  [43] sinc(Eigen::Matrix<double, -1, 1, 0, -1, 1> const&) [45] std::ostream& Eigen::internal::print_matrix<Eigen::Matrix<double, -1, 1, 0, -1, 1> >(std::ostream&, Eigen::Matrix<double, -1, 1, 0, -1, 1> const&, Eigen::IOFormat const&) [61] Crystal::feature() const
+  [30] kappa(Eigen::Matrix<double, -1, 1, 0, -1, 1> const&, double, double) [71] std::ostream& Eigen::operator<< <Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::ostream&, Eigen::DenseBase<Eigen::Matrix<double, 8, 1, 0, 8, 1> > const&) [52] std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::find(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const
+  [69] getParam(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&) [46] std::ostream& Eigen::operator<< <Eigen::Matrix<double, -1, 1, 0, -1, 1> >(std::ostream&, Eigen::DenseBase<Eigen::Matrix<double, -1, 1, 0, -1, 1> > const&) [29] std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::find(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+   [8] at::Tensor toTensor<8>(Eigen::Matrix<double, 8, 1, ((Eigen::StorageOptions)0)|((((8)==(1))&&((1)!=(1)))?((Eigen::StorageOptions)1) : ((((1)==(1))&&((8)!=(1)))?((Eigen::StorageOptions)0) : ((Eigen::StorageOptions)0))), 8, 1> const&) [39] std::ostream& Eigen::operator<< <Eigen::Transpose<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >(std::ostream&, Eigen::DenseBase<Eigen::Transpose<Eigen::Matrix<double, 8, 1, 0, 8, 1> > > const&) [24] std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::clear()
+   [7] at::Tensor toTensor<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > > const&) [57] std::ostream& Eigen::operator<< <Eigen::Transpose<Eigen::Matrix<double, -1, 1, 0, -1, 1> > >(std::ostream&, Eigen::DenseBase<Eigen::Transpose<Eigen::Matrix<double, -1, 1, 0, -1, 1> > > const&) [62] std::_Hashtable<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long>, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, unsigned long> >, std::__detail::_Select1st, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::_M_rehash(unsigned long, unsigned long const&)
+   [6] std::tuple<at::Tensor, at::Tensor, at::Tensor, at::Tensor, at::Tensor> toTensor<Eigen::Matrix<double, 8, 1, 0, 8, 1> >(std::tuple<std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<int, std::allocator<int> >, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<double, std::allocator<double> >, std::vector<bool, std::allocator<bool> > > const&) [25] torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, at::Tensor>::~OrderedDict() [47] std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release()
+  [13] toTensor(std::vector<bool, std::allocator<bool> > const&) [28] torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, at::Tensor>::operator[](std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [31] std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_weak_release()
+  [14] toTensor(std::vector<double, std::allocator<double> > const&) [50] std::shared_ptr<torch::nn::Module>& torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::insert<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::LinearImpl> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&, std::shared_ptr<torch::nn::LinearImpl>&&) [63] std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release_last_use_cold()
+  [12] toTensor(std::vector<int, std::allocator<int> > const&) [51] std::shared_ptr<torch::nn::LinearImpl> torch::nn::Module::register_module<torch::nn::LinearImpl>(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, torch::nn::ModuleHolder<torch::nn::LinearImpl>) [64] std::_Sp_counted_ptr_inplace<NetworkImpl, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::_M_destroy()
+  [15] toVector(at::Tensor const&) [58] torch::nn::Module::~Module() [65] std::_Sp_counted_ptr_inplace<NetworkImpl, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::_M_dispose()
+  [16] NetworkImpl::initializeParameters() [72] torch::optim::Adam::Adam(std::vector<torch::optim::OptimizerParamGroup, std::allocator<torch::optim::OptimizerParamGroup> >, torch::optim::AdamOptions) [66] std::vector<at::Tensor, std::allocator<at::Tensor> >::~vector()
+  [10] NetworkImpl::forward(at::Tensor) [9] torch::autograd::make_variable(at::Tensor, bool, bool) [23] void std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >::_M_realloc_insert<Eigen::Matrix<double, 8, 1, 0, 8, 1> const&>(__gnu_cxx::__normal_iterator<Eigen::Matrix<double, 8, 1, 0, 8, 1>*, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > > >, Eigen::Matrix<double, 8, 1, 0, 8, 1> const&)
+  [54] NetworkImpl::NetworkImpl(int, int, int) [73] Crystal::writeInitial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&) [53] void std::vector<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item, std::allocator<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item> >::_M_realloc_insert<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, std::shared_ptr<torch::nn::LinearImpl> >(__gnu_cxx::__normal_iterator<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item*, std::vector<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item, std::allocator<torch::OrderedDict<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::shared_ptr<torch::nn::Module> >::Item> > >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, std::shared_ptr<torch::nn::LinearImpl>&&)
+  [55] NetworkImpl::~NetworkImpl() [59] Crystal::computeSOmega(Eigen::Matrix<double, -1, 1, 0, -1, 1>) [80] std::vector<torch::optim::OptimizerParamGroup, std::allocator<torch::optim::OptimizerParamGroup> >::~vector()
+   [3] c10::intrusive_ptr<c10::TensorImpl, c10::UndefinedTensorImpl>::reset_() [74] Crystal::initializeTimeFreqData() [44] void std::vector<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool>, std::allocator<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool> > >::_M_realloc_insert<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool> const&>(__gnu_cxx::__normal_iterator<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool>*, std::vector<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool>, std::allocator<std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool> > > >, std::tuple<Eigen::Matrix<double, 8, 1, 0, 8, 1>, int, Eigen::Matrix<double, 8, 1, 0, 8, 1>, double, bool> const&)
+  [34] c10::bad_optional_access::~bad_optional_access() [40] Crystal::step(int) [26] void std::vector<double, std::allocator<double> >::_M_realloc_insert<double const&>(__gnu_cxx::__normal_iterator<double*, std::vector<double, std::allocator<double> > >, double const&)
+  [11] Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::proposeAction(Eigen::Matrix<double, 8, 1, 0, 8, 1> const&, double) [75] Crystal::reset() [48] void std::vector<double, std::allocator<double> >::_M_realloc_insert<double>(__gnu_cxx::__normal_iterator<double*, std::vector<double, std::allocator<double> > >, double&&)
+   [2] Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::learn() [76] Crystal::Crystal(Param&) [27] void std::vector<int, std::allocator<int> >::_M_realloc_insert<int const&>(__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > >, int const&)
+   [5] Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::tdLoss(std::tuple<std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<int, std::allocator<int> >, std::vector<Eigen::Matrix<double, 8, 1, 0, 8, 1>, std::allocator<Eigen::Matrix<double, 8, 1, 0, 8, 1> > >, std::vector<double, std::allocator<double> >, std::vector<bool, std::allocator<bool> > > const&) [4] ReplayBuffer<Eigen::Matrix<double, 8, 1, 0, 8, 1> >::sample(std::linear_congruential_engine<unsigned long, 48271ul, 0ul, 2147483647ul>*) const [35] void std::shuffle<int*, std::linear_congruential_engine<unsigned long, 48271ul, 0ul, 2147483647ul>&>(int*, int*, std::linear_congruential_engine<unsigned long, 48271ul, 0ul, 2147483647ul>&)
+  [17] Agent<Eigen::Matrix<double, 8, 1, 0, 8, 1>, 8>::Agent() [60] Crystal::computeFOmega() const [41] std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > std::operator+<char, std::char_traits<char>, std::allocator<char> >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, char const*)
+  [49] Eigen::PlainObjectBase<Eigen::Matrix<double, -1, 1, 0, -1, 1> >::PlainObjectBase<Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, Eigen::Matrix<double, -1, 1, 0, -1, 1> > >(Eigen::DenseBase<Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, Eigen::Matrix<double, -1, 1, 0, -1, 1> > > const&) [77] Crystal::computeCtrlSig() const [18] frame_dummy

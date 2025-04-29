@@ -1,8 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import matplotlib as mpl
 import os
 import pulse_sequence as ps
+import gaussianquad as gq
 
 def kappa(t, harmonic, eta, max_time):
     return t + eta * np.sin(np.pi * harmonic * t / max_time)
@@ -107,8 +109,6 @@ def plot_job(max_time,
     max_time (number): maximum time evolution time
     freq (np.ndarray): frequency mesh
     noise (np.ndarray): noise PSD values for each value of frequency. Curve is the Fermi Dirac distribution.
-    chem_pot (number): chemical potential associated with the noise.
-    temp (number): temperature associated with the noise.
     pulse_timings (np.ndarray, shape (3, Npa)): the times at which the agent applied pulse
     Npa (int): number of pulses the agent actually applied
     Nts (int): number of chances along time mesh at which agent could apply pulse
@@ -156,7 +156,8 @@ def plot_job(max_time,
     # Find max index for plotting
     cutoffIdx = len(noise)-1 # Initialize
     for i in range(len(noise)-1, -1, -1):
-        if (noise[i] / freq[i]**2 > 1e-3):
+        if (noise[i] / freq[i]**2 > 1e-5):
+        #if (noise[i] / freq[i]**2 > 1e-3):
             cutoffIdx = i
             break
     print("cutoffFreq = {}".format(freq[cutoffIdx]))
@@ -258,6 +259,240 @@ def plot_job(max_time,
         plt.show()
     plt.close()
 
+    return
+
+def plot_solutions(max_time,
+             freq,
+             noise,
+             pulse_timings,
+             Npa,
+             filters,
+             overlaps,
+             title,
+             save = None, show = False, filterScale='linear', noiseScale='linear'):
+    """
+    PARAMETERS:
+    max_time (number): maximum time evolution time
+    freq (np.ndarray): frequency mesh
+    noise (np.ndarray): noise PSD values for each value of frequency. Curve is the Fermi Dirac distribution.
+    pulse_timings (np.ndarray, shape (3, Npa)): the times at which the agent applied pulse
+    Npa (int): number of pulses applied
+    filters (np.ndarray, shape (3, len(freq))): the filters as a function of frequency for agent, UDD, and CPMG
+    overlaps (np.ndarray, shape (3,)):  Overlap associated with agent's best filter, UDD overlap, and CPMG overlap
+
+    save (Optional, string): indicates whether or not to save. If string is provided, figure is saved to the filename represented by string.
+    show (Optional, bool): indicated whether to show figure using matplotlib's interactive environment
+    
+    Note: for all of the arrays mentioned above, the quantity/quantities associated with
+          the agent are in row 0,
+          UDD are in row 1,
+          CPMG are in row 2.
+
+    RETURNS:
+    None
+    """
+
+    fig = plt.figure(layout = 'constrained', figsize = (16, 8))
+    
+    mpl.rcParams['axes.linewidth'] = 2
+    mpl.rcParams['xtick.major.size'] = 5
+    mpl.rcParams['xtick.major.width'] = 2 
+    mpl.rcParams['xtick.minor.size'] = 1
+    mpl.rcParams['xtick.minor.width'] = 1
+    mpl.rcParams['ytick.major.size'] = 5
+    mpl.rcParams['ytick.major.width'] = 2 
+    mpl.rcParams['ytick.minor.size'] = 1
+    mpl.rcParams['ytick.minor.width'] = 1
+
+    mosaic = """
+             DEF
+             ABC
+             """
+    axd = fig.subplot_mosaic(mosaic, width_ratios=[1, 1, 1], height_ratios=[6,1])
+    
+    UDDColor = '#377EB8'# Curious Blue
+    UDDLinestyle = 'solid'
+    UDDLabel = r'$\chi_{UDD} = $' + '{:.3e}'.format(overlaps[1])
+
+    agentColor = '#984EA3'# Deep Lilac
+    agentLinestyle = 'solid'
+    agentLabel = r'$\chi_{Optimizer} = $' + '{:.3e}'.format(overlaps[0])
+    
+    CPMGColor = '#FF7F00'# Dark Orange
+    CPMGLinestyle = 'solid'
+    CPMGLabel = r'$\chi_{CPMG} = $' + '{:.3e}'.format(overlaps[2])
+
+    noiseColor = '#4DAF4A'# Fruit Salad, green
+    noiseLinestyle = 'dashdot'
+    noiseLabel = r'$S(\nu)$'
+
+    lwps = 4 # Linewidth for pulse sequence plots
+    lwspectrum = 2.5 # Linewidth for filter/noise plots
+    #maxIdx = int(0.5 * len(noise))
+   
+    # Define font sizes
+    SIZE_DEFAULT = 14
+    SIZE_LARGE = 16
+
+
+    # ONLY NEED THIS FOR FERMI-DIRAC
+    fig.suptitle(title, fontsize = SIZE_LARGE)
+    
+    # Plot pulse sequence over time
+
+    axd['A'].set_title('UDD ($N_{{pulse}} = {}$)'.format(int(Npa)), fontsize = SIZE_LARGE)
+    axd['A'].set_xlabel('Time', fontsize = SIZE_LARGE)
+    axd['A'].sharex(axd['C'])
+    axd['A'].vlines(pulse_timings[1], 0, 1, color=UDDColor, linestyle=UDDLinestyle, linewidth = lwps)
+    axd['A'].yaxis.set_major_locator(ticker.NullLocator()) # Remove y axis labels/ticks
+    axd['A'].tick_params(axis='both', which='major', labelsize=SIZE_LARGE)
+    axd['A'].tick_params(axis='both', which='minor', labelsize=SIZE_DEFAULT)
+   
+    axd['B'].set_title('Optimizer ($N_{{pulse}} = {0}$)'.format(int(Npa)), fontsize = SIZE_LARGE)
+    axd['B'].sharex(axd['C'])
+    axd['B'].set_xlabel('Time', fontsize = SIZE_LARGE)
+    axd['B'].vlines(pulse_timings[0], 0, 1, color=agentColor, linewidth = lwps)
+    axd['B'].yaxis.set_major_locator(ticker.NullLocator()) # Remove y axis labels/ticks
+    axd['B'].tick_params(axis='both', which='major', labelsize=SIZE_LARGE)
+    axd['B'].tick_params(axis='both', which='minor', labelsize=SIZE_DEFAULT)
+   
+    axd['C'].set_title('CPMG ($N_{{pulse}} = {}$)'.format(int(Npa)), fontsize = SIZE_LARGE)
+    axd['C'].set_xlabel('Time', fontsize = SIZE_LARGE)
+    axd['C'].set_xlim(0, max_time)
+    axd['C'].vlines(pulse_timings[2], 0, 1, color=CPMGColor, linestyle=CPMGLinestyle, linewidth=lwps)
+    axd['C'].yaxis.set_major_locator(ticker.NullLocator()) # Remove y axis labels/ticks
+    axd['C'].tick_params(axis='both', which='major', labelsize=SIZE_LARGE)
+    axd['C'].tick_params(axis='both', which='minor', labelsize=SIZE_DEFAULT)
+
+    # Plot filter functions and noise PSD
+   
+    #axd['D'].sharex(axd['F'])
+    axd['D'].set_ylabel(r'$F(\nu)$', fontsize = SIZE_LARGE)
+    axUDDNoise = axd['D'].twinx()
+    axUDDNoise.set_ylabel(noiseLabel, fontsize = SIZE_LARGE)
+    filterPlotUDD = axd['D'].plot(freq, filters[1], color=UDDColor, linestyle=UDDLinestyle, label = r'$F(\nu)_{UDD}$', linewidth = lwspectrum)
+    noisePlotUDD = axUDDNoise.plot(freq, noise, color=noiseColor, linestyle=noiseLinestyle, label = r'$S(\nu)$', linewidth = lwspectrum)
+    linesUDD = filterPlotUDD + noisePlotUDD
+    labelsUDD = [l.get_label() for l in linesUDD]
+    axd['D'].set_title(UDDLabel, fontsize = SIZE_LARGE)
+    axd['D'].legend(linesUDD, labelsUDD, fontsize = SIZE_LARGE)
+    axd['D'].set_xlabel(r'$\nu$ [1/time]', fontsize = SIZE_LARGE)
+    axd['D'].tick_params(axis='both', which='major', labelsize=SIZE_LARGE)
+    axd['D'].tick_params(axis='both', which='minor', labelsize=SIZE_DEFAULT)
+    axUDDNoise.tick_params(axis='y', which='major', labelsize=SIZE_LARGE)
+    axUDDNoise.tick_params(axis='y', which='minor', labelsize=SIZE_DEFAULT)
+    axd['D'].set_yscale(filterScale)
+    axUDDNoise.set_yscale(noiseScale)
+    
+
+
+    axd['E'].set_ylabel(r'$F(\nu)$', fontsize = SIZE_LARGE)
+    axAgentNoise = axd['E'].twinx()
+    axAgentNoise.set_ylabel(noiseLabel, fontsize = SIZE_LARGE)
+    filterPlotAgent = axd['E'].plot(freq, filters[0], color=agentColor, linestyle=agentLinestyle, label = r'$F(\nu)_{Optimizer}$', linewidth = lwspectrum)
+    noisePlotAgent = axAgentNoise.plot(freq, noise, color=noiseColor, linestyle=noiseLinestyle, label = r'$S(\nu)$', linewidth = lwspectrum)
+    linesAgent = filterPlotAgent + noisePlotAgent
+    labelsAgent = [l.get_label() for l in linesAgent]
+    axd['E'].set_title(agentLabel, fontsize = SIZE_LARGE)
+    axd['E'].legend(linesAgent, labelsAgent, fontsize = SIZE_LARGE)
+    axd['E'].set_xlabel(r'$\nu$ [1/time]', fontsize = SIZE_LARGE)
+    axd['E'].tick_params(axis='both', which='major', labelsize=SIZE_LARGE)
+    axd['E'].tick_params(axis='both', which='minor', labelsize=SIZE_DEFAULT)
+    axAgentNoise.tick_params(axis='y', which='major', labelsize=SIZE_LARGE)
+    axAgentNoise.tick_params(axis='y', which='minor', labelsize=SIZE_DEFAULT)
+    axd['E'].set_yscale(filterScale)
+    axAgentNoise.set_yscale(noiseScale)
+
+    axd['F'].set_ylabel(r'$F(\nu)$', fontsize = SIZE_LARGE)
+    axCPMGNoise = axd['F'].twinx()
+    axCPMGNoise.set_ylabel(noiseLabel, fontsize = SIZE_LARGE)
+    filterPlotCPMG = axd['F'].plot(freq, filters[2], color=CPMGColor, linestyle=CPMGLinestyle, label = r'$F(\nu)_{CPMG}$', linewidth = lwspectrum)
+    noisePlotCPMG = axCPMGNoise.plot(freq, noise, color=noiseColor, linestyle=noiseLinestyle, label = r'$S(\nu)$', linewidth = lwspectrum)
+    linesCPMG = filterPlotCPMG + noisePlotCPMG
+    labelsCPMG = [l.get_label() for l in linesCPMG]
+    axd['F'].set_title(CPMGLabel, fontsize = SIZE_LARGE)
+    axd['F'].set_xlabel(r'$\nu$ [1/time]', fontsize = SIZE_LARGE)
+    axd['F'].legend(linesCPMG, labelsCPMG, fontsize = SIZE_LARGE)
+    axd['F'].tick_params(axis='both', which='major', labelsize=SIZE_LARGE)
+    axd['F'].tick_params(axis='both', which='minor', labelsize=SIZE_DEFAULT)
+    axCPMGNoise.tick_params(axis='y', which='major', labelsize=SIZE_LARGE)
+    axCPMGNoise.tick_params(axis='y', which='minor', labelsize=SIZE_DEFAULT)
+    axd['F'].set_yscale(filterScale)
+    axCPMGNoise.set_yscale(noiseScale)
+
+
+    #fig.tight_layout()
+    if show:
+        plt.show()
+    elif save:
+        plt.savefig(save)
+        plt.close(fig=fig)
+
+    return
+
+def ax_make_pulse_times_plot(ax, pulse_times, title, color, linewidth, max_time, labelbottom=True):
+    ax.set_title(title)
+    ax.vlines(pulse_times, 0, 1, color=color, linewidth = linewidth)
+    ax.yaxis.set_major_locator(ticker.NullLocator()) # Remove y axis labels/ticks
+    ax.tick_params(labelbottom=labelbottom) # Remove or keep x axis labels
+    ax.grid(axis = 'x')
+    ax.set_title(title)
+    return
+
+def ax_make_filter_noise_plot(ax,
+                              filter_func, filter_color, filter_linestyle, filter_label,
+                              noise, noise_color, noise_linestyle, noise_label,
+                              freq, xlabel, title,
+                              linewidth,
+                              xscale='linear', yscale='linear', twin_y=True, labelbottom=True):
+    if twin_y:
+        ax_noise = ax.twiny()
+
+        ax_noise.set_yscale(yscale)
+        ax.set_yscale(yscale)
+        
+        ax_noise.set_ylabel(noise_label)
+        ax.set_label(filter_label)
+        
+        ax_noise.plot(freq, noise, color=noise_color, linewidth=linewidth, label=noise_label)
+    else:
+        ax.set_yscale(yscale)
+        ax.set_ylabel(ylabel)
+
+        ax.plot(freq, noise, color=noise_color, linewidth=linewidth, label=noise_label)
+    ax.plot(freq, filter_func, color=filter_color, linewidth=linewidth, label=filter_label)
+    ax.set_xscale(xscale)
+    ax.set_xlabel(xlabel)
+    ax.set_title(title)
+    ax.legend()
+    return
+
+def plot_times_and_filters(sequences, sequence_labels,
+                           max_time, freq, freq_label,
+                           filters, filter_colors, filter_linestyle, filter_labels,
+                           noise, noise_color, noise_linestyle, noise_label,
+                           filter_noise_titles,
+                           freq_scale='linear', filter_noise_scale='linear', twin_y=True):
+
+    nSequence = len(sequences)
+    linewidth = 2
+    fig, axs = plt.subplots(nrows=nSequence, ncols=2, layout='constrained')
+
+    for i in range(nSequence):
+        ax_left = axs[i, 0]
+        ax_right = axs[i, 1]
+        if i != nSequence - 1:
+            labelbottom = False
+        # Make pulse sequence plot
+        ax_make_pulse_times_plot(ax_left, sequences[i], sequence_labels[i], filter_colors[i], linewidth, max_time, labelbottom=labelbottom)
+        # Make filter function plot
+        ax_make_filter_noise_plot(ax_right,
+                                  filters[i], filter_colors[i], filter_linestyle, filter_labels[i],
+                                  noise, noise_color, noise_linestyle, noise_label,
+                                  freq, freq_label, filter_noise_titles[i], linewidth, yscale=filter_noise_scale, twin_y=twin_y, labelbottom=labelbottom)
+
+#    plt.savefig('../paper_plots/Figure1.svg', dpi=300)
+    plt.show()
     return
 
 def temperature_sweep(data_dir, plot_dir, subdir_prefix='job', show = True):
@@ -764,6 +999,180 @@ def multi_single_eta_plots(data_dir, save, subdir_prefix='job'):
 
     return
 
+def num_pulse_vs_harmonic(data_dir, noise_func, subdir_prefix='N', subsubdir_prefix='J', show = True, save = None, plotstyle='contour'):
+    """
+    Make plot of eta on the x axis and fidelity on the y axis.
+    PARAMETERS:
+    data_dir (string): directory containing the subdirectories which contain the data files
+    noise_func (function): noise as a function of frequency, where frequency in units of 1 / time
+    subdir_prefix (Optional, string): the prefix of all the subdirectories
+    show (bool): indicates whether to show the eta plot using matplotlib's interactive environment
+    save (None or string): indicate whether or not and where to save plot
+    plotstyle (string): 'contour' or 'scatter. Indicates whether to plot as contour or scatter plot.
+
+    RETURNS:
+    None
+    """
+
+    # Define font sizes
+    SIZE_TICK_LABEL = 12
+    SIZE_AXIS_LABEL = 18
+    SIZE_TITLE = 22
+    # Define pad sizes
+    PAD_AXH = 18
+    PAD_DEFAULT_AXIS_LABEL = 14
+    PAD_TITLE = 18
+    # Define plot line widths
+    LW_AXIS = 2
+    LW_CURVES = 2
+    LW_SEQUENCE = 2.5
+    SIZE_SCATTER = 40
+    # matplotlib metaparameters 
+    mpl.rcParams['axes.linewidth'] = LW_AXIS
+    mpl.rcParams['xtick.major.size'] = 7#5
+    mpl.rcParams['xtick.major.width'] = 2 
+    mpl.rcParams['xtick.minor.size'] = 1
+    mpl.rcParams['xtick.minor.width'] = 1
+    mpl.rcParams['ytick.major.size'] = 7#5
+    mpl.rcParams['ytick.major.width'] = 2 
+    mpl.rcParams['ytick.minor.size'] = 1
+    mpl.rcParams['ytick.minor.width'] = 1
+    mpl.rcParams['axes.titlepad'] = PAD_AXH
+    plt.rcParams['figure.constrained_layout.use'] = True
+    mpl.rcParams['font.sans-serif'] = ['Droid Sans']
+    noise_color = '#2CA02C'# Green
+
+    ## Check if plot directory exists
+    #if os.path.exists(plot_dir) == False:
+    #    raise ValueError("Path " + plot_dir + " does not exist.")
+
+    # Lists will store values corresponding to each eta
+    min_avg_infid_list = [] # List of average minimum infidelities found in each job directory
+    nPulse_list = [] # List containing each run's number of pulses
+    maxJ_list = [] # List containing each run's highest action harmonic
+
+
+    print("Reading from directory "+ data_dir)
+    job_counter = 0
+    # For every file in data_dir
+    for file in os.listdir(data_dir):
+        if file.startswith(subdir_prefix):
+            file_fail_counter = 0
+            Nfiles = len(os.listdir(os.path.join(data_dir, file))) # Number files in subdirectory
+
+            run_counter = 0
+            # For every file in the subdirectory
+            for subdir_file in os.listdir(os.path.join(data_dir, file)):
+                if subdir_file.startswith(subsubdir_prefix):
+                    try:
+                        oDir = os.path.join(data_dir, file, subdir_file) # Directory with output data
+
+                        # Load data
+                        if job_counter == 0 and run_counter==0:
+                            freq = np.loadtxt(os.path.join(oDir, 'freq.txt'))
+                            sOmega = np.loadtxt(os.path.join(oDir, 'sOmega.txt'))
+                            maxTime = np.loadtxt(os.path.join(oDir, 'maxTime.txt'))
+                            
+                        # Load numPulse, maxJ
+                        nPulse = int( np.loadtxt(os.path.join(oDir, 'nPulse.txt')) ) # Number of pulse applications
+                        harmonics = np.loadtxt(os.path.join(oDir, 'harmonics.txt')).astype(int)
+                        maxJ = np.max(harmonics)
+                        nPulse_list.append(nPulse)
+                        maxJ_list.append(maxJ)
+
+                        # Load noise and freq and make sure consistent
+                        new_sOmega = np.loadtxt(os.path.join(oDir, 'sOmega.txt'))
+                        new_freq = np.loadtxt(os.path.join(oDir, 'freq.txt'))
+                        if not np.array_equal(sOmega, new_sOmega):
+                            raise ValueError(f"sOmega.txt in {oDir} is not the same as the others.")
+                        if not np.array_equal(freq, new_freq):
+                            raise ValueError(f"freq.txt in {oDir} is not the same as the others.")
+                        
+                        max_final_fid = np.loadtxt(os.path.join(oDir, 'fid.txt'))[-1]
+                        min_final_infid = 1 - max_final_fid
+                        min_avg_infid_list.append(min_final_infid)
+                        
+                        run_counter += 1
+                    
+                    except FileNotFoundError:
+                        raise FileNotFoundError(f"{oDir} not found or is missing data.")
+                else:
+                    print(f"File {oDir} is not a target file. Trying next file.")
+                    file_fail_counter += 1
+
+            if file_fail_counter == Nfiles:
+                raise Exception("No target files found in {os.path.join(data_dir, file)}.")
+        job_counter += 1
+
+
+    if len(harmonics) == 6: 
+        harmonic_title = 'Harmonic Set $\{\pm 1, \pm 2, \pm J\}$'
+    if len(harmonics) == 8: 
+        harmonic_title = 'Harmonic Set $\{\pm 1, \pm 2, \pm (J-1), \pm J\}$'
+
+    fig = plt.figure(layout = 'constrained', figsize=(10, 10))
+    mosaic = """
+             S.
+             JC
+             """
+    axd = fig.subplot_mosaic(mosaic, width_ratios=[1, 0.1], height_ratios=[0.2, 1])
+
+    # MAKE SPECTRUM PLOT
+
+    # Get cutoff index
+    cutoffFreq = freq[-1]
+    print('cutoffFreq: ', cutoffFreq)
+    # Make array of times
+    max_times = np.linspace(maxTime, 10*maxTime, 100)
+    # Calculate T2star
+    T2star = ps.calculateT2star(cutoffFreq, noise_func, max_times, verbose=True)
+    # Put sOmega in units of 1 / time since it has units rad^2 / time
+    sOmega /= (2 * np.pi)**2
+    # Scale sOmega and freqs in terms of frequency of 1 / T2star
+    sOmega /= (1 / T2star)
+    freq /= (1 / T2star)
+    cutoffIdx = len(sOmega)-1 # Initialize
+    maxS = np.max(sOmega)
+    freq_maxS = freq[np.argmax(sOmega)]
+    for i in range(len(sOmega)-1, -1, -1):
+        if ( (sOmega[i] / freq[i]**2) / (maxS / freq_maxS**2) > 1e-8):
+            cutoffIdx = i
+            break
+    axd['S'].plot(freq[:cutoffIdx], sOmega[:cutoffIdx])
+    #axd['S'].set_xlabel('$\omega / (2\pi) [1/T_2^*]$', fontsize=SIZE_AXIS_LABEL)
+    #axd['S'].set_ylabel('$S(\omega) / (2\pi)^2 [1/T_2^*]$', fontsize=SIZE_AXIS_LABEL)
+    axd['S'].set_xlabel(r'$\frac{\omega}{2\pi} \left[\frac{1}{T_2^*}\right]$', fontsize=SIZE_AXIS_LABEL)
+    axd['S'].set_ylabel(r'$\frac{\mathrm{Re}[S(\omega)]}{(2\pi)^2} \left[\frac{1}{T_2^*}\right]$', fontsize=SIZE_AXIS_LABEL)
+    axd['S'].tick_params(axis='both', which='major', labelsize=SIZE_TICK_LABEL) 
+
+    # MAKE CONTOUR PLOT
+    axd['J'].set_xlabel('$J$', fontsize=SIZE_AXIS_LABEL)
+    axd['J'].set_ylabel('$N$', fontsize=SIZE_AXIS_LABEL)
+    axd['J'].tick_params(axis='both', which='major', labelsize=SIZE_TICK_LABEL) 
+    if plotstyle == "contour":
+        axd['J'].tricontour(maxJ_list, nPulse_list, min_avg_infid_list)
+        contour = axd['J'].tricontourf(maxJ_list, nPulse_list, min_avg_infid_list)
+    elif plotstyle == "scatter":
+        axd['J'].scatter(maxJ_list, nPulse_list, c=min_avg_infid_list)
+        scatter = axd['J'].scatter(maxJ_list, nPulse_list, c=min_avg_infid_list)
+     
+
+    # MAKE COLORBAR
+    if plotstyle == "contour":
+        cbar = fig.colorbar(contour, cax=axd['C']) 
+    elif plotstyle == "scatter":
+        cbar = fig.colorbar(scatter, cax=axd['C'])
+    cbar.ax.tick_params(labelsize=SIZE_TICK_LABEL)
+    cbar.set_label('1 - Fidelity', loc='center', labelpad=10, fontsize=SIZE_AXIS_LABEL)
+
+    if save is not None:
+        plt.savefig(save, dpi=300)
+    if show:
+        plt.show()
+    plt.close()
+
+    return
+
 if __name__=='__main__':
      
     # Load data
@@ -823,5 +1232,12 @@ if __name__=='__main__':
     pd = '/home/charlie/Documents/ml/CollectiveAction/paper_plots'
     #temperature_sweep(dd, pd, show=False)
     #single_eta_multi_run(dd, show=True)
-    multi_eta_multi_run(dd, show=True)
+    #multi_eta_multi_run(dd, show=True)
     #multi_single_eta_plots(dd, save=pd)
+
+#def num_pulse_vs_harmonic(data_dir, noise_func, subdir_prefix='N', subsubdir_prefix='J', show = True, save = None):
+    max_time = 1
+    IR_cutoff = 1 / max_time
+    S0 = 1
+    noise_func = lambda x: S0 / np.where(x <= IR_cutoff, 1, x)
+    num_pulse_vs_harmonic(dd, noise_func)

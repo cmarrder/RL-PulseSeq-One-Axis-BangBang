@@ -514,6 +514,8 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
   /usr/include/features.h \
   /usr/include/gnu/stubs-64.h \
   /usr/include/gnu/stubs.h \
+  /usr/include/gsl/gsl_sf_expint.h \
+  /usr/include/gsl/gsl_sf_result.h \
   /usr/include/inttypes.h \
   /usr/include/libintl.h \
   /usr/include/limits.h \
@@ -8263,6 +8265,10 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 
 /usr/local/lib/libtorch/include/ATen/ops/erfinv.h:
 
+/usr/local/lib/libtorch/include/ATen/ops/erfc_ops.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/erfc_native.h:
+
 /usr/local/lib/libtorch/include/ATen/ops/permute_copy.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/linalg_pinv.h:
@@ -8443,8 +8449,6 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 
 /usr/include/string.h:
 
-/usr/local/lib/libtorch/include/ATen/ops/erfc_native.h:
-
 /usr/local/lib/libtorch/include/ATen/ops/fake_quantize_per_tensor_affine_native.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/_foreach_acos.h:
@@ -8498,10 +8502,6 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 /usr/local/lib/libtorch/include/ATen/ops/_test_string_default.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/_empty_per_channel_affine_quantized_ops.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/linalg_cholesky_ex_native.h:
-
-/usr/lib/gcc/x86_64-redhat-linux/12/include/avx512vbmivlintrin.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/not_equal_native.h:
 
@@ -9623,6 +9623,10 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 
 /usr/local/lib/libtorch/include/ATen/ops/_embedding_bag_backward_native.h:
 
+/usr/local/lib/libtorch/include/ATen/ops/linalg_cholesky_ex_native.h:
+
+/usr/lib/gcc/x86_64-redhat-linux/12/include/avx512vbmivlintrin.h:
+
 /usr/include/c++/12/random:
 
 /usr/lib/gcc/x86_64-redhat-linux/12/include/avx512vbmiintrin.h:
@@ -9662,6 +9666,14 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 /usr/lib/gcc/x86_64-redhat-linux/12/include/avx512bitalgintrin.h:
 
 /usr/include/stdlib.h:
+
+/usr/lib/gcc/x86_64-redhat-linux/12/include/avx2intrin.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/matmul_native.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/linalg_svdvals_ops.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/_nested_view_from_buffer.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/hsplit_native.h:
 
@@ -10349,6 +10361,12 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 
 /home/charlie/Documents/ml/CollectiveAction/include/Action.hpp:
 
+/usr/local/lib/libtorch/include/ATen/ops/nll_loss_forward.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/_addmm_activation_native.h:
+
+/usr/include/c++/12/bits/basic_string.h:
+
 /usr/local/lib/libtorch/include/ATen/ops/new_zeros_native.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/_coalesce.h:
@@ -10356,14 +10374,6 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 /usr/include/bits/setjmp.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/copy_sparse_to_sparse.h:
-
-/usr/lib/gcc/x86_64-redhat-linux/12/include/avx2intrin.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/matmul_native.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/linalg_svdvals_ops.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/_nested_view_from_buffer.h:
 
 /usr/include/c++/12/bits/locale_facets_nonio.h:
 
@@ -10422,6 +10432,10 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 /usr/local/lib/libtorch/include/ATen/ops/_foreach_sqrt_native.h:
 
 /usr/include/c++/12/iostream:
+
+/usr/local/lib/libtorch/include/ATen/ops/_convolution_double_backward_ops.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/_upsample_bicubic2d_aa_native.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/_foreach_log10_native.h:
 
@@ -10562,16 +10576,6 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 /usr/local/lib/libtorch/include/ATen/ops/_foreach_sinh_native.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/convolution_overrideable_native.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/_upsample_bicubic2d_aa_native.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/_convolution_double_backward_ops.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/nll_loss_forward.h:
-
-/usr/include/c++/12/bits/basic_string.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/_addmm_activation_native.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/sparse_coo_tensor_ops.h:
 
@@ -10869,6 +10873,8 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 
 /usr/include/bits/types/struct_itimerspec.h:
 
+/usr/include/eigen3/Eigen/src/Eigenvalues/EigenSolver.h:
+
 /usr/local/lib/libtorch/include/ATen/ops/_weight_norm.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/_embedding_bag_per_sample_weights_backward_native.h:
@@ -10917,6 +10923,8 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 
 /usr/local/lib/libtorch/include/ATen/ops/_fake_quantize_learnable_per_channel_affine_ops.h:
 
+/usr/include/gsl/gsl_sf_result.h:
+
 /usr/local/lib/libtorch/include/ATen/ops/_foreach_log2.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/grid_sampler_3d_backward_ops.h:
@@ -10952,6 +10960,14 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 /usr/local/lib/libtorch/include/ATen/ops/_foreach_mul.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/bincount_ops.h:
+
+/usr/include/gsl/gsl_sf_expint.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/log10_meta.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/_empty_affine_quantized_ops.h:
+
+/usr/local/lib/libtorch/include/ATen/ops/erf_native.h:
 
 /home/charlie/Documents/ml/CollectiveAction/include/Agent.hpp:
 
@@ -11679,8 +11695,6 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 
 /usr/include/eigen3/Eigen/src/plugins/ReshapedMethods.h:
 
-/usr/local/lib/libtorch/include/ATen/ops/erfc_ops.h:
-
 /usr/local/lib/libtorch/include/ATen/ops/topk_meta.h:
 
 /usr/local/lib/libtorch/include/ATen/core/enum_tag.h:
@@ -11892,8 +11906,6 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 /usr/local/lib/libtorch/include/ATen/ops/_embedding_bag_native.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/_sparse_csc_tensor_unsafe.h:
-
-/usr/include/eigen3/Eigen/src/Eigenvalues/EigenSolver.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/linalg_vecdot_native.h:
 
@@ -14894,9 +14906,3 @@ CMakeFiles/learn.dir/src/learn.cpp.o: /home/charlie/Documents/ml/CollectiveActio
 /usr/local/lib/libtorch/include/ATen/ops/eq_meta.h:
 
 /usr/local/lib/libtorch/include/ATen/ops/erf.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/log10_meta.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/_empty_affine_quantized_ops.h:
-
-/usr/local/lib/libtorch/include/ATen/ops/erf_native.h:

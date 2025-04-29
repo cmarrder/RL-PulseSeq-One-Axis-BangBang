@@ -10,7 +10,19 @@
 #include "Sequence.hpp"
 #include "Param.hpp"
 #include "GaussQuad.hpp"
+#include <gsl/gsl_sf_expint.h> // Package for Si and Ci, the sin and cos integrals.
 
+/*
+Choose from the following noise options:
+
+  fermi_dirac
+  1_over_f_with_low_cutoff
+  lorentzian
+  lorentzians
+  gaussians
+
+ */
+std::string noise = "lorentzians";//"1_over_f_with_low_cutoff";
 constexpr bool useFFT = false;
 constexpr double cutoffEps = 1e-6;
 
@@ -24,9 +36,8 @@ VectorXd myReciprocal(const VectorXd& x, const double epsilon)
 {
   // Can't just name this function reciprocal because there is a function named reciprocal in Torch library.
   // Calculate reciprocal of x. If |x| < epsilon, then return epsilon.
-  //VectorXd zeroRemoved = (x.array().abs() < 1e-12).select(VectorXd::Constant(x.size(), 1e-12), x);
-  VectorXd zeroRemoved = (x.array().abs() < epsilon).select(VectorXd::Constant(x.size(), epsilon), x);
-  return 1 / zeroRemoved.array();
+  VectorXd zeroRemoved = (abs(x.array()) < epsilon).select(VectorXd::Constant(x.size(), epsilon), x);
+  return inverse(zeroRemoved.array()).matrix();
 }
 
 VectorXd heaviside(const VectorXd& x)
@@ -40,19 +51,30 @@ VectorXd boxcar(const VectorXd& x, const double center, const double width)
   // Boxcar function as a function of x.
   double left = center - width / 2.0;
   double right = center + width / 2.0;
-  return heaviside(x.array() - left) - heaviside(x.array() - right);
+  return heaviside((x.array() - left).matrix()) - heaviside((x.array() - right).matrix());
 }
 
 VectorXd sinc(const VectorXd& x)
 {
   double EPS = 1e-20;
-  //int dim = x.size();
-  //VectorXd res(dim);
-  //for (int i = 0; i < dim; i++)
-  //  res(i) = (fabs(x(i)) < EPS ? 1 : sin(M_PI * x(i)) / (M_PI * x(i)));
-  VectorXd res;
-  res = (x * M_PI).array().sin() * myReciprocal(x * M_PI, EPS).array();
+  VectorXd y = x * M_PI;
+  VectorXd res = ( sin(y.array()) * myReciprocal(y, EPS).array() ).matrix();
   return res;
+}
+
+double sinc(const double x)
+{
+  double EPS = 1e-20;
+  double y = 0.0;
+  if (x == 0.0)
+  {
+    y = M_PI * EPS; 
+  }
+  else
+  {
+    y = M_PI * x;
+  }
+  return std::sin(y) / y;
 }
 
 VectorXd lorentzian(const VectorXd& x, const double center, const double fwhm)
@@ -60,16 +82,8 @@ VectorXd lorentzian(const VectorXd& x, const double center, const double fwhm)
   // Normalized Lorentzian as a function of x.
   int nA = x.size();
   VectorXd numerator = VectorXd::Ones(nA) * fwhm / 2 / M_PI;
-  VectorXd denominator = (x.array() - center).pow(2) + std::pow(fwhm / 2, 2);
+  VectorXd denominator = ( (x.array() - center).pow(2) + std::pow(fwhm / 2, 2) ).matrix();
   return numerator.cwiseQuotient(denominator);
-}
-
-VectorXd gaussian(const VectorXd& x, const double mu, const double sigma)
-{
-  // Normalized Gaussian as a function of x.
-  VectorXd numerator = exp(-square(x.array() - mu) / 2 / sigma);
-  double denominator = std::sqrt(2 * M_PI * sigma * sigma); 
-  return numerator / denominator;
 }
 
 VectorXd lorentzians(const VectorXd& x, const VectorXd& centers, const VectorXd& fwhms, const VectorXd& heights)
@@ -86,6 +100,14 @@ VectorXd lorentzians(const VectorXd& x, const VectorXd& centers, const VectorXd&
   return sum;
 }
 
+VectorXd gaussian(const VectorXd& x, const double mu, const double sigma, const double amplitude)
+{
+  // Normalized Gaussian as a function of x.
+  VectorXd numerator = ( exp(-square((x.array() - mu) / sigma) / 2) ).matrix();
+  double denominator = sigma * std::sqrt(2 * M_PI); 
+  return amplitude * numerator / denominator;
+}
+
 VectorXd gaussians(const VectorXd& x, const VectorXd& mus, const VectorXd& sigmas, const VectorXd& heights)
 {
   // Sum of Gaussians. Each of which is normalized.
@@ -96,12 +118,29 @@ VectorXd gaussians(const VectorXd& x, const VectorXd& mus, const VectorXd& sigma
   VectorXd sum = VectorXd::Zero(nA);
   for (int k = 0; k < nCenter; k++)
   {
-    sum += heights(k) * gaussian(x, mus(k), sigmas(k));
+    sum +=  gaussian(x, mus(k), sigmas(k), heights(k));
   }
   return sum;
 }
 
+double x_Si(const double x)
+{
+  return x * gsl_sf_Si(x);
+}
 
+double xSq_Ci(const double x)
+{
+  if (x == 0.0)
+  {
+    return 0.0;
+  }
+  else
+  {
+    return x * x * gsl_sf_Ci(x);
+  }
+}
+
+// HERE: CONTINUE SWITCHING ARRAY BACK TO VECTOR
 
 class Crystal {
 
@@ -125,6 +164,7 @@ class Crystal {
   double initialAvgInfid;
   VectorXcd FT_of_ft_term1;
   VectorXcd FT_of_ft_prefactor;
+  VectorXd FT_of_ft_2_times_signs;
   
   VectorXd initialCenterTimes()
   {
@@ -145,89 +185,69 @@ class Crystal {
     VectorXd centers = (range.array() + 0.5) / denom;
     return centers;
   }
-  
-  VectorXd computeSOmega(VectorXd frequencies) const
+
+  VectorXd fermiDiracDistrib(VectorXd frequencies, double chemPot, double temperature)
+  {
+    VectorXd y = VectorXd::Zero(frequencies.size());
+    VectorXd x = ( (frequencies.array() - chemPot) / temperature ).matrix();
+    y = ( inverse((exp(x.array()) + 1)) ).matrix();
+    return y;
+  }
+
+  VectorXd computeSOmega(VectorXd frequencies)
   {
     VectorXd somega = VectorXd::Zero(nFreq);
     
-    //// UNCOMMENT THE NOISE MODEL YOU WANT BELOW: 
-    
-    /*
-    //// FERMI-DIRAC:
-    VectorXd ONE = VectorXd::Ones(frequencies.size());
-    VectorXd v = (frequncies - noiseParam1 * ONE) / noiseParam2;
-    somega = ONE.array() / (v.array().exp() + ONE.array());
-    */
-
-             
-    //// 1/f NOISE:
-    somega = myReciprocal(frequencies, 1e-3);
-    
-
-    /*     
-    //// LORENTZIAN:
-    double flipRate = (1.0 / 10.0) * (1.0 / maxTime);
-    double fwhm = 4 * flipRate;
-    //// Divide output by number of elements in centers to normalize.
-    somega = lorentzian(freq, 0, fwhm);
-    */
-
-    /* 
-    //// SUM OF LORENTZIANS:
-    //VectorXd centers = peakLocCPMG(); // Place Lorentzian at each peak of CPMG Filter function
-    //VectorXd fwhms = VectorXd::Ones(nPeaks).array() / 2;
-    //VectorXd heights = pow(centers.array(), -2);
-    double cpmgPeakFreq = nPulse / (2 * maxTime); // The first peak frequency of the CPMG filter function
-    //Vector2d centers(0.0, 0.7 * cpmgPeakFreq); // Place Lorentzian at each peak of CPMG Filter function
-    Vector2d centers(0.0, 0.7 * cpmgPeakFreq); // Place Lorentzian at origin and some fraction of location of peak of CPMG Filter function
-    int nPeaks = centers.size(); 
-    Vector2d fwhms(1.0 / 2.0, 1.0 / 4.0); // MAKE SURE FWHM IS NOT SMALLER THAN KEY FREQUENCIES IN TIME MESH
-    VectorXd heights = myReciprocal(2 * M_PI * fwhms, 1e-6); 
-    //// Divide output by number of elements in centers to normalize.
-    somega = lorentzians(frequencies, centers, fwhms, heights) / nPeaks;
-    */
-
-    /*
-    //// SUM OF GAUSSIANS:
-    VectorXd centers = peakLocCPMG(); // Place Gaussian at each peak of CPMG Filter function
-    centers = (centers.array() + centers(0) / 2).matrix(); // Shift so that noise peaks are in between CPMG filter function peaks
-    int nPeaks = centers.size(); 
-    VectorXd sigmas = VectorXd::Ones(nPeaks).array() / 2;
-    VectorXd heights = pow(centers.array(), -2);
-    somega = gaussians(frequencies, centers, sigmas, heights);
-    */
-   
-    /* 
-    //// BOXCAR FUNCTION:
-    double cpmgPeakFreq = nPulse / (2 * maxTime); // The first peak frequency of the CPMG filter function
-    double freqResolution = 1.0 / maxTime;
-    double bandWidth = noiseParam1 * freqResolution;
-    double bandCenter = noiseParam2 * cpmgPeakFreq;
-    if (noiseParam2 < 1.0)
+    if (noise == "fermi_dirac")
     {
-      std::cout << "Error: Noise bandwidth is less than the frequency resolution!" << std::endl;
+      somega = fermiDiracDistrib(frequencies, noiseParam1, noiseParam2);
     }
-    //somega = myReciprocal(frequencies, 1e-3).array() * (1.0 - boxcar(frequencies, bandCenter, bandWidth)).array();
-    //somega = 1.0 - boxcar(frequencies, bandCenter, bandWidth).array();
-    // Noise which is a sum of two boxcars, each with distinct centers and widths.
-    double boxcar1Right = bandCenter - bandWidth / 2; // Right boundary of 1st boxcar
-    double center1 = (boxcar1Right + 0) / 2;
-    double width1 = boxcar1Right - 0;
-    double boxcar2Left = bandCenter + bandWidth / 2; // Left boundary of 2nd boxcar
-    double center2 = (frequencies(idxMaxFreq) + boxcar2Left) / 2;
-    double width2 = frequencies(idxMaxFreq) - boxcar2Left;
-    somega = boxcar(frequencies, center1, width1) + boxcar(frequencies, center2, width2);
-    */
-    
-    /* 
-    //// STEP FUNCTION
-    //double freqResolution = 1.0 / maxTime;
-    //double bandWidth = noiseParam1 * freqResolution;
-    double cpmgPeakFreq = nPulse / (2 * maxTime); // The first peak frequency of the CPMG filter function
-    double bandWidth = noiseParam1 * cpmgPeakFreq;
-    somega = heaviside(frequencies.array()) - heaviside(frequencies.array() - bandWidth);
-    */
+             
+    else if (noise == "1_over_f_with_low_cutoff")
+    {
+      // Set the frequencies below cutoffFreq to 1
+      double S0 = 1.0;//noiseParam1;
+      double cutoffFreq = 1.0 / maxTime;
+      VectorXd lowFreqRemoved = ( abs(frequencies.array()) < cutoffFreq).select(VectorXd::Constant(frequencies.size(), 1.0), frequencies);
+      somega = S0 * inverse(lowFreqRemoved.array()).matrix();
+    }
 
+    else if (noise == "lorentzian")
+    {
+      double flipRate = (1.0 / 10.0) * (1.0 / maxTime);
+      double fwhm = 4 * flipRate;
+      somega = lorentzian(freq, 0, fwhm);
+    }
+
+    else if (noise == "lorentzians")
+    {
+      //double cpmgPeakFreq = nPulse / (2 * maxTime); // The first peak frequency of the CPMG filter function
+      //Vector2d centers(0.0, 0.7 * cpmgPeakFreq); // Place Lorentzian at origin and some fraction of location of peak of CPMG Filter function
+      //int nPeaks = centers.size(); 
+      //Vector2d fwhms(1.0 / 2.0, 1.0 / 4.0); // MAKE SURE FWHM IS NOT SMALLER THAN KEY FREQUENCIES IN TIME MESH
+      //VectorXd heights = 10 * inverse(2 * M_PI * fwhms.array()).matrix(); 
+      ////// Divide output by number of elements in centers to normalize.
+      //somega = lorentzians(frequencies, centers, fwhms, heights) / nPeaks;
+
+      VectorXd centers {{0.0, 2.0, 6.5, 18.5, 24.0, 30.5, 32.0, 34.5, 35.5, 39.0, 42.0}};
+      VectorXd fwhms {{0.97791257, 0.69318029, 1.33978924, 1.22886943, 1.04032235,
+	      0.57028931, 1.85807798, 2.40010327, 0.71804862, 1.9982775, 0.76180626}};
+      VectorXd heights {{10.0, 7.07106781, 3.9223227, 2.32495277, 2.04124145, 1.81071492,
+	      1.76776695, 1.70251306, 1.67836272, 1.60128154, 1.5430335}};
+
+      somega = 10 * lorentzians(frequencies, centers, fwhms, heights);
+    }
+
+    else if (noise == "gaussians")
+    {
+      VectorXd centers = peakLocCPMG(); // Place Gaussian at each peak of CPMG Filter function
+      centers = ( centers.array() + centers(0) / 2 ).matrix(); // Shift so that noise peaks are in between CPMG filter function peaks
+      int nPeaks = centers.size(); 
+      VectorXd sigmas = VectorXd::Ones(nPeaks) / 2;
+      VectorXd heights = ( centers.array().pow(-2) ).matrix();
+      somega = gaussians(frequencies, centers, sigmas, heights);
+    }
+   
     return somega; 
   }
 
@@ -242,38 +262,25 @@ class Crystal {
         
         VectorXcd FT_of_ft = VectorXcd::Zero(nTimePts);
         FFT<double> fft;
-        fft.fwd(FT_of_ft, ctrlSigPadded);
-        return dTime * FT_of_ft(seq(0, idxMaxFreq)); // Only consider the positive freqs. Normalize by multiplying by dTime.
+        fft.fwd(FT_of_ft, ctrlSigPadded.matrix());
+        return dTime * FT_of_ft(seq(0, idxMaxFreq)).array(); // Only consider the positive freqs. Normalize by multiplying by dTime.
     }
-    //else
-    //{
-    //    VectorXd timeWithEnds = VectorXd::Zero(nPulse + 2);
-    //    timeWithEnds(0) = 0;
-    //    timeWithEnds(nPulse + 1) = maxTime;
-    //    timeWithEnds(seq(1, nPulse)) = sequence.getCenterTimes();
-    //    
-    //    VectorXd boxcarWidths = timeWithEnds(seq(1, nPulse+1)) - timeWithEnds(seq(0, nPulse));
-    //    VectorXd boxcarCenters = (timeWithEnds(seq(1, nPulse+1)) + timeWithEnds(seq(0, nPulse))) / 2;
-
-    //    
-    //    VectorXcd FT_of_ft = VectorXcd::Zero(nFreq);
-    //    for (int k = 0; k < nPulse + 1; k++) {
-    //            VectorXd boxFT = sinc(freq * boxcarWidths(k));
-    //            FT_of_ft += (std::pow(-1, k) * (-I * 2.0 * M_PI * freq * boxcarCenters(k)).array().exp() * boxcarWidths(k) * boxFT.array()).matrix();
-    //    }
-    //    return FT_of_ft;
-    //}
     else
     {
-
-	VectorXd centerTimes = sequence.getCenterTimes();
+        VectorXd timeWithEnds = VectorXd::Zero(nPulse + 2);
+        timeWithEnds(0) = 0;
+        timeWithEnds(nPulse + 1) = maxTime;
+        timeWithEnds(seq(1, nPulse)) = sequence.getCenterTimes();
+        
+        VectorXd boxcarWidths = timeWithEnds(seq(1, nPulse+1)) - timeWithEnds(seq(0, nPulse));
+        VectorXd boxcarCenters = (timeWithEnds(seq(1, nPulse+1)) + timeWithEnds(seq(0, nPulse))) / 2;
 
         VectorXcd FT_of_ft = VectorXcd::Zero(nFreq);
-        for (int k = 0; k < nPulse; k++) {
-		double tk = centerTimes(k);
-		FT_of_ft += ((-I * M_PI * (2 * freq.array() * tk + k + 1)).array().exp()).matrix();
+        for (int k = 0; k < nPulse + 1; k++) {
+                VectorXd boxFT = sinc(freq * boxcarWidths(k));
+                FT_of_ft = FT_of_ft +
+			( std::pow(-1, k) * exp(-I * 2.0 * M_PI * freq.array() * boxcarCenters(k)) * boxcarWidths(k) * boxFT.array() ).matrix();
         }
-	FT_of_ft = (FT_of_ft_prefactor.array() * (FT_of_ft_term1.array() + 2 * FT_of_ft.array())).matrix();
         return FT_of_ft;
     }
   }
@@ -344,6 +351,7 @@ class Crystal {
     if (somega.size() != frequencies.size())
     {
       std::cout << "In getCutoffIndex, somega and frequencies of different sizes." << std::endl;
+      exit(0);
     }
     int numF = frequencies.size();
     for (int k = numF - 1; k > -1; k--)
@@ -357,10 +365,29 @@ class Crystal {
     return numF - 1;
   }
 
-  //double getCutoffFrequency()
-  //{
-  //  // HERE
-  //}
+  double getCutoffFrequency(double initialGuess)
+  {
+    // Determine UV Cutoff
+    Vector2d S_div_freq_sq;
+    Vector2d freqTestPts;
+
+    double freqIncrement = initialGuess / 100.0;
+    double freqMax = initialGuess + freqIncrement;
+
+    // Initialize
+    freqTestPts << initialGuess, freqMax;
+    S_div_freq_sq = ( computeSOmega(freqTestPts).array() / pow(freqTestPts.array(), 2.0) ).matrix();
+
+    while (S_div_freq_sq(1) / S_div_freq_sq(0) > 1e-9)
+    {
+      freqMax = freqMax + freqIncrement;
+      freqTestPts(1) = freqMax;
+      S_div_freq_sq = ( computeSOmega(freqTestPts).array() / pow(freqTestPts.array(), 2.0) ).matrix();
+    }
+
+    return freqMax;
+  }
+
 
   void initializeTimeFreqData()
   {
@@ -377,17 +404,54 @@ class Crystal {
     } 
     else
     {
-      nFreq = 1000; // Global variable. Should be factor of 5.
-      double nyquistFreq = 0.5 / dTime; 
-      dFreq = nyquistFreq / (nFreq + 1); // Make temporary frequency increment. Will be finalized later. 
-      VectorXd tempFreqs = VectorXd::LinSpaced(nFreq, 0, nyquistFreq);
-      VectorXd tempSOmega = computeSOmega(tempFreqs);
-      double maxFreq = tempFreqs(getCutoffIndex(tempSOmega, tempFreqs));
+      double UV_Cutoff_Guess = 0;
+      if (noise == "fermi_dirac")
+      {
+        UV_Cutoff_Guess = noiseParam1;
+      }
+               
+      else if (noise == "1_over_f_with_low_cutoff")
+      {
+        double cutoffFreq = 1.0 / maxTime;
+        UV_Cutoff_Guess = cutoffFreq;
+      }
+
+      else if (noise == "lorentzian")
+      {
+        double flipRate = (1.0 / 10.0) * (1.0 / maxTime);
+        double fwhm = 4 * flipRate;
+        UV_Cutoff_Guess = fwhm / 2.0;
+      }
+
+      else if (noise == "lorentzians")
+      {
+        //double cpmgPeakFreq = nPulse / (2 * maxTime); // The first peak frequency of the CPMG filter function
+        //Vector2d centers(0.0, 0.7 * cpmgPeakFreq); // Place Lorentzian at origin and some fraction of location of peak of CPMG Filter function
+        //Vector2d fwhms(1.0 / 2.0, 1.0 / 4.0); // MAKE SURE FWHM IS NOT SMALLER THAN KEY FREQUENCIES IN TIME MESH
+        //UV_Cutoff_Guess = centers(1) + fwhms(1) / 2.0;
+        UV_Cutoff_Guess = 208.01139517 / 2.0 / M_PI;
+      }
+
+      else if (noise == "gaussians")
+      {
+        VectorXd centers = peakLocCPMG(); // Place Gaussian at each peak of CPMG Filter function
+        centers = ( centers.array() + centers(0) / 2 ).matrix(); // Shift so that noise peaks are in between CPMG filter function peaks
+        int nPeaks = centers.size(); 
+        VectorXd sigmas = VectorXd::Ones(nPeaks) / 2;
+        VectorXd heights = ( centers.array().pow(-2) ).matrix();
+        UV_Cutoff_Guess = centers(nPeaks - 1) + sigmas(nPeaks - 1);
+      }
+
+      nFreq = 40000; // Global variable. Should be factor of 5.
+      double maxFreq = 0;
+      maxFreq = getCutoffFrequency(UV_Cutoff_Guess);
+      std::cout << "maxFreq:" << std::endl << maxFreq << std::endl;
+       
+      // Check is FID filter is normalized, then shift window as long as S / freq**2 from UV below a cutoff, or as long as chi remains the same after freq doubling
 
       // Gaussian quadrature points and weights
       MatrixXd gQuad = shiftedGaussQuad5(0, maxFreq, nFreq/5);
   
-      //freq = VectorXd::LinSpaced(nFreq, 0, maxFreq); // Global variable
       freq = gQuad.col(0);
       weights = gQuad.col(1);
 
@@ -463,22 +527,26 @@ class Crystal {
 
     // Initialize harmonics for action functions. We need to do this in a roundabout way because
     // C++ doesn't allow comma initialization of Eigen::VectorXd instances when in a class but outside of a method.
-    VectorXd harmonics(8);
-    harmonics << 1, -1, 2, -2, 7, -7, 8, -8;
+    //
+    //VectorXd harmonics(8);
+    //double J = static_cast<double>(nPulse);
+    //harmonics << 1, -1, 2, -2, J-1, -(J-1), J, -J;
+    //
+    VectorXd harmonics(6);
+    double J = param.maxJ;//static_cast<double>(nPulse);
+    harmonics << 1, -1, 2, -2, J, -J;
     actionHarmonics = harmonics;
-    //actionEtas = (nPulse / actionHarmonics.array()).abs() * etaN; 
-    actionEtas = (1 / actionHarmonics.array()).abs() * eta1; 
 
-    std::cout << "actionHarmonics:" << std::endl << actionHarmonics.transpose() <<std::endl;
-    std::cout << "actionEtas:" << std::endl << actionEtas.transpose() <<std::endl;
+    //actionEtas = ( (nPulse / actionHarmonics.array()).abs() * etaN ).matrix(); 
+    actionEtas = ( (1 / actionHarmonics.array()).abs() * eta1 ).matrix(); 
+
+    std::cout << "nPulse: " << nPulse << std::endl;
+    std::cout << "actionHarmonics:" << std::endl << actionHarmonics.transpose() << std::endl;
+    std::cout << "actionEtas:" << std::endl << actionEtas.transpose() << std::endl;
    
     initializeTimeFreqData(); 
     sOmega = computeSOmega(freq);
     weightedSOmega = sOmega.cwiseProduct(weights);
-
-    // Calculate ahead of time:
-    FT_of_ft_term1 = -1 + (-I * M_PI * (2 * freq.array() * maxTime + nPulse + 1)).array().exp();
-    FT_of_ft_prefactor = (I / 2.0 / M_PI) * myReciprocal(freq, 1e-20);
 
     if (useFFT == true)
     {
@@ -488,6 +556,8 @@ class Crystal {
     sequence.updateCenterTimes(initialCenterTimes());
 
     writeInitial(param.oDir);
+
+    std::cout << "Initial fid: " << avgFid() << std::endl;
 
   }
 
@@ -499,7 +569,6 @@ class Crystal {
   void step(int action)
   {
     VectorXd oldTimes = sequence.getCenterTimes();
-    //sequence.updateCenterTimes(actionList[action](oldTimes)); // Used this when action functions encoded as fixed function objects.
     VectorXd newTimes = kappa(oldTimes, actionHarmonics[action], actionEtas[action]);
     sequence.updateCenterTimes(newTimes);
   }
@@ -511,17 +580,83 @@ class Crystal {
     feature = sequence.getCenterTimes();
     return feature;
   }
-    
+
+  double chi_1_over_f_low_cutoff(double S0, double freqCutoff) const
+  {
+    VectorXd timeWithEnds = VectorXd::Zero(nPulse + 2);
+    timeWithEnds(0) = 0;
+    timeWithEnds(nPulse + 1) = maxTime;
+    timeWithEnds(seq(1, nPulse)) = sequence.getCenterTimes();
+    double angfreqCutoff = 2 * M_PI * freqCutoff;
+
+    double sum1 = 0.0;
+    double sum2 = 0.0;
+    double sum3 = 0.0;
+    double sum4 = 0.0;
+
+    for (int n = 0; n < nPulse + 1; n++)
+    {
+      double an = timeWithEnds(n+1) - timeWithEnds(n);
+      double phase = angfreqCutoff * an;
+      sum1 += x_Si(phase) + std::cos(phase) - 1;
+      sum3 += an * an * (-gsl_sf_Ci(phase) + 0.5 * std::pow(sinc(an * freqCutoff), 2) + sinc(2 * an * freqCutoff));
+    }
+
+    for (int i = 0; i < nPulse; i++)
+    {
+      for (int j = i+1; j < nPulse + 1; j++)
+      {
+        double sign = std::pow(-1.0, i+j);
+	// Define time differences for the calculation
+        double phi1 = angfreqCutoff * (timeWithEnds(j) - timeWithEnds(i+1));
+        double phi2 = angfreqCutoff * (timeWithEnds(j+1) - timeWithEnds(i));
+        double phi3 = angfreqCutoff * (timeWithEnds(j) - timeWithEnds(i));
+        double phi4 = angfreqCutoff * (timeWithEnds(j+1) - timeWithEnds(i+1));
+
+        sum2 += sign *
+                (x_Si(phi1) + x_Si(phi2)
+                - x_Si(phi3) - x_Si(phi4)
+                + std::cos(phi1) + std::cos(phi2) - std::cos(phi3) - std::cos(phi4));
+        sum4 += sign *
+                ( - xSq_Ci(phi1) - xSq_Ci(phi2)
+                + xSq_Ci(phi3) + xSq_Ci(phi4)
+                + phi1 * std::sin(phi1) + phi2 * std::sin(phi2)
+                - phi3 * std::sin(phi3) - phi4 * std::sin(phi4)
+                - std::cos(phi1) - std::cos(phi2) + std::cos(phi3) + std::cos(phi4));
+	
+      }
+    }
+    return S0 * ((sum1 + sum2) / (M_PI * angfreqCutoff) + sum3 + sum4 / angfreqCutoff / angfreqCutoff);
+  }
+  
   double chi() const
   {
-    VectorXd fOmegaAbs2 = computeFOmegaAbs2();
     double overlap;
     if (useFFT == true)
     {
+      VectorXd fOmegaAbs2 = computeFOmegaAbs2();
       overlap =  (fOmegaAbs2.head(cutoffIdx).transpose() * sOmega.head(cutoffIdx))(0) * dFreq; // Select 0 element because technically result of vector product is vector of length 1
+    }
+    else if (noise == "1_over_f_with_low_cutoff")
+    {
+      double amplitude = 1;
+      double cutoff = 1.0 / maxTime;
+      overlap = chi_1_over_f_low_cutoff(amplitude, cutoff);
+      
+      //VectorXd fOmegaAbs2 = computeFOmegaAbs2();
+      //overlap =  (fOmegaAbs2.transpose() * weightedSOmega)(0); // Select 0 element because technically result of vector product is vector of length 1
+
+      // Testing:
+      double overlap2 = 0;
+      VectorXd fOmegaAbs2 = computeFOmegaAbs2();
+      overlap2 =  (fOmegaAbs2.transpose() * weightedSOmega)(0); // Select 0 element because technically result of vector product is vector of length 1
+      std::cout << std::endl << "Exact chi:" << std::endl << overlap << std::endl;
+      std::cout << "Numerical chi:" << std::endl << overlap2 << std::endl;
+      std::cout << "Percent error:" << std::endl << (overlap - overlap2) / overlap << std::endl;
     }
     else
     {
+      VectorXd fOmegaAbs2 = computeFOmegaAbs2();
       overlap =  (fOmegaAbs2.transpose() * weightedSOmega)(0); // Select 0 element because technically result of vector product is vector of length 1
     }
     return overlap;
@@ -552,8 +687,6 @@ class Crystal {
  VectorXd getSum() const
   {
     VectorXd fOmegaAbs2 = computeFOmegaAbs2();
-    //double overlap =  (fOmegaAbs2.head(cutoffIdx + 1).transpose() * sOmega.head(cutoffIdx + 1))(0) * dFreq; // Select 0 element because technically result of vector product is vector of length 1
-    
     return fOmegaAbs2.transpose() * sOmega;
   }
 

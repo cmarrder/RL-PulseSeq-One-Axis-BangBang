@@ -19,10 +19,13 @@ template <class State>
 class ReplayBuffer {
 
   size_t memorySize = 100000;
-  size_t batchSize = 64;
+  size_t batchSize = 128;//64;
 
   int stepPtr = 0;
   std::vector<Step<State>> buffer;
+
+  double time_in_push = 0;
+  double time_in_sample = 0;
 
 public:
 
@@ -31,16 +34,29 @@ public:
   void push(const State& state, const int action, const State& next_state, 
     const double reward, const bool done)
   {
+    // TIME START	
+    //std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
     Step<State> step = std::make_tuple(state, action, next_state, reward, done);
     if (buffer.size() < memorySize )
       buffer.push_back(step); //if buffer is less than memory size then add step to end of the buffer.
     else
       buffer[stepPtr] = step; //If buffer size larger than memory replace step at point stepptr.
     stepPtr = (stepPtr + 1) % memorySize;
+
+    // TIME END	
+    //std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    //double num_ns = std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count();
+    //time_in_push += num_ns;
   }
 //Makes the Sample with all attributes much like push does. 
-  Sample<State> sample(std::minstd_rand* g) const
+  Sample<State> sample(std::minstd_rand* g)
+  //Sample<State> sample(std::minstd_rand* g) const
   {
+
+    // TIME START	
+    //std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
     std::vector<State> states;
     std::vector<int> actions;
     std::vector<State> next_states;
@@ -77,7 +93,23 @@ public:
       dones.push_back(std::get<4>(buffer[samplePtr[i]]));
     }
 
+
+    // TIME END	
+    //std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    //double num_ns = std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count();
+    //time_in_sample += num_ns;
+
     return std::make_tuple(states, actions, next_states, rewards, dones);
+  }
+
+
+  double getTimeInPush()
+  {
+	  return time_in_push / 1e9;
+  }
+  double getTimeInSample()
+  {
+	  return time_in_sample / 1e9;
   }
 
 };

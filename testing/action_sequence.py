@@ -590,9 +590,10 @@ def action_sequence_plot(initial_times,
                          max_time,
                          freqs,
                          noise,
+                         noise_func,
+                         fidelities,
                          show=True,
-                         save=None,
-                         weights=None):
+                         save=None):
     """
     PARAMETERS:
     initial_times (list like)
@@ -603,47 +604,58 @@ def action_sequence_plot(initial_times,
     """
 
     # Define font sizes
-    SIZE_TICK_LABEL = 12
-    SIZE_AXIS_LABEL = 16
-    SIZE_TITLE = 22
+    FONT_SCALE = 1.4
+    SIZE_TICK_LABEL = 12 * FONT_SCALE
+    SIZE_AXIS_LABEL = 16 * FONT_SCALE
+    SIZE_TITLE = 16 * FONT_SCALE
     # Define pad sizes
     PAD_AXH = 18
     PAD_DEFAULT_AXIS_LABEL = 14
     PAD_TITLE = 18
     # Define plot line widths
-    LW_AXIS = 2
-    LW_CURVES = 2
-    LW_SEQUENCE = 2.5
-    SIZE_SCATTER = 40
+    LW_AXIS = 2 * FONT_SCALE
+    LW_CURVES = 2.2 * FONT_SCALE
+    LW_SEQUENCE = 2.2 * FONT_SCALE
+    SIZE_SCATTER = 40 * FONT_SCALE
     # matplotlib metaparameters 
     mpl.rcParams['axes.linewidth'] = LW_AXIS
-    mpl.rcParams['xtick.major.size'] = 7#5
-    mpl.rcParams['xtick.major.width'] = 2 
-    mpl.rcParams['xtick.minor.size'] = 1
-    mpl.rcParams['xtick.minor.width'] = 1
-    mpl.rcParams['ytick.major.size'] = 7#5
-    mpl.rcParams['ytick.major.width'] = 2 
-    mpl.rcParams['ytick.minor.size'] = 1
-    mpl.rcParams['ytick.minor.width'] = 1
+    mpl.rcParams['xtick.major.size'] = 7 * FONT_SCALE
+    mpl.rcParams['xtick.major.width'] = 2 * FONT_SCALE
+    mpl.rcParams['xtick.minor.size'] = 1 * FONT_SCALE
+    mpl.rcParams['xtick.minor.width'] = 1 * FONT_SCALE
+    mpl.rcParams['ytick.major.size'] = 7 * FONT_SCALE
+    mpl.rcParams['ytick.major.width'] = 2 * FONT_SCALE
+    mpl.rcParams['ytick.minor.size'] = 1 * FONT_SCALE
+    mpl.rcParams['ytick.minor.width'] = 1 * FONT_SCALE
     mpl.rcParams['axes.titlepad'] = PAD_AXH
     plt.rcParams['figure.constrained_layout.use'] = True
     mpl.rcParams['font.sans-serif'] = ['Droid Sans']
     agent_color = '#984EA3'# Lilac
     noise_color = '#2CA02C'# Green
-    noise_linestyle = 'dashed'
+    noise_linestyle = (0, (3, 1, 1, 1))
 
-    fig = plt.figure(layout = 'constrained', figsize=(12, 10))
+    fig = plt.figure(layout = 'constrained', figsize=(14, 12)) # Size for paper
+    #fig = plt.figure(layout = 'constrained', figsize=(12, 10)) # Size for paper
+    #fig = plt.figure(layout = 'constrained', figsize=(12, 7)) # Size for slides
+    #mosaic = """
+    #         F.P.H.0
+    #         F.P.H.1
+    #         F.P.H.2
+    #         """
     mosaic = """
-             F.P.H.0
-             F.P.H.1
-             F.P.H.2
+             F.PH.0
+             F.PH.1
+             F.PH.2
              """
-    axd = fig.subplot_mosaic(mosaic, width_ratios=[1, 0.1, 3, 0.1, 0.25, 0.3,  2])
+    #axd = fig.subplot_mosaic(mosaic, width_ratios=[1, 0.1, 3, 0.1, 0.25, 0.3,  2])
+    #axd = fig.subplot_mosaic(mosaic, width_ratios=[0.7, 0.05, 3, 0.1, 0.25, 0.15,  2])
+    axd = fig.subplot_mosaic(mosaic, width_ratios=[0.7, 0.01, 3, 0.3, 0.01,  2])
     # Make harmonic set title
     harmonic_title = 'Harmonic Set $\{'
     abs_h = np.abs(harmonic_set)
     unique_abs_h, counts = np.unique(abs_h, return_counts=True)
     for i, h in np.ndenumerate(unique_abs_h):
+        # If duplicate, then we can assume there was positive and negative copy of the element
         if counts[i] > 1:
             harmonic_title += '\pm' + str(h)
         else:
@@ -695,14 +707,14 @@ def action_sequence_plot(initial_times,
     axd['H'].set_yticks(ticks=y2tick_locs, labels = y2tick_labels, horizontalalignment='center')
     axd['H'].set_yticks(ticks=(y2tick_locs + 0.5)[:-1], minor=True)
     axd['H'].tick_params(axis='both', which='both', length=0, width=0, color='black', size=0, labelsize=SIZE_TICK_LABEL)
-    axd['H'].tick_params(axis='y', which='major', direction='in', pad=-12.25)
-    axd['H'].set_ylabel('Harmonics Chosen', fontsize=SIZE_AXIS_LABEL, rotation=270, labelpad=PAD_TITLE, verticalalignment='center')
+    axd['H'].tick_params(axis='y', which='major', direction='in', pad=-18)
+    axd['H'].set_ylabel('Harmonics Chosen', fontsize=SIZE_AXIS_LABEL, rotation=270, labelpad=PAD_TITLE * 1.2, verticalalignment='center')
     axd['H'].yaxis.set_label_position("right") # Put y axis label on the right side of plot
     axd['H'].yaxis.tick_right() # Put y axis ticks and labels on the right
     axd['H'].xaxis.set_major_locator(ticker.NullLocator()) # Remove ticks
     axd['H'].spines[['top', 'bottom', 'right', 'left']].set_visible(False)
+    rect_width = 1.05
     rect_origin = (0, vlines_ymin[0])
-    rect_width = 1
     rect_height = vlines_ymin[-1]-vlines_ymin[0]
     rect = patches.Rectangle(rect_origin, rect_width, rect_height, linewidth=LW_AXIS, edgecolor='black', facecolor='none')
     axd['H'].hlines(vlines_ymin[1:-1], rect_origin[0], rect_origin[0] + rect_width, linewidth=LW_AXIS, color='black')
@@ -726,33 +738,25 @@ def action_sequence_plot(initial_times,
             break
     for n in range(nStep + 1):
         axd['P'].vlines(pulse_times, np.flip(vlines_ymin)[n], np.flip(vlines_ymax)[n], color = agent_color, lw=LW_SEQUENCE)
-        ff = ps.FilterFunc(freqs, pulse_times, max_time)
-        ###########chi = ps.chi(freqs, noise, ff)
-        if weights is not None:
-            chi = ps.chi(freqs[:cutoffIdx], noise[:cutoffIdx], ff[:cutoffIdx], weights=weights[:cutoffIdx])
-        else:
-            chi = ps.chi(freqs[:cutoffIdx], noise[:cutoffIdx], ff[:cutoffIdx])
-         
-        fid_array[n] = ps.fidelity(chi)
         # Get fidelity and filter function for the first filter function plot
         if n == 0:
-            fid_slices[0] = fid_array[n]
-            ff_slices[0] = ff
+            fid_slices[0] = fidelities[n]
+            ff_slices[0] = ps.FilterFunc(freqs, pulse_times, max_time)
         # Get fidelity and filter function for the second filter function plot
         elif n == int(nStep / 2):
-            fid_slices[1] = fid_array[n]
-            ff_slices[1] = ff
+            fid_slices[1] = fidelities[n]
+            ff_slices[1] = ps.FilterFunc(freqs, pulse_times, max_time)
         if n < nStep:
             action = action_sequence[n]
             pulse_times = kappa(pulse_times, harmonic_set[action], eta_set[action], max_time)
     # Get fidelity and filter function for the third filter function plot
-    ff_slices[2] = ff
-    fid_slices[2] = fid_array[n]
+    fid_slices[2] = fidelities[n]
+    ff_slices[2] = ps.FilterFunc(freqs, pulse_times, max_time)
     
     ##########         FIDELITY PLOT         ##########
     ###################################################
-    
-    infid_array = 1 - fid_array
+
+    infid_array = 1 - fidelities
     min_infid = np.min(infid_array)
     max_infid = np.max(infid_array)
     axd['F'].sharey(axd['P'])
@@ -762,7 +766,8 @@ def action_sequence_plot(initial_times,
     axd['F'].grid(axis='y') # Add gridlines
     axd['F'].set_xlim(0.95 * min_infid, 1.05 * max_infid)
     axd['F'].scatter(infid_array, np.flip(np.arange(nStep + 1)), s=SIZE_SCATTER)
-    axd['F'].set_xticks(ticks=[min_infid, (max_infid + min_infid) / 2, max_infid])
+    #axd['F'].set_xticks(ticks=[min_infid, (max_infid + min_infid) / 2, max_infid])
+    axd['F'].set_xticks(ticks=[0, (max_infid * 1.10) / 2, max_infid * 1.10])
     axd['F'].xaxis.set_major_formatter('{x:.2f}') # Set format of x ticks to 2 decimal places
     # Set the minimum number of ticks for the x-axis
     #axd['F'].xaxis.set_major_locator(ticker.MaxNLocator(nbins='auto', min_n_ticks=3))
@@ -772,18 +777,34 @@ def action_sequence_plot(initial_times,
 
     # Find max index for plotting
     cutoff_idx = len(noise)-1 # Initialize
+    maxNoise = np.max(noise)
+    freq_maxNoise = freqs[np.argmax(noise)]
     for i in range(len(noise)-1, -1, -1):
-        if (noise[i] / freqs[i]**2 > 1e-3):
+        if ( (noise[i] / freqs[i]**2) / (maxNoise / freq_maxNoise**2) > 1e-8):
             cutoff_idx = i
             break
-    angfreqs = 2 * np.pi * freqs # Convert to angular frequency
+    # Get T2star, the fundamental timescale of our system
+    max_times = np.linspace(max_time, 10*max_time, 100)
+    T2star = ps.calculateT2star(freqs[-1], noise_func, max_times, verbose=True)
+
+    # Put sOmega in units of 1 / time since it has units rad^2 / time
+    noise /= (2 * np.pi)**2
+    # Scale sOmega and freqs in terms of frequency of 1 / T2star
+    noise /= (1 / T2star)
+    freqs /= (1 / T2star)
+    # Put filter functions in units of T2star since it has units of time already
+    ff_slices /= T2star
+
+    #angfreqs = 2 * np.pi * freqs # Convert to angular frequency
     for j in range(3):
         ax_key = str(j)
-        axd[ax_key].plot(angfreqs[:cutoff_idx], ff_slices[j, :cutoff_idx], color=agent_color, label='$F(\omega)$', lw=LW_CURVES)
-        axd[ax_key].plot(angfreqs[:cutoff_idx], noise[:cutoff_idx], color = noise_color, label='$S(\omega)$', lw=LW_CURVES, linestyle=noise_linestyle)
+        #axd[ax_key].plot(freqs[:cutoff_idx], ff_slices[j, :cutoff_idx], color=agent_color, label='$F(\omega)$', lw=LW_CURVES)
+        #axd[ax_key].plot(freqs[:cutoff_idx], noise[:cutoff_idx], color = noise_color, label='$S(\omega)$', lw=LW_CURVES, linestyle=noise_linestyle)
+        axd[ax_key].plot(freqs[:cutoff_idx], ff_slices[j, :cutoff_idx], color=agent_color, label=r'$F(\omega) \left[T_2^*\right]$', lw=LW_CURVES)
+        axd[ax_key].plot(freqs[:cutoff_idx], noise[:cutoff_idx], color = noise_color, label=r'$\mathrm{Re}[S(\omega)]/(2\pi)^2 \left[1/T_2^*\right]$', lw=LW_CURVES, linestyle=noise_linestyle)
         axd[ax_key].tick_params(axis='both', which='major', labelsize=SIZE_TICK_LABEL) 
         axd[ax_key].set_yscale('log')
-        axd[ax_key].legend(prop={'size': SIZE_TICK_LABEL})
+        axd[ax_key].legend(prop={'size': SIZE_TICK_LABEL * 0.9})
         if j == 0:
             axd[ax_key].set_title('Step {0}: Fidelity = {1:.3f}'.format(j, fid_slices[j]), fontsize=SIZE_AXIS_LABEL)
         elif j > 0:
@@ -793,7 +814,8 @@ def action_sequence_plot(initial_times,
                 axd[ax_key].set_title('Step {0}: Fidelity = {1:.3f}'.format(int(nStep/2), fid_slices[j]), fontsize=SIZE_AXIS_LABEL)
             elif j == 2:
                 axd[ax_key].set_title('Step {0}: Fidelity = {1:.3f}'.format(nStep, fid_slices[j]), fontsize=SIZE_AXIS_LABEL)
-                axd[ax_key].set_xlabel('$\omega$', fontsize=SIZE_AXIS_LABEL)
+                #axd[ax_key].set_xlabel('$\omega$', fontsize=SIZE_AXIS_LABEL)
+                axd[ax_key].set_xlabel(r'$\frac{\omega}{2\pi} \left[\frac{1}{T_2^*}\right]$', fontsize=SIZE_AXIS_LABEL)
 
     if save is not None:
         plt.savefig(save, dpi=300)
@@ -806,9 +828,9 @@ if __name__=="__main__":
 
     #job_dir = '/home/charlie/Documents/ml/CollectiveAction/eta_scan_data/1_over_f/harmonics_01_02_08/job_00002/run_00001'
     #job_dir = '/home/charlie/Documents/ml/CollectiveAction/data/job_00003/run_00000'
-    job_dir = '/home/charlie/Documents/ml/CollectiveAction/data'
+    job_dir = '/home/charlie/Documents/ml/CollectiveAction/data_NJ_scan_lorentzians_run1/N_022/J_022'
     #job_dir = '/home/charlie/Documents/ml/CollectiveAction/data_partial_eta1_scan_oops/job_00007/run_00001'
-    save_dir = '/home/charlie/Documents/ml/CollectiveAction/paper_plots/Fig3.svg'
+    #save_dir = '/home/charlie/Documents/ml/CollectiveAction/paper_plots/Fig3_v2.svg'
     action_sequence = list(np.loadtxt(os.path.join(job_dir, 'action.txt'), dtype=int))
     harmonics_arr = np.loadtxt(os.path.join(job_dir, 'harmonics.txt'), dtype=int)
     eta1 = np.loadtxt(os.path.join(job_dir, 'eta1.txt'))
@@ -819,11 +841,20 @@ if __name__=="__main__":
     #bestFilter = np.loadtxt(os.path.join(job_dir, 'bestFilter.txt'))
     weights_arr = np.loadtxt(os.path.join(job_dir, 'weights.txt')) #None
     pulse_times = np.loadtxt(os.path.join(job_dir, 'initialState.txt'))#ps.PDD(Npulse, max_time)
+    fid_arr = np.loadtxt(os.path.join(job_dir, 'fid.txt'))
+
+    centers = np.array([0.0, 2.0, 6.5, 18.5, 24.0, 30.5, 32.0, 34.5, 35.5, 39.0, 42.0])
+    fwhms = np.array([0.97791257, 0.69318029, 1.33978924, 1.22886943, 1.04032235, 0.57028931, 1.85807798, 2.40010327, 0.71804862, 1.9982775, 0.76180626])
+    heights = np.array([10.0, 7.07106781, 3.9223227, 2.32495277, 2.04124145, 1.81071492,
+            1.76776695, 1.70251306, 1.67836272, 1.60128154, 1.5430335])
+    
+    noise_func = lambda v: ps.lorentzians(v, centers, fwhms, heights=heights)
 
     max_time = 1
     Npulse = 8
     eta_arr = np.abs(1 / harmonics_arr) * eta1
 
-    #action_sequence_plot(pulse_times, action_sequence, harmonics_arr, eta_arr, max_time, freqs_arr, noise_arr, save=save_dir, show=False, weights=weights_arr)
-    action_sequence_plot(pulse_times, action_sequence, harmonics_arr, eta_arr, max_time, freqs_arr, noise_arr, weights=weights_arr)
+    save_dir = '/home/charlie/Documents/ml/CollectiveAction/paper_plots/Fig3_N_022_J022.svg'
+    action_sequence_plot(pulse_times, action_sequence, harmonics_arr, eta_arr, max_time, freqs_arr, noise_arr, noise_func, fid_arr, save=save_dir, show=True)
+    #action_sequence_plot(pulse_times, action_sequence, harmonics_arr, eta_arr, max_time, freqs_arr, noise_arr, noise_func, fid_arr)
 

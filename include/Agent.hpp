@@ -6,9 +6,55 @@
 #include <sstream>
 #include <iomanip>
 
+#include <chrono>
+#include <iostream>
+
 #include "Network.hpp"
 #include "ReplayBuffer.hpp"
 #include "Translate.hpp"
+
+void validate_model_io(const torch::nn::Module& model, int expected_input_size, int expected_output_size) {
+    int input_size = -1;
+    int output_size = -1;
+
+    std::vector<std::pair<std::string, torch::Tensor>> linear_weights;
+
+    for (const auto& param : model.named_parameters()) {
+        const std::string& name = param.key();
+
+        // Look for weight tensors of Linear layers (usually ends with "weight")
+        if (name.find("weight") != std::string::npos) {
+            const auto& size = param.value().sizes();
+
+            // Linear layers have 2D weight tensors: [out_features, in_features]
+            if (size.size() == 2) {
+                linear_weights.emplace_back(name, param.value());
+            }
+        }
+    }
+
+    if (linear_weights.size() < 1) {
+        throw std::runtime_error("No linear layers found in model.");
+    }
+
+    // First linear layer's input size
+    input_size = linear_weights.front().second.size(1); // [out, **in**]
+    output_size = linear_weights.back().second.size(0); // [**out**, in]
+
+    if (input_size != expected_input_size) {
+        throw std::runtime_error("Input size mismatch: expected " +
+            std::to_string(expected_input_size) + ", got " + std::to_string(input_size));
+    }
+
+    if (output_size != expected_output_size) {
+        throw std::runtime_error("Output size mismatch: expected " +
+            std::to_string(expected_output_size) + ", got " + std::to_string(output_size));
+    }
+
+    std::cout << "Model input/output size validated: " 
+              << input_size << " -> " << output_size << std::endl;
+}
+
 
 template <class State, int numAction>
 class Agent {
@@ -72,6 +118,24 @@ public:
   void load(std::string fileName) {
     torch::load(dqn, fileName + ".dqn");
     torch::load(target, fileName + ".tgt");
+
+    int nInput = State().size();
+    int nOutput = numAction;
+
+    std::cout << "Going to validate dqn network input/output size." << std::endl;
+    validate_model_io(*dqn, nInput, nOutput);
+    std::cout << "Going to validate target network input/output size." << std::endl;
+    validate_model_io(*target, nInput, nOutput);
+    exit(0);
+  }
+
+  double getTimeInPush()
+  {
+	  return replayBuffer.getTimeInPush();
+  }
+  double getTimeInSample()
+  {
+	  return replayBuffer.getTimeInSample();
   }
 };
 
@@ -97,8 +161,10 @@ int Agent<State, numAction>::proposeAction(const State& state,
     std::vector<double> qValue = toVector(
       dqn->forward(toTensor(state).to(torch::kDouble)));
     return optimumPolicy(qValue);
-  } else
+  }
+  else {
     return randomPolicy(numAction, generator);
+  }
 }
 
 template <class State, int numAction>

@@ -4,13 +4,11 @@
 #include <cmath>
 #include "Sequence.hpp"
 
-//constexpr double actionInterval = 4 * M_PI;
-constexpr size_t numAction = 8;
-
+constexpr size_t numAction = 6;
 
 VectorXd kappa(const VectorXd& centerTimes, const double harmonic, const double eta)
 {
-  return centerTimes.array() + eta * (harmonic * M_PI * centerTimes.array() / maxTime).sin();
+  return ( centerTimes.array() + eta * sin(harmonic * M_PI * centerTimes.array() / maxTime) ).matrix();
 }
 
 /*
